@@ -11,18 +11,15 @@
 				{"default_moments":{
 					"mapping":{"index":"no", "type":"double"},
 					"match":"*.moments.*"}
-				},
-				{"default_strings":{
-					"mapping":{"index":"not_analyzed","type":"string"},
-					"match":"*"
-				}}
+				}
 			],
 			"_all":{
 				"enabled":false
 			},
 			"_source":{
 				"compress":true
-			}
+			},
+			"dynamic" : true
 		}
 	}
 }

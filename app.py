@@ -57,10 +57,8 @@ class d2e:
 
     def transform(self, records):
         for r in records:
-            r.json=CNV.JSON2object(r.json_blob).dict
+            r.json= d2e.summarize(CNV.JSON2object(r.json_blob).dict)
             r.json_blob=None
-
-            d2e.summarize(r.dict)
 
 
     # RESPONSIBLE FOR CONVERTING LONG ARRAYS OF NUMBERS TO THEIR REPRESENTATIVE
@@ -68,9 +66,7 @@ class d2e:
     @staticmethod
     def summarize(r):
         try:
-            if isinstance(r, Map):
-                D.error("Not allowed")
-            elif isinstance(r, dict):
+            if isinstance(r, dict):
                 for k, v in [(k,v) for k,v in r.items()]:
                     new_v=d2e.summarize(v)
                     if isinstance(new_v, Moments):
@@ -83,26 +79,11 @@ class d2e:
                 except Exception, e:
                     for i, v in enumerate(r):
                         r[i]=d2e.summarize(v)
-                    return r
-            else:
-                return r
+            return r
         except Exception, e:
             D.warning("Can not summarize: ${json}", {"json":CNV.object2JSON(r)})
 
 
-            for k, v in [(k,v) for k,v in r.items()]:
-                if isinstance(v, Map):
-                    d2e.summarize(v.dict)
-                elif isinstance(v, dict):
-                    d2e.summarize(v)
-                elif isinstance(v, list):
-                    try:
-                        temp=[("s"+str(i), m) for i, m in enumerate(Moments.new_instance(v).tuple)]
-                        r[k+"_moments"]=hash(temp)
-                        r[k]=None
-                    except Exception, e:
-                        for v2 in v:
-                            d2e.summarize(v2)
 
 
 
@@ -130,3 +111,4 @@ with DB(settings.datazilla) as dz:
     # RUN
     converter=d2e(dz, es)
     converter.run()
+    es.set_refresh_interval(1)
