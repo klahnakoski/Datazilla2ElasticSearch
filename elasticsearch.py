@@ -51,7 +51,10 @@ class ElasticSearch():
 
     # -1 FOR NO REFRESH
     def set_refresh_interval(self, seconds):
-        ElasticSearch.put(self.path+"/_settings", data="{\"index\":{\"refresh_interval\":\""+str(seconds)+"\"}}")
+        ElasticSearch.put(
+             self.settings.host+":"+str(self.settings.port)+"/"+self.settings.index+"/_settings",
+             data="{\"index.refresh_interval\":\""+str(seconds)+"\"}"
+        )
 
 
         

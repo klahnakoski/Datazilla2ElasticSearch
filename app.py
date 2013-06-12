@@ -68,6 +68,28 @@ class d2e:
     @staticmethod
     def summarize(r):
         try:
+            if isinstance(r, Map):
+                D.error("Not allowed")
+            elif isinstance(r, dict):
+                for k, v in [(k,v) for k,v in r.items()]:
+                    new_v=d2e.summarize(v)
+                    if isinstance(new_v, Moments):
+                        #CONVERT MOMENTS' TUPLE TO NAMED HASH (FOR EASIER ES INDEXING)
+                        new_v={"moments":dict([("s"+str(i), m) for i, m in enumerate(new_v.tuple)])}
+                    r[k]=new_v
+            elif isinstance(r, list):
+                try:
+                    return Moments.new_instance(r)
+                except Exception, e:
+                    for i, v in enumerate(r):
+                        r[i]=d2e.summarize(v)
+                    return r
+            else:
+                return r
+        except Exception, e:
+            D.warning("Can not summarize: ${json}", {"json":CNV.object2JSON(r)})
+
+
             for k, v in [(k,v) for k,v in r.items()]:
                 if isinstance(v, Map):
                     d2e.summarize(v.dict)
@@ -75,13 +97,12 @@ class d2e:
                     d2e.summarize(v)
                 elif isinstance(v, list):
                     try:
-                        r[k+"_moments"]=Moments.new_instance(v).tuple
+                        temp=[("s"+str(i), m) for i, m in enumerate(Moments.new_instance(v).tuple)]
+                        r[k+"_moments"]=hash(temp)
                         r[k]=None
                     except Exception, e:
                         for v2 in v:
                             d2e.summarize(v2)
-        except Exception, e:
-            D.warning("Can not summarize: ${json}", {"json":CNV.object2JSON(r)})
 
 
 
@@ -102,6 +123,7 @@ with DB(settings.datazilla) as dz:
     es=ElasticSearch(settings.elasticsearch)
     with open("test_schema.json") as f:
         schema=CNV.JSON2object(f.read(), flexible=True)
+    ElasticSearch.delete_index(settings.elasticsearch)
     ElasticSearch.create_index(settings.elasticsearch, schema)
     es.set_refresh_interval(-1)
 
