@@ -72,7 +72,15 @@ class d2e:
                     if isinstance(new_v, Moments):
                         #CONVERT MOMENTS' TUPLE TO NAMED HASH (FOR EASIER ES INDEXING)
                         new_v={"moments":dict([("s"+str(i), m) for i, m in enumerate(new_v.tuple)])}
-                    r[k]=new_v
+
+                    #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
+                    if k in ["date", "date_loaded"]: new_v*=1000
+
+                    #REMOVE DOT FROM NAME, SO EASIER TO QUERY
+                    new_k=k.replace(".", "_dot_")
+                    r[k]=None
+                    r[new_k]=new_v
+#                    r[k]=new_v
             elif isinstance(r, list):
                 try:
                     return Moments.new_instance(r)

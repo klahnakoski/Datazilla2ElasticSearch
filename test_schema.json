@@ -10,8 +10,8 @@
 			"dynamic_templates":[
 				{"default_moments":{
 					"mapping":{"index":"no", "type":"double"},
-					"match":"*.moments.*"}
-				}
+					"match":"*.moments.*"
+				}}
 			],
 			"_all":{
 				"enabled":false
