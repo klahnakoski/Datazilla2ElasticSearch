@@ -8,9 +8,9 @@
 	"mappings":{
 		"test_results":{
 			"dynamic_templates":[
-				{"default_Cumulant":{
+				{"default_cumulant":{
 					"mapping":{"index":"no", "type":"double"},
-					"match":"*.Cumulant.*"
+					"match":"*.cumulant.*"
 				}}
 			],
 			"_all":{
