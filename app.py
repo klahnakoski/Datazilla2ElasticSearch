@@ -1,7 +1,7 @@
+from math import ceil, floor
 from util.cnv import CNV
-from util.map import Map
 from util.query import Q
-from util.stats import Moments
+from util.stats import Cumulant
 
 from util.db import DB
 from elasticsearch import ElasticSearch
@@ -9,6 +9,8 @@ from util.debug import D
 from util.startup import startup
 
 
+
+DEBUG = False
 
 
 class d2e:
@@ -69,9 +71,9 @@ class d2e:
             if isinstance(r, dict):
                 for k, v in [(k,v) for k,v in r.items()]:
                     new_v=d2e.summarize(v)
-                    if isinstance(new_v, Moments):
+                    if isinstance(new_v, Cumulant):
                         #CONVERT MOMENTS' TUPLE TO NAMED HASH (FOR EASIER ES INDEXING)
-                        new_v={"moments":dict([("s"+str(i), m) for i, m in enumerate(new_v.tuple)])}
+                        new_v={"cumulant":dict([("s"+str(i), m) for i, m in enumerate(new_v.tuple)])}
 
                     #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
                     if k in ["date", "date_loaded"]: new_v*=1000
@@ -83,7 +85,19 @@ class d2e:
 #                    r[k]=new_v
             elif isinstance(r, list):
                 try:
-                    return Moments.new_instance(r)
+                    bottom=0.0
+                    top=0.8
+
+                    ## keep_middle - THE PROPORTION [0..1] OF VALUES TO KEEP, EXTREMES ARE REJECTED
+                    values=[float(v) for v in r]
+
+                    length=len(values)
+                    min=int(floor(length*bottom))
+                    max=int(ceil(length*top))
+                    values=sorted(values)[min:max]
+                    if DEBUG: D.println("${num} of ${total} used in cumulant", {"num":len(values), "total":length})
+
+                    return Cumulant.new_instance(values)
                 except Exception, e:
                     for i, v in enumerate(r):
                         r[i]=d2e.summarize(v)
@@ -112,9 +126,9 @@ with DB(settings.datazilla) as dz:
     es=ElasticSearch(settings.elasticsearch)
     with open("test_schema.json") as f:
         schema=CNV.JSON2object(f.read(), flexible=True)
-    ElasticSearch.delete_index(settings.elasticsearch)
-    ElasticSearch.create_index(settings.elasticsearch, schema)
-    es.set_refresh_interval(-1)
+#    ElasticSearch.delete_index(settings.elasticsearch)
+#    ElasticSearch.create_index(settings.elasticsearch, schema)
+#    es.set_refresh_interval(-1)
 
     # RUN
     converter=d2e(dz, es)
