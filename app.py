@@ -126,9 +126,9 @@ with DB(settings.datazilla) as dz:
     es=ElasticSearch(settings.elasticsearch)
     with open("test_schema.json") as f:
         schema=CNV.JSON2object(f.read(), flexible=True)
-#    ElasticSearch.delete_index(settings.elasticsearch)
-#    ElasticSearch.create_index(settings.elasticsearch, schema)
-#    es.set_refresh_interval(-1)
+    ElasticSearch.delete_index(settings.elasticsearch)
+    ElasticSearch.create_index(settings.elasticsearch, schema)
+    es.set_refresh_interval(-1)
 
     # RUN
     converter=d2e(dz, es)
