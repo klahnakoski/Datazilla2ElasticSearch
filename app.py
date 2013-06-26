@@ -1,7 +1,8 @@
+from datetime import datetime
 from math import ceil, floor
 from util.cnv import CNV
 from util.query import Q
-from util.stats import Cumulant
+from util.stats import Z_moment
 
 from util.db import DB
 from elasticsearch import ElasticSearch
@@ -27,7 +28,8 @@ class d2e:
         while True:
             records=self.extract(min_id, limit)
             self.transform(records)
-            self.es.load(records)
+
+            #            self.es.load(records)
 
             if len(records)<limit: break
             min_id=max(*Q.select(records, "id"))
@@ -48,69 +50,37 @@ class d2e:
             FROM
                 objectstore
             WHERE
-                id>${min_id}
+                id>${min_id} AND
+                instr(json_blob, "yelp.com")>0 and
+                instr(json_blob, "62d955cfe160")>0 AND
+                instr(json_blob, "tp5o")>0
+            ORDER BY
+                id
             LIMIT
                 ${limit}
             """,{
                 "min_id":min_id,
                 "limit":limit
         })
+#
+#                instr(json_blob, "1366212899")>0
+#                (instr(json_blob, "136324")>0 or instr(json_blob, "136325")>0)
 
 
     def transform(self, records):
         for r in records:
-            r.json= d2e.summarize(CNV.JSON2object(r.json_blob).dict)
-            r.json_blob=None
+            json = r.json_blob
+            r.json = d2e.summarize(CNV.JSON2object(json).dict)
 
+    #            mintime=CNV.datetime2unix(datetime(2013, 03, 14, 04, 0, 0))*1000
+    #            maxtime=CNV.datetime2unix(datetime(2013, 03, 14, 05, 0, 0))*1000
+    #
+    #            if mintime<=r.json.testrun.date<maxtime:
+    #            D.println(str(r.json.results.amazon_dot_com))
+            D.println(str(r.json))
+    #            D.println(str(r.json.results_aux))
 
-    # RESPONSIBLE FOR CONVERTING LONG ARRAYS OF NUMBERS TO THEIR REPRESENTATIVE
-    # MOMENTS
-    @staticmethod
-    def summarize(r):
-        try:
-            if isinstance(r, dict):
-                for k, v in [(k,v) for k,v in r.items()]:
-                    new_v=d2e.summarize(v)
-                    if isinstance(new_v, Cumulant):
-                        #CONVERT MOMENTS' TUPLE TO NAMED HASH (FOR EASIER ES INDEXING)
-                        new_v={"cumulant":dict([("s"+str(i), m) for i, m in enumerate(new_v.tuple)])}
-
-                    #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
-                    if k in ["date", "date_loaded"]: new_v*=1000
-
-                    #REMOVE DOT FROM NAME, SO EASIER TO QUERY
-                    new_k=k.replace(".", "_dot_")
-                    r[k]=None
-                    r[new_k]=new_v
-#                    r[k]=new_v
-            elif isinstance(r, list):
-                try:
-                    bottom=0.0
-                    top=0.8
-
-                    ## keep_middle - THE PROPORTION [0..1] OF VALUES TO KEEP, EXTREMES ARE REJECTED
-                    values=[float(v) for v in r]
-
-                    length=len(values)
-                    min=int(floor(length*bottom))
-                    max=int(ceil(length*top))
-                    values=sorted(values)[min:max]
-                    if DEBUG: D.println("${num} of ${total} used in cumulant", {"num":len(values), "total":length})
-
-                    return Cumulant.new_instance(values)
-                except Exception, e:
-                    for i, v in enumerate(r):
-                        r[i]=d2e.summarize(v)
-            return r
-        except Exception, e:
-            D.warning("Can not summarize: ${json}", {"json":CNV.object2JSON(r)})
-
-
-
-
-
-
-
+            r.json_blob = None
 
 
 
@@ -126,11 +96,11 @@ with DB(settings.datazilla) as dz:
     es=ElasticSearch(settings.elasticsearch)
     with open("test_schema.json") as f:
         schema=CNV.JSON2object(f.read(), flexible=True)
-    ElasticSearch.delete_index(settings.elasticsearch)
-    ElasticSearch.create_index(settings.elasticsearch, schema)
-    es.set_refresh_interval(-1)
+#    ElasticSearch.delete_index(settings.elasticsearch)
+#    ElasticSearch.create_index(settings.elasticsearch, schema)
+#    es.set_refresh_interval(-1)
 
     # RUN
     converter=d2e(dz, es)
     converter.run()
-    es.set_refresh_interval(1)
+#    es.set_refresh_interval(1)

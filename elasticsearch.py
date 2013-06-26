@@ -1,4 +1,4 @@
-
+import sha
 import requests
 from util.cnv import CNV
 from util.debug import D
@@ -40,13 +40,19 @@ class ElasticSearch():
 
     def load(self, records):
         # ADD LINE WITH COMMAND
-        lines=['{"create":{"_id":"'+str(r.id)+'"}}\n'+CNV.object2JSON(r)+"\n" for r in records]
+        lines=[]
+        for r in records:
+            json=CNV.object2JSON(r)
+            id=sha.new(json).hexdigest()
+            lines.extend('{"create":{"_id":"'+id+'"}}\n'+json+"\n")
+
+        if len(lines)==0: return
         response=ElasticSearch.post(
             self.path+"/_bulk",
             data="".join(lines),
             headers={"Content-Type":"text"}
         )
-        if DEBUG: D.println("${num} items added", {"num":len(CNV.JSON2object(response.content).items)})
+        if DEBUG: D.println("${num} items added", {"num":len(records)})
 
 
     # -1 FOR NO REFRESH
@@ -57,6 +63,16 @@ class ElasticSearch():
         )
 
 
+
+    def search(self, query):
+        try:
+            response=ElasticSearch.post(self.path+"/_search", data=CNV.object2JSON(query))
+            if DEBUG: D.println(response.content[:100])
+            return CNV.JSON2object(response.content)
+        except Exception, e:
+            D.error("Problem with search", e)
+
+    
         
     @staticmethod
     def post(*list, **args):

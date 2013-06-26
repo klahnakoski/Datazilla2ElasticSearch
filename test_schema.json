@@ -8,9 +8,13 @@
 	"mappings":{
 		"test_results":{
 			"dynamic_templates":[
-				{"default_cumulant":{
+				{"default_moment":{
 					"mapping":{"index":"no", "type":"double"},
-					"match":"*.cumulant.*"
+					"match":"*.moment.*"
+				}},
+				{"xperf":{
+					"mapping":{"index":"no", "type":"string"},
+					"match":"results_xperf.*"
 				}}
 			],
 			"_all":{
