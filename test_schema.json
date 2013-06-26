@@ -13,7 +13,7 @@
 					"match":"*.moment.*"
 				}},
 				{"xperf":{
-					"mapping":{"index":"no", "type":"string"},
+					"mapping":{"type":"string"},
 					"match":"results_xperf.*"
 				}}
 			],

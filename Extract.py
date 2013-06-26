@@ -32,7 +32,7 @@ def extract_from_datazilla(settings):
         "from":0,
         "size":0,
         "sort":[],
-        "facets":{"revisions":{"terms":{"field":"json.test_build.revision","size":200000}}}
+        "facets":{"revisions":{"terms":{"field":"test_build.revision","size":200000}}}
     })
     existing_revisions=set([t.term for t in existing_revisions.facets.revisions.terms])
     D.println("Number of revisions in ES: "+str(len(existing_revisions)))
@@ -87,6 +87,6 @@ def reset(settings):
 
 
 settings=startup.read_settings()
-#reset(settings)
+reset(settings)
 extract_from_datazilla(settings)
 
