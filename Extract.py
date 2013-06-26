@@ -32,7 +32,7 @@ def extract_from_datazilla(settings):
         "from":0,
         "size":0,
         "sort":[],
-        "facets":{"revisions":{"terms":{"field":"json.test_build.revision","size":200000}}}
+        "facets":{"revisions":{"terms":{"field":"test_build.revision","size":200000}}}
     })
     existing_revisions=set([t.term for t in existing_revisions.facets.revisions.terms])
     D.println("Number of revisions in ES: "+str(len(existing_revisions)))
@@ -41,36 +41,37 @@ def extract_from_datazilla(settings):
     es.set_refresh_interval(-1)
     new_revisions=available_revisions-existing_revisions
     D.println("${num_revisions} new revisions", {"num_revisions":len(new_revisions)})
-    for revision in new_revisions:
-        try:
-            rawdata_url = Template(settings.production.detail+"/${branch}/${revision}/").substitute({
-                "branch":"Mozilla-Inbound",
-                "revision":revision
-            })
+    try:
+        for revision in new_revisions:
+            try:
+                rawdata_url = Template(settings.production.detail+"/${branch}/${revision}/").substitute({
+                    "branch":"Mozilla-Inbound",
+                    "revision":revision
+                })
 
-            with Timer("read from DZ") as t:
-                content=requests.get(rawdata_url).content
-            data=CNV.JSON2object(content)
-            D.println(
-                "Add ${num_tests} tests for revision ${revision} (${size} bytes)", {
-                "num_tests":len(data),
-                "revision":revision,
-                "size":len(content)
-            })
+                with Timer("read from DZ") as t:
+                    content=requests.get(rawdata_url).content
+                data=CNV.JSON2object(content)
+                D.println(
+                    "Add ${num_tests} tests for revision ${revision} (${size} bytes)", {
+                    "num_tests":len(data),
+                    "revision":revision,
+                    "size":len(content)
+                })
 
-            if len(data)==0:
-                data=[
-                    {"test_build":{"revision":revision}}
-                ]
-            else:
-                for d in data: transform(d)
+                if len(data)==0:
+                    data=[
+                        {"test_build":{"revision":revision}}
+                    ]
+                else:
+                    for d in data: transform(d)
 
-            with Timer("push to ES") as t:
-                es.load(data)
-        except Exception, e:
-            D.warning("Can not load data for revision ${revision}", {"revision":revision})
-
-    es.set_refresh_interval(1)
+                with Timer("push to ES") as t:
+                    es.load(data)
+            except Exception, e:
+                D.warning("Can not load data for revision ${revision}", {"revision":revision})
+    finally:
+        es.set_refresh_interval(1)
 
 
 

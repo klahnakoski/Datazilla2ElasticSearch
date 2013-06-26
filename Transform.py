@@ -27,6 +27,11 @@ def transform(r, keep_arrays_smaller_than=25):
         r.results_aux.Main_RSS          ={"moments":Z_moment.new_instance(r.results_aux.Main_RSS        ).dict}
         r.results_aux.shutdown          ={"moments":Z_moment.new_instance(r.results_aux.shutdown        ).dict}
 
+    if r.results_xperf is not None:
+        r.results_xperf.mainthread_writebytes=[{"path":i[1], "value":i[0]} for i in r.results_xperf.mainthread_writebytes]
+        r.results_xperf.mainthread_readcount=[{"path":i[1], "value":i[0]} for i in r.results_xperf.mainthread_readcount]
+        r.results_xperf.mainthread_writecount=[{"path":i[1], "value":i[0]} for i in r.results_xperf.mainthread_writecount]
+        r.results_xperf.mainthread_readbytes=[{"path":i[1], "value":i[0]} for i in r.results_xperf.mainthread_readbytes]
 #    summarize(r.dict, keep_arrays_smaller_than)
     return r
 
