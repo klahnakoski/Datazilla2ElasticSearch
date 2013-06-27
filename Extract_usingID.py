@@ -1,6 +1,7 @@
 import itertools
 from string import Template
 import requests
+from util.basic import nvl
 from util.debug import D
 from util.startup import startup
 from util.cnv import CNV
@@ -53,6 +54,10 @@ def extract_from_datazilla_using_id(settings):
 
                 with Timer("push to ES") as t:
                     es.load(data, "datazilla_id")
+
+                with open(nvl(settings.output_file, "raw_json_blobs.tab"), "a") as myfile:
+                    myfile.write(str(blob_id)+"\t"+content+"\n")
+
             except Exception, e:
                 D.warning("Can not load data for id ${id}", {"id":blob_id})
     finally:
@@ -76,6 +81,6 @@ def reset(settings):
 
 
 settings=startup.read_settings()
-#reset(settings)
+reset(settings)
 extract_from_datazilla_using_id(settings)
 
