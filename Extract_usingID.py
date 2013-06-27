@@ -13,7 +13,7 @@ def extract_from_datazilla_using_id(settings):
 
     #FIND WHAT'S IN ES
     es=ElasticSearch(settings.elasticsearch)
-    existing_revisions=es.search({
+    existing_ids=es.search({
         "query":{"filtered":{
             "query":{"match_all":{}},
             "filter":{"script":{"script":"true"}}
@@ -23,7 +23,7 @@ def extract_from_datazilla_using_id(settings):
         "sort":[],
         "facets":{"ids":{"terms":{"field":"datazilla_id","size":200000}}}
     })
-    existing_ids=set([t.term for t in existing_revisions.facets.ids.terms])
+    existing_ids=set([t.term for t in existing_ids.facets.ids.terms])
     D.println("Number of ids in ES: "+str(len(existing_ids)))
 
 
@@ -34,7 +34,7 @@ def extract_from_datazilla_using_id(settings):
 
             try:
                 with Timer("read from DZ") as t:
-                    content=requests.get(settings.production.json_blob+"/"+str(blob_id)).content
+                    content=requests.get(settings.production.blob_url+"/"+str(blob_id)).content
 
                 data=CNV.JSON2object(content).json_blob
                 D.println(
@@ -62,7 +62,10 @@ def extract_from_datazilla_using_id(settings):
 
 
 def reset(settings):
-    ElasticSearch.delete_index(settings.elasticsearch)
+    try:
+        ElasticSearch.delete_index(settings.elasticsearch)
+    except Exception, e:
+        pass
 
     with open("test_schema.json") as f:
         schema=CNV.JSON2object(f.read(), flexible=True)

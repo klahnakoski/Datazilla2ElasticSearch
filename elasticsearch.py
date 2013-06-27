@@ -1,5 +1,6 @@
 import sha
 import requests
+import time
 from util.cnv import CNV
 from util.debug import D
 
@@ -29,6 +30,7 @@ class ElasticSearch():
             data=CNV.object2JSON(schema),
             headers={"Content-Type":"application/json"}
         )
+        time.sleep(2)
 
 
     @staticmethod
@@ -73,7 +75,9 @@ class ElasticSearch():
         try:
             response=ElasticSearch.post(self.path+"/_search", data=CNV.object2JSON(query))
             if DEBUG: D.println(response.content[:100])
-            return CNV.JSON2object(response.content)
+            result=CNV.JSON2object(response.content)
+            if result.error is None: return result
+            D.error(result.error)
         except Exception, e:
             D.error("Problem with search", e)
 
