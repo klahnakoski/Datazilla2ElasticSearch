@@ -10,10 +10,12 @@ DEBUG=False
 
 
 
-def transform(r, keep_arrays_smaller_than=25):
+def transform(r, datazilla_id, keep_arrays_smaller_than=25):
     #CONVERT AGE TIMINGS TO ARRAY OF PAGE TIMINGS
+    r.datazilla_id=datazilla_id
+    
     r.results=[{
-        "page":k,
+        "name":k,
         "moments": Z_moment.new_instance(v).dict,
         "samples": (dict(("s"+right("00"+str(i), 2), s) for i, s in enumerate(v)) if len(v)<=keep_arrays_smaller_than else None)
     } for k,v in r.results.items()]

@@ -38,12 +38,17 @@ class ElasticSearch():
         )
 
 
-    def load(self, records):
+    def load(self, records, id_field=None):
         # ADD LINE WITH COMMAND
         lines=[]
         for r in records:
             json=CNV.object2JSON(r)
-            id=sha.new(json).hexdigest()
+
+            if id_field is None:
+                id=sha.new(json).hexdigest()
+            else:
+                id=str(r[id_field])
+            
             lines.extend('{"create":{"_id":"'+id+'"}}\n'+json+"\n")
 
         if len(lines)==0: return
