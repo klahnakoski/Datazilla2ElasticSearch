@@ -15,13 +15,14 @@ def extract_from_datazilla(settings):
     url=settings.production.summary
     response = requests.get(url, params={
         "days_ago":30,
-        "branches":"Mozilla-Inbound",
+        "branches":"Places",
         "numdays":30
     })
     data=CNV.JSON2object(response.content)
     available_revisions=set(itertools.chain(*[v["revisions"] for k, v in data.items()]))
     D.println("Number of revisions in DZ: "+str(len(available_revisions)))
 
+    
     #FIND WHAT'S IN ES
     es=ElasticSearch(settings.elasticsearch)
     existing_revisions=es.search({
@@ -36,6 +37,7 @@ def extract_from_datazilla(settings):
     })
     existing_revisions=set([t.term for t in existing_revisions.facets.revisions.terms])
     D.println("Number of revisions in ES: "+str(len(existing_revisions)))
+
 
     #ONLY PULL THE STUFF WE HAVE NOT SEEN
     es.set_refresh_interval(-1)
