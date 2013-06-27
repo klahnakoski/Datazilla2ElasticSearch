@@ -88,6 +88,6 @@ def reset(settings):
 
 
 settings=startup.read_settings()
-reset(settings)
+#reset(settings)
 extract_from_datazilla(settings)
 
