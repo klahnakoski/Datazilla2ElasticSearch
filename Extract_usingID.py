@@ -1,6 +1,7 @@
 import itertools
 from string import Template
 import requests
+import time
 from util.basic import nvl
 from util.debug import D
 from util.startup import startup
@@ -24,7 +25,7 @@ def extract_from_datazilla_using_id(settings):
         "sort":[],
         "facets":{"ids":{"terms":{"field":"datazilla_id","size":200000}}}
     })
-    existing_ids=set([t.term for t in existing_ids.facets.ids.terms])
+    existing_ids=set([int(t.term) for t in existing_ids.facets.ids.terms])
     D.println("Number of ids in ES: "+str(len(existing_ids)))
 
 
@@ -45,15 +46,10 @@ def extract_from_datazilla_using_id(settings):
                     "size":len(content)
                 })
 
-                if len(data)==0:
-                    data=[
-                        {"datazilla_id":blob_id}
-                    ]
-                else:
-                    for d in data: transform(d, datazilla_id=blob_id)
+                transform(data, datazilla_id=blob_id)
 
                 with Timer("push to ES") as t:
-                    es.load(data, "datazilla_id")
+                    es.load([data], "datazilla_id")
 
                 with open(nvl(settings.output_file, "raw_json_blobs.tab"), "a") as myfile:
                     myfile.write(str(blob_id)+"\t"+content+"\n")
@@ -74,10 +70,21 @@ def reset(settings):
 
     with open("test_schema.json") as f:
         schema=CNV.JSON2object(f.read(), flexible=True)
-    ElasticSearch.create_index(settings.elasticsearch, schema)
+    es=ElasticSearch.create_index(settings.elasticsearch, schema)
 
+    es.set_refresh_interval(-1)
 
+    with open(settings.output_file, "r") as myfile:
+        for line in myfile:
+            col=line.split("\t")
+            id=col[0]
+            data=CNV.JSON2object(col[1]).json_blob
+            transform(data, datazilla_id=id)
 
+            es.load([data], "datazilla_id")
+
+    es.set_refresh_interval(1)
+    time.sleep(2)
 
 
 settings=startup.read_settings()

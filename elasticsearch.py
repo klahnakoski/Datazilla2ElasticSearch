@@ -31,6 +31,7 @@ class ElasticSearch():
             headers={"Content-Type":"application/json"}
         )
         time.sleep(2)
+        return ElasticSearch(settings)
 
 
     @staticmethod
@@ -64,9 +65,12 @@ class ElasticSearch():
 
     # -1 FOR NO REFRESH
     def set_refresh_interval(self, seconds):
+        if seconds<=0: interval="-1"
+        else: interval=str(seconds)+"s"
+
         ElasticSearch.put(
              self.settings.host+":"+str(self.settings.port)+"/"+self.settings.index+"/_settings",
-             data="{\"index.refresh_interval\":\""+str(seconds)+"\"}"
+             data="{\"index.refresh_interval\":\""+interval+"\"}"
         )
 
 

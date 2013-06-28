@@ -9,11 +9,13 @@ DEBUG=False
 
 
 
-
+# A SIMPLE TRANSFORM OF DATA:  I WOULD ALSO LIKE TO ADD DIMENSIONAL TYPE INFORMATION
+# WHICH WOULD GIVE DEAR READER A BETTER FEEL FOR THE TOTALITY OF THIS DATA
+# BUT THEN AGAIN, SIMPLE IS BETTER, YES?
 def transform(r, datazilla_id, keep_arrays_smaller_than=25):
-    #CONVERT AGE TIMINGS TO ARRAY OF PAGE TIMINGS
     r.datazilla_id=datazilla_id
-    
+
+    #CONVERT FROM <name>:<samples> TO {"name":<name>, "samples":<samples>}
     r.results=[{
         "name":k,
         "moments": Z_moment.new_instance(v).dict,
@@ -23,11 +25,13 @@ def transform(r, datazilla_id, keep_arrays_smaller_than=25):
     #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
     r.testrun.date*=1000
 
+    #COLAPSE THESE TO SIMPLE MOMENTS
     if r.results_aux is not None:
         r.results_aux.responsivness     ={"moments":Z_moment.new_instance(r.results_aux.responsivness   ).dict}
         r.results_aux["Private bytes"]  ={"moments":Z_moment.new_instance(r.results_aux["Private bytes"]).dict}
         r.results_aux.Main_RSS          ={"moments":Z_moment.new_instance(r.results_aux.Main_RSS        ).dict}
         r.results_aux.shutdown          ={"moments":Z_moment.new_instance(r.results_aux.shutdown        ).dict}
+
 
     if r.results_xperf is not None:
         r.results_xperf.mainthread_writebytes=[{"path":i[1], "value":i[0]} for i in r.results_xperf.mainthread_writebytes]
