@@ -1,5 +1,4 @@
-import itertools
-from string import Template
+from operator import mod
 import requests
 import time
 from util.basic import nvl
@@ -12,6 +11,14 @@ from util.timer import Timer
 
 
 def extract_from_datazilla_using_id(settings):
+    if settings.production.share is not None:
+        VAL=int(settings.production.share.split("mod")[0])
+        MOD=int(settings.production.share.split("mod")[1])
+    else:
+        VAL=0
+        MOD=1
+
+
 
     #FIND WHAT'S IN ES
     es=ElasticSearch(settings.elasticsearch)
@@ -31,7 +38,8 @@ def extract_from_datazilla_using_id(settings):
 
     try:
 
-        for blob_id in range(settings.production.min, settings.production.max+1):
+        for blob_id in range(settings.production.min, settings.production.max+MOD):
+            if blob_id % MOD != VAL: continue
             if blob_id in existing_ids: continue
 
             try:
@@ -88,6 +96,6 @@ def reset(settings):
 
 
 settings=startup.read_settings()
-reset(settings)
+#reset(settings)
 extract_from_datazilla_using_id(settings)
 

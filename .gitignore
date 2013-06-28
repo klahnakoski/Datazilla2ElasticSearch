@@ -3,3 +3,4 @@
 src
 settings.json
 raw_json_blobs.tab
+data/*
