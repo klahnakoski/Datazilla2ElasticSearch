@@ -66,7 +66,7 @@ with open(settings.output_file, "r") as input_file:
     with open("good_talos.tab", "w") as output_file:
         for i, line in enumerate(input_file):
             try:
-        #        if i>100: break
+                if i>100: break
                 if i % 1000==0: D.println("loading line "+str(i))
                 if i in all: continue
                 all.add(i)
@@ -82,11 +82,17 @@ df=DataFrame(arrays, columns=["path", "length", "count"])
 length_dim=pandas.cut(df.length, parts, labels=[("     "+str(p))[-5:]+" to "+str(parts[i+1]-1) for i,p in enumerate(parts[0:-1])], right=False)
 summary=df.groupby(["path", length_dim]).size()
 table=summary.unstack("length")
-D.println("\n"+CNV.DataFrame2string(table))
+s=CNV.DataFrame2string(table)
+D.println("\n"+s)
+with open("talos_summary1.tab", "w") as output_file:
+    output_file.write(s)
 
 sum2=df.groupby(["path", "length"]).size()
 tab2=sum2.unstack("length")
-D.println("\n"+CNV.DataFrame2string(tab2))
+s=CNV.DataFrame2string(tab2)
+D.println("\n"+s)
+with open("talos_summary2.tab", "w") as output_file:
+    output_file.write(s)
 
 
 
