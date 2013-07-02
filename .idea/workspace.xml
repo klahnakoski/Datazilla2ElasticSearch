@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2be14c04-396c-482c-b241-310fccc83074" name="Default" comment="More changes for D2E">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SummarizeTalos.py" afterPath="$PROJECT_DIR$/SummarizeTalos.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Extract_usingID.py" afterPath="$PROJECT_DIR$/Extract_usingID.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../pyLibrary/util/cnv.py" afterPath="$PROJECT_DIR$/../pyLibrary/util/cnv.py" />
     </list>
     <ignored path="Datazilla2ElasticSearch.iws" />
@@ -79,10 +79,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="SummarizeTalos.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="SummarizeTalos.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="68" column="8" selection-start="1890" selection-end="1890" vertical-scroll-proportion="0.20604396">
+            <state line="73" column="36" selection-start="2082" selection-end="2082" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -97,15 +97,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="88" column="32" selection-start="2145" selection-end="2177" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="connections.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://C:/Python27/Lib/site-packages/MySQLdb/connections.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -115,10 +106,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Extract_usingID.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="Extract_usingID.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Extract_usingID.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="0" selection-start="240" selection-end="240" vertical-scroll-proportion="0.0">
+            <state line="64" column="12" selection-start="2102" selection-end="2102" vertical-scroll-proportion="0.46703297">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="map.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../pyLibrary/util/map.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="39" column="0" selection-start="1265" selection-end="1265" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -198,8 +198,8 @@
         <option value="$PROJECT_DIR$/../pyLibrary/util/cnv.py" />
         <option value="$PROJECT_DIR$/settings.json" />
         <option value="$PROJECT_DIR$/Transform.py" />
-        <option value="$PROJECT_DIR$/Extract_usingID.py" />
         <option value="$PROJECT_DIR$/SummarizeTalos.py" />
+        <option value="$PROJECT_DIR$/Extract_usingID.py" />
       </list>
     </option>
   </component>
@@ -319,7 +319,7 @@
       <recent name="C:\Users\klahnakoski\git\Datazilla2ElasticSearch" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.SummarizeTalos">
+  <component name="RunManager" selected="Python.extract_from_datazilla">
     <configuration default="false" name="app" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -545,7 +545,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1944" y="11" width="1554" height="916" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -617,14 +617,6 @@
           <url>file://$PROJECT_DIR$/Transform.py</url>
           <line>86</line>
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/Extract_usingID.py</url>
-          <line>45</line>
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/Extract_usingID.py</url>
-          <line>97</line>
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
@@ -633,11 +625,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../esFrontLine/src/library/util/cnv.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="6" selection-start="644" selection-end="644" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://C:/Python27/Lib/site-packages/pandas/core/groupby.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="1350" column="0" selection-start="40773" selection-end="40773" vertical-scroll-proportion="0.20532915" />
@@ -709,16 +696,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Extract_usingID.py">
+    <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="0" selection-start="240" selection-end="240" vertical-scroll-proportion="0.0">
+        <state line="73" column="36" selection-start="2082" selection-end="2082" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/map.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="68" column="8" selection-start="1890" selection-end="1890" vertical-scroll-proportion="0.20604396">
+        <state line="39" column="0" selection-start="1265" selection-end="1265" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Extract_usingID.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="64" column="12" selection-start="2102" selection-end="2102" vertical-scroll-proportion="0.46703297">
           <folding />
         </state>
       </provider>

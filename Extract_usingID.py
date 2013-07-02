@@ -84,16 +84,19 @@ def reset(settings):
 
 
 settings=startup.read_settings()
-#reset(settings)
 
 if settings.production.share is not None:
-   settings.thread.val=int(settings.production.share.split("mod")[0])
-   settings.thread.modMOD=int(settings.production.share.split("mod")[1])
+    settings.thread={}
+    settings.thread.val=int(settings.production.share.split("mod")[0])
+    settings.thread.mod=int(settings.production.share.split("mod")[1])
 else:
-   settings.thread.val=0
-   settings.thread.mod=1
+    settings.thread={}
+    settings.thread.val=0
+    settings.thread.mod=1
 
 settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
+
+reset(settings)
 extract_from_datazilla_using_id(settings)
 
