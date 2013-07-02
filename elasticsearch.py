@@ -52,7 +52,7 @@ class ElasticSearch():
             else:
                 id=str(r[id_field])
             
-            lines.extend('{"create":{"_id":"'+id+'"}}\n'+json+"\n")
+            lines.extend('{"index":{"_id":"'+id+'"}}\n'+json+"\n")
 
         if len(lines)==0: return
         response=ElasticSearch.post(
@@ -60,6 +60,11 @@ class ElasticSearch():
             data="".join(lines),
             headers={"Content-Type":"text"}
         )
+        items=CNV.JSON2object(response.content)["items"]
+
+        for i in items:
+            if i.index.ok!=True: D.error(i.index.error)
+
         if DEBUG: D.println("${num} items added", {"num":len(records)})
 
 
