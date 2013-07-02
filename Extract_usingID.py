@@ -72,6 +72,7 @@ def reset(settings):
 
     with open(settings.output_file, "r") as myfile:
         for line in myfile:
+            if len(line.strip())==0: continue
             col=line.split("\t")
             id=col[0]
             data=CNV.JSON2object(col[1]).json_blob
