@@ -59,17 +59,24 @@ def arrays_add(path, r):
 #THIS IS WHAT I MUST DO
 settings=startup.read_settings()
 parts=[0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000]
+all=set()
 
-with open(settings.output_file, "r") as myfile:
-    for i, line in enumerate(myfile):
-        try:
-            if i % 1000==0: D.println("loading line "+str(i))
-    #        if i>100: break
-            col=line.split("\t")
-            data=CNV.JSON2object(col[1]).json_blob
-            arrays_add("["+data.testrun.suite+"]", data)
-        except Exception, e:
-            D.warning("can not process line:\n\t"+line, e)
+
+with open(settings.output_file, "r") as input_file:
+    with open("good_talos.tab", "w") as output_file:
+        for i, line in enumerate(input_file):
+            try:
+        #        if i>100: break
+                if i % 1000==0: D.println("loading line "+str(i))
+                if i in all: continue
+                all.add(i)
+
+                col=line.split("\t")
+                data=CNV.JSON2object(col[1]).json_blob
+                arrays_add("["+data.testrun.suite+"]", data)
+                output_file.write(line+"\n")
+            except Exception, e:
+                D.warning("can not process line:\n\t"+line, e)
 
 df=DataFrame(arrays, columns=["path", "length", "count"])
 length_dim=pandas.cut(df.length, parts, labels=[("     "+str(p))[-5:]+" to "+str(parts[i+1]-1) for i,p in enumerate(parts[0:-1])], right=False)
