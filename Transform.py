@@ -12,8 +12,18 @@ DEBUG=False
 # A SIMPLE TRANSFORM OF DATA:  I WOULD ALSO LIKE TO ADD DIMENSIONAL TYPE INFORMATION
 # WHICH WOULD GIVE DEAR READER A BETTER FEEL FOR THE TOTALITY OF THIS DATA
 # BUT THEN AGAIN, SIMPLE IS BETTER, YES?
-def transform(r, datazilla_id, keep_arrays_smaller_than=25):
-    r.datazilla_id=datazilla_id
+def transform(datazilla, datazilla_id, keep_arrays_smaller_than=25):
+    r=datazilla.json_blob
+
+    #ADD DATAZILLA MARKUP
+    r.datazilla={
+        "id":datazilla_id,
+        "date_loaded":datazilla.date_loaded,
+        "error_flag":datazilla.error_flag,
+        "test_run_id":datazilla.test_run_id,
+        "processed_flag":datazilla.processed_flag,
+        "error_msg":datazilla.error_msg
+    }
 
     #CONVERT FROM <name>:<samples> TO {"name":<name>, "samples":<samples>}
     r.results=[{

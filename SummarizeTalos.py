@@ -58,7 +58,7 @@ def arrays_add(path, r):
 
 #THIS IS WHAT I MUST DO
 settings=startup.read_settings()
-parts=[0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000]
+parts=[0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000]
 all=set()
 
 
