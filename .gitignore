@@ -3,4 +3,5 @@
 src
 settings.json
 raw_json_blobs.tab
+good_talos.tab
 data/*
