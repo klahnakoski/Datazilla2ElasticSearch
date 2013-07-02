@@ -62,27 +62,25 @@ parts=[0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000]
 
 with open(settings.output_file, "r") as myfile:
     for i, line in enumerate(myfile):
-#        if i>10: break
-        col=line.split("\t")
-        data=CNV.JSON2object(col[1]).json_blob
-        arrays_add("["+data.testrun.suite+"]", data)
+        try:
+            if i % 1000==0: D.println("loading line "+str(i))
+    #        if i>100: break
+            col=line.split("\t")
+            data=CNV.JSON2object(col[1]).json_blob
+            arrays_add("["+data.testrun.suite+"]", data)
+        except Exception, e:
+            D.warning("can not process line:\n\t"+line, e)
 
 df=DataFrame(arrays, columns=["path", "length", "count"])
 length_dim=pandas.cut(df.length, parts, labels=[("     "+str(p))[-5:]+" to "+str(parts[i+1]-1) for i,p in enumerate(parts[0:-1])], right=False)
-summary=df.groupby(["path", length_dim]).size()#agg({"count":sum})
-#summary=summary.unstack(length_dim.labels)
-#table=summary
+summary=df.groupby(["path", length_dim]).size()
 table=summary.unstack("length")
-
-
-#pandas.set_option("display.max_rows", 2000)
-#pandas.set_option("display.max_columns",20)
-#pandas.set_option('line_width', 40000)
-#pandas.set_option('expand_frame_repr', True)
 D.println("\n"+CNV.DataFrame2string(table))
 
+sum2=df.groupby(["path", "length"]).size()
+tab2=sum2.unstack("length")
+D.println("\n"+CNV.DataFrame2string(tab2))
 
-#D.println("\n"+table.describe().to_string())
 
 
 
