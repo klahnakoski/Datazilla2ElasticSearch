@@ -1,7 +1,6 @@
-import sys
+from util.startup import startup
 from util.cnv import CNV
 from util.debug import D
-from app import settings
 from util.timer import Timer
 
 with Timer("load pandas"):
@@ -15,7 +14,7 @@ def arrays_add(path, r):
     try:
         if isinstance(r, dict):
             for k, v in [(k,v) for k,v in r.items()]:
-                new_path=path+"["+CNV.value2quote(k)+"]"
+                new_path=path+"["+k+"]"
                 arrays_add(new_path, v)
         elif isinstance(r, list):
             try:
@@ -58,18 +57,19 @@ def arrays_add(path, r):
 #})
 
 #THIS IS WHAT I MUST DO
-parts=[0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+settings=startup.read_settings()
+parts=[0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000]
 
 with open(settings.output_file, "r") as myfile:
     for i, line in enumerate(myfile):
 #        if i>10: break
         col=line.split("\t")
         data=CNV.JSON2object(col[1]).json_blob
-        arrays_add("", data)
+        arrays_add("["+data.testrun.suite+"]", data)
 
 df=DataFrame(arrays, columns=["path", "length", "count"])
-length_dim=pandas.cut(df.length, parts, labels=["starting at "+("    "+str(p))[-4:] for p in parts[0:-1]], right=False)
-summary=df.groupby(["path", length_dim]).agg({"count":sum})
+length_dim=pandas.cut(df.length, parts, labels=[("     "+str(p))[-5:]+" to "+str(parts[i+1]-1) for i,p in enumerate(parts[0:-1])], right=False)
+summary=df.groupby(["path", length_dim]).size()#agg({"count":sum})
 #summary=summary.unstack(length_dim.labels)
 #table=summary
 table=summary.unstack("length")
@@ -79,7 +79,7 @@ table=summary.unstack("length")
 #pandas.set_option("display.max_columns",20)
 #pandas.set_option('line_width', 40000)
 #pandas.set_option('expand_frame_repr', True)
-D.println(CNV.DataFrame2string(table))
+D.println("\n"+CNV.DataFrame2string(table))
 
 
 #D.println("\n"+table.describe().to_string())

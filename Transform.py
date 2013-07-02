@@ -1,4 +1,3 @@
-import pandas
 from math import floor, ceil
 from util.cnv import CNV
 from util.debug import D

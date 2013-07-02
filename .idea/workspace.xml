@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2be14c04-396c-482c-b241-310fccc83074" name="Default" comment="More changes for D2E">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Extract_usingID.py" afterPath="$PROJECT_DIR$/Extract_usingID.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SummarizeTalos.py" afterPath="$PROJECT_DIR$/SummarizeTalos.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Transform.py" afterPath="$PROJECT_DIR$/Transform.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/requirements.txt" afterPath="$PROJECT_DIR$/requirements.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../pyLibrary/util/cnv.py" afterPath="$PROJECT_DIR$/../pyLibrary/util/cnv.py" />
     </list>
     <ignored path="Datazilla2ElasticSearch.iws" />
@@ -86,7 +84,34 @@
       <file leaf-file-name="SummarizeTalos.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="65" column="14" selection-start="1807" selection-end="1807" vertical-scroll-proportion="0.0">
+            <state line="62" column="0" selection-start="1703" selection-end="1703" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pydevd.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.IntelliJIdea10/config/plugins/python/helpers/pydev/pydevd.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="958" column="0" selection-start="41277" selection-end="41277" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="app.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="88" column="32" selection-start="2145" selection-end="2177" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="connections.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://C:/Python27/Lib/site-packages/MySQLdb/connections.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="186" column="0" selection-start="5477" selection-end="5477" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -95,7 +120,25 @@
       <file leaf-file-name="Extract_usingID.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Extract_usingID.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="50" column="75" selection-start="1531" selection-end="1531" vertical-scroll-proportion="0.46551725">
+            <state line="13" column="29" selection-start="334" selection-end="334" vertical-scroll-proportion="0.60714287">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="debug.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../pyLibrary/util/debug.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="64" column="0" selection-start="2291" selection-end="2291" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Transform.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Transform.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="10" column="0" selection-start="158" selection-end="158" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -147,7 +190,6 @@
         <option value="$PROJECT_DIR$/test_schema.json" />
         <option value="$PROJECT_DIR$/Extract.py" />
         <option value="$PROJECT_DIR$/elasticsearch.py" />
-        <option value="$PROJECT_DIR$/Transform.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/../pyLibrary/util/query.py" />
         <option value="$PROJECT_DIR$/../esFrontLine/src/library/util/query.py" />
@@ -156,8 +198,9 @@
         <option value="$PROJECT_DIR$/../esFrontLine/src/library/util/cnv.py" />
         <option value="$PROJECT_DIR$/src/library/util/cnv.py" />
         <option value="$PROJECT_DIR$/../pyLibrary/util/cnv.py" />
-        <option value="$PROJECT_DIR$/SummarizeTalos.py" />
         <option value="$PROJECT_DIR$/settings.json" />
+        <option value="$PROJECT_DIR$/Transform.py" />
+        <option value="$PROJECT_DIR$/SummarizeTalos.py" />
         <option value="$PROJECT_DIR$/Extract_usingID.py" />
       </list>
     </option>
@@ -195,7 +238,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Favorites" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -253,6 +295,7 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Favorites" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -278,7 +321,7 @@
       <recent name="C:\Users\klahnakoski\git\Datazilla2ElasticSearch" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.extract_from_datazilla">
+  <component name="RunManager" selected="Python.SummarizeTalos">
     <configuration default="false" name="app" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -503,25 +546,25 @@
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1944" y="14" width="1536" height="1040" extended-state="0" />
+    <frame x="1944" y="11" width="1554" height="916" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27003294" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.48030496" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32953104" sideWeight="0.5747863" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44004402" sideWeight="0.92199486" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25271" sideWeight="0.72996706" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24832664" sideWeight="0.51969504" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32909784" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.45394737" sideWeight="0.99809885" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44345617" sideWeight="0.99809885" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32890365" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
@@ -574,7 +617,15 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Transform.py</url>
-          <line>87</line>
+          <line>86</line>
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/Extract_usingID.py</url>
+          <line>45</line>
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/Extract_usingID.py</url>
+          <line>97</line>
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -584,41 +635,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://C:/Python27/Lib/site-packages/pandas/core/reshape.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="118" column="45" selection-start="3387" selection-end="3387" vertical-scroll-proportion="0.33164558" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/debug.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="0" selection-start="1136" selection-end="1136" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/pandas/core/internals.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="476" column="0" selection-start="16390" selection-end="16390" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/pandas/core/format.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1613" column="28" selection-start="55525" selection-end="55534" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/pandas/core/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="304" column="0" selection-start="8727" selection-end="8727" vertical-scroll-proportion="0.58987343" />
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/pandas/core/frame.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2006" column="0" selection-start="73975" selection-end="73975" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/db.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-9.941772" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../esFrontLine/src/library/util/cnv.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="16" column="6" selection-start="644" selection-end="644" vertical-scroll-proportion="0.0" />
@@ -634,18 +650,51 @@
         <state line="178" column="0" selection-start="6149" selection-end="6149" vertical-scroll-proportion="0.20532915" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/cnv.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="14" selection-start="1807" selection-end="1807" vertical-scroll-proportion="0.0">
+        <state line="91" column="0" selection-start="2727" selection-end="2727" vertical-scroll-proportion="0.3328" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/startup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/library/util/startup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="8" selection-start="1429" selection-end="1429" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="88" column="32" selection-start="2145" selection-end="2177" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/MySQLdb/connections.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="186" column="0" selection-start="5477" selection-end="5477" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/debug.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="64" column="0" selection-start="2291" selection-end="2291" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Transform.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="0" selection-start="158" selection-end="158" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test_schema.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/library/util/cnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="63" column="13" selection-start="2043" selection-end="2043" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/settings.json">
@@ -655,23 +704,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/cnv.py">
+    <entry file="file://$USER_HOME$/.IntelliJIdea10/config/plugins/python/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="91" column="0" selection-start="2727" selection-end="2727" vertical-scroll-proportion="0.3328">
+        <state line="958" column="0" selection-start="41277" selection-end="41277" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/library/util/cnv.py">
+    <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="13" selection-start="2043" selection-end="2043" vertical-scroll-proportion="0.0">
+        <state line="62" column="0" selection-start="1703" selection-end="1703" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Extract_usingID.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="75" selection-start="1531" selection-end="1531" vertical-scroll-proportion="0.46551725">
+        <state line="13" column="29" selection-start="334" selection-end="334" vertical-scroll-proportion="0.60714287">
           <folding />
         </state>
       </provider>
