@@ -39,8 +39,8 @@ def etl(blob_id, es, settings):
 def etl_main_loop(es, VAL, existing_ids, settings):
     try:
         for blob_id in range(settings.production.min,
-                             settings.production.max + settings.threads):
-            if blob_id % settings.thread.mod != VAL: continue
+                             settings.production.max + settings.production.threads):
+            if blob_id % settings.production.threads != VAL: continue
             if blob_id in existing_ids: continue
             try:
                 etl(blob_id, es, settings)
@@ -56,18 +56,27 @@ def extract_from_datazilla_using_id(settings):
     existing_ids=es.search({
         "query":{"filtered":{
             "query":{"match_all":{}},
-            "filter":{"range":{"datazilla.id":{"gte":settings.production.min, "lt":settings.production.max+settings.thread.mod}}}
+            "filter":{"range":{"datazilla.id":{"gte":settings.production.min, "lt":settings.production.max+settings.production.threads}}}
         }},
         "from":0,
         "size":0,
         "sort":[],
         "facets":{"ids":{"terms":{"field":"datazilla.id","size":400000}}}
     })
-    existing_ids=set([int(t.term) for t in existing_ids.facets.ids.terms])
+
+    bad_ids=[]
+    int_ids=set()
+    for t in existing_ids.facets.ids.terms:
+        try:
+            int_ids.add(int(t.term))
+        except Exception, e:
+            bad_ids.append(t.term)
+    existing_ids=int_ids
     D.println("Number of ids in ES: "+str(len(existing_ids)))
+    D.println("BAD ids in ES: "+str(bad_ids))
 
     threads=[]
-    for t in range(settings.thread.mod):
+    for t in range(settings.production.threads):
         thread=threading.Thread(target=etl_main_loop, args=(es, t, existing_ids, settings))
 #        thread.setDaemon(True)
         thread.start()
@@ -118,6 +127,6 @@ settings.production.threads=nvl(settings.production.threads, 1)
 settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
 
-reset(settings)
+#reset(settings)
 extract_from_datazilla_using_id(settings)
 

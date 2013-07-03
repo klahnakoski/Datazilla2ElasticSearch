@@ -17,6 +17,18 @@
 					"match":"results_xperf.*"
 				}}
 			],
+			"properties":{
+				"datazilla":{
+					"properties":{
+						"id":{"type":"long"},
+						"date_loaded":{"type":"long"},
+						"error_flag":{"type":"string"},
+						"test_run_id":{"type":"long"},
+						"processed_flag":{"type":"string"},
+						"error_msg":{"type":"string"}
+					}
+				}
+			},
 			"_all":{
 				"enabled":false
 			},

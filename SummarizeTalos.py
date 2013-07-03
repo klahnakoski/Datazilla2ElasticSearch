@@ -9,6 +9,7 @@ with Timer("load pandas"):
 
 arrays = []
 
+#TRAVERSE THE JSON GRAPH AND REPORT THE float() ARRAY POPULATIONS
 def arrays_add(path, r):
 
     try:
@@ -64,19 +65,40 @@ all=set()
 
 with open(settings.output_file, "r") as input_file:
     with open("good_talos.tab", "w") as output_file:
-        for i, line in enumerate(input_file):
+        for line in input_file:
             try:
-                if i>100: break
-                if i % 1000==0: D.println("loading line "+str(i))
-                if i in all: continue
-                all.add(i)
+                if len(line.strip())==0: continue
 
                 col=line.split("\t")
+                id=int(col[0])
+                if id % 1000==0: D.println("loading id "+str(id))
+                if id in all: continue
+                all.add(id)
                 data=CNV.JSON2object(col[1]).json_blob
                 arrays_add("["+data.testrun.suite+"]", data)
-                output_file.write(line+"\n")
+                output_file.write(line)
             except Exception, e:
                 D.warning("can not process line:\n\t"+line, e)
+#def etl(col, output_file):
+#    try:
+#        data = CNV.JSON2object(col["json"]).json_blob
+#        id = int(col["id"])
+#        if id%1000==0: D.println("Loading ID "+str(id))
+#        arrays_add("[" + data.testrun.suite + "]", data)
+#        output_file.write(col["json"])
+#    except Exception, e:
+#        D.warning("Bad Line\n\t:${line}", {"line":col["json"]})
+#
+#raw=pandas.read_csv(
+#    settings.output_file,
+#    sep='\t',
+#    names=["id", "json"],
+#    header=None
+#)
+#with open("good_talos.tab", "w") as output_file:
+#    for i, x in raw.iterrows():
+#        etl(x, output_file)
+
 
 df=DataFrame(arrays, columns=["path", "length", "count"])
 length_dim=pandas.cut(df.length, parts, labels=[("     "+str(p))[-5:]+" to "+str(parts[i+1]-1) for i,p in enumerate(parts[0:-1])], right=False)
