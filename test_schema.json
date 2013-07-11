@@ -10,7 +10,7 @@
 			"dynamic_templates":[
 				{"default_moment":{
 					"mapping":{"index":"no", "type":"double"},
-					"match":"*.moment.*"
+					"match":"*.moments.s*"
 				}},
 				{"xperf":{
 					"mapping":{"type":"string"},

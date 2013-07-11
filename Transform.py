@@ -31,12 +31,12 @@ def transform(datazilla, datazilla_id, keep_arrays_smaller_than=25):
         k=replace(k, ".", "_dot_")
         if len(v)<=keep_arrays_smaller_than:
             new_results[k]=v
-        else:
-            try:
-                new_results[k]={"moments":Z_moment.new_instance(v).dict}
-            except Exception, e:
-                new_results[k]={"moments":Z_moment.new_instance(v).dict}
-                D.error("can not reduce series to moments", e)
+#        else:
+#            try:
+#                new_results[k]={"moments":Z_moment.new_instance(v).dict}
+#            except Exception, e:
+#                new_results[k]={"moments":Z_moment.new_instance(v).dict}
+#                D.error("can not reduce series to moments", e)
     r.results=new_results
 
     #CONVERT FROM <name>:<samples> TO {"name":<name>, "samples":<samples>}

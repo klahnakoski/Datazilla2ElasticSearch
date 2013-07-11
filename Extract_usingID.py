@@ -115,12 +115,18 @@ def reset(settings):
                     data=CNV.JSON2object(col[1])
                     data=transform(data, datazilla_id=id)
 
-                    es.load([data], "datazilla.id")
+                    try:
+                        es.load([data], "datazilla.id")
+                    except Exception, e:
+                        D.warning("Can not load data (${length}bytes):\n\t${prefix}", {
+                            "length":len(CNV.object2JSON(data)),
+                            "prefix":CNV.object2JSON(data)[0:100]
+                        })
                 except Exception, e:
-                    D.warning("Bad line (${length}bytes):\n\t${prefix}", {
-                        "length":len(line),
-                        "prefix":line[0:100]
-                    })
+                     D.warning("Bad line (${length}bytes):\n\t${prefix}", {
+                         "length":len(CNV.object2JSON(line)),
+                         "prefix":CNV.object2JSON(line)[0:100]
+                     })
 
     es.set_refresh_interval(1)
     time.sleep(2)
@@ -128,7 +134,7 @@ def reset(settings):
 
 settings=startup.read_settings()
 settings.production.threads=nvl(settings.production.threads, 1)
-settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
+settings.output_file=nvl(settings.output_file, "Sample.tab")
 
 
 reset(settings)

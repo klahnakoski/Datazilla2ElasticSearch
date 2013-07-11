@@ -63,7 +63,8 @@ class ElasticSearch():
         items=CNV.JSON2object(response.content)["items"]
 
         for i in items:
-            if i.index.ok!=True: D.error(i.index.error)
+            if i.index.ok!=True:
+                D.error(i.index.error+" while loading line:\n"+lines[i])
 
         if DEBUG: D.println("${num} items added", {"num":len(records)})
 
