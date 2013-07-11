@@ -1,8 +1,8 @@
 from math import floor, ceil
+from string import replace
 from util.cnv import CNV
 from util.debug import D
 from util.stats import Z_moment
-from util.strings import right
 
 
 DEBUG=False
@@ -25,12 +25,28 @@ def transform(datazilla, datazilla_id, keep_arrays_smaller_than=25):
         "error_msg":datazilla.error_msg
     }
 
+
+    new_results={}
+    for k,v in r.results.items():
+        k=replace(k, ".", "_dot_")
+        if len(v)<=keep_arrays_smaller_than:
+            new_results[k]=v
+        else:
+            try:
+                new_results[k]={"moments":Z_moment.new_instance(v).dict}
+            except Exception, e:
+                new_results[k]={"moments":Z_moment.new_instance(v).dict}
+                D.error("can not reduce series to moments", e)
+    r.results=new_results
+
     #CONVERT FROM <name>:<samples> TO {"name":<name>, "samples":<samples>}
-    r.results=[{
-        "name":k,
-        "moments": Z_moment.new_instance(v).dict,
-        "samples": (dict(("s"+right("00"+str(i), 2), s) for i, s in enumerate(v)) if len(v)<=keep_arrays_smaller_than else None)
-    } for k,v in r.results.items()]
+    #USING stack() WOULD BE CLEARER, BUT DOES NOT HANDLE THE TOO-LARGE SEQUENCES
+#    r.results=Q.stack([r.results], column="name")
+#    r.results=[{
+#        "name":k,
+#        "moments": Z_moment.new_instance(v).dict,
+#        "samples": (dict(("s"+right("00"+str(i), 2), s) for i, s in enumerate(v)) if len(v)<=keep_arrays_smaller_than else None)
+#    } for k,v in r.results.items()]
 
     #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
     r.testrun.date*=1000

@@ -3,11 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="2be14c04-396c-482c-b241-310fccc83074" name="Default" comment="More changes for D2E">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Extract_usingID.py" afterPath="$PROJECT_DIR$/Extract_usingID.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Sample.py" afterPath="$PROJECT_DIR$/Sample.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SummarizeTalos.py" afterPath="$PROJECT_DIR$/SummarizeTalos.py" />
-      <change type="MODIFICATION" beforePath="C:\Users\klahnakoski\git\pyLibrary\util\debug.py" afterPath="C:\Users\klahnakoski\git\pyLibrary\util\debug.py" />
-      <change type="MODIFICATION" beforePath="C:\Users\klahnakoski\git\pyLibrary\util\map.py" afterPath="C:\Users\klahnakoski\git\pyLibrary\util\map.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Transform.py" afterPath="$PROJECT_DIR$/Transform.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../pyLibrary/util/query.py" afterPath="$PROJECT_DIR$/../pyLibrary/util/query.py" />
     </list>
     <ignored path="Datazilla2ElasticSearch.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -83,10 +81,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Extract_usingID.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Extract_usingID.py">
+      <file leaf-file-name="SummarizeTalos.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="111" column="25" selection-start="3363" selection-end="3363" vertical-scroll-proportion="0.0">
+            <state line="65" column="0" selection-start="1803" selection-end="1803" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -95,61 +93,25 @@
       <file leaf-file-name="Transform.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Transform.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="0" selection-start="527" selection-end="750" vertical-scroll-proportion="0.22463769">
+            <state line="42" column="10" selection-start="1302" selection-end="1302" vertical-scroll-proportion="0.60181">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test_schema.json" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test_schema.json">
+      <file leaf-file-name="stats.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../pyLibrary/util/stats.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="29" selection-start="462" selection-end="462" vertical-scroll-proportion="0.0">
+            <state line="102" column="0" selection-start="3009" selection-end="3009" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SummarizeTalos.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
+      <file leaf-file-name="query.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../pyLibrary/util/query.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="11" column="65" selection-start="281" selection-end="281" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="bug_version.json" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../Bugzilla Anthropology/src/main/webapp/es/js/etl/bug_version.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="63" column="19" selection-start="1778" selection-end="1778" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pydevd.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/.IntelliJIdea10/config/plugins/python/helpers/pydev/pydevd.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="1202" column="0" selection-start="49887" selection-end="49887" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="settings.json" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/settings.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="23" selection-start="419" selection-end="419" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="map.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/library/util/map.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="0" selection-start="1015" selection-end="1015" vertical-scroll-proportion="0.0">
+            <state line="135" column="0" selection-start="3944" selection-end="3944" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -159,6 +121,33 @@
         <entry file="file://$PROJECT_DIR$/Extract.py">
           <provider selected="true" editor-type-id="text-editor">
             <state line="68" column="35" selection-start="2356" selection-end="2356" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Extract_usingID.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Extract_usingID.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="98" column="31" selection-start="2879" selection-end="2879" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="map.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../pyLibrary/util/map.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="55" column="0" selection-start="1773" selection-end="1773" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="settings.json" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/settings.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="11" column="28" selection-start="269" selection-end="269" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -188,22 +177,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../pyLibrary/util/query.py" />
-        <option value="$PROJECT_DIR$/../esFrontLine/src/library/util/query.py" />
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="C:/Python27/Lib/site-packages/pandas/core/reshape.py" />
         <option value="$PROJECT_DIR$/../esFrontLine/src/library/util/cnv.py" />
         <option value="$PROJECT_DIR$/src/library/util/cnv.py" />
         <option value="$PROJECT_DIR$/../pyLibrary/util/cnv.py" />
-        <option value="$PROJECT_DIR$/Transform.py" />
         <option value="$PROJECT_DIR$/../pyLibrary/util/debug.py" />
         <option value="$PROJECT_DIR$/Sample.py" />
         <option value="$PROJECT_DIR$/../pyLibrary/util/map.py" />
         <option value="$PROJECT_DIR$/src/library/util/map.py" />
-        <option value="$PROJECT_DIR$/Extract_usingID.py" />
         <option value="$PROJECT_DIR$/settings.json" />
         <option value="$PROJECT_DIR$/test_schema.json" />
+        <option value="$PROJECT_DIR$/src/library/util/query.py" />
         <option value="$PROJECT_DIR$/SummarizeTalos.py" />
+        <option value="$PROJECT_DIR$/../pyLibrary/util/query.py" />
+        <option value="$PROJECT_DIR$/Extract_usingID.py" />
+        <option value="$PROJECT_DIR$/Transform.py" />
       </list>
     </option>
   </component>
@@ -240,6 +229,9 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Favorites" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -248,11 +240,54 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Datazilla2ElasticSearch" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Datazilla2ElasticSearch" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pyLibrary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Datazilla2ElasticSearch" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Datazilla2ElasticSearch" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pyLibrary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="util" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Datazilla2ElasticSearch" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Datazilla2ElasticSearch" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Datazilla2ElasticSearch" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Favorites" />
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -277,7 +312,7 @@
       <recent name="C:\Users\klahnakoski\git\Datazilla2ElasticSearch" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.SummarizeTalos">
+  <component name="RunManager" selected="Python.extract_from_datazilla">
     <configuration default="false" name="app" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -287,7 +322,7 @@
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
-      <module name="" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app.py" />
       <option name="PARAMETERS" value="--settings_file settings.json" />
       <RunnerSettings RunnerId="PyDebugRunner" />
@@ -339,7 +374,7 @@
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
-      <module name="" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="app" />
       <option name="PARAMETERS" value="--settings_file settings.json" />
       <method>
@@ -449,7 +484,7 @@
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
-      <module name="" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Extract_usingID.py" />
       <option name="PARAMETERS" value="--settings_file settings.json" />
       <RunnerSettings RunnerId="PyDebugRunner" />
@@ -465,7 +500,7 @@
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
-      <module name="" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SummarizeTalos.py" />
       <option name="PARAMETERS" value="--settings_file settings.json" />
       <RunnerSettings RunnerId="PyDebugRunner" />
@@ -480,8 +515,8 @@
       </envs>
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <module name="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Sample.py" />
       <option name="PARAMETERS" value="--settings_file settings.json" />
       <RunnerSettings RunnerId="PyDebugRunner" />
@@ -519,25 +554,25 @@
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1456" height="872" extended-state="6" />
+    <frame x="54" y="-8" width="1554" height="916" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44313306" sideWeight="0.99809885" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3822342" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3811944" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32939914" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950467" sideWeight="0.61776584" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43991417" sideWeight="0.92199486" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25197417" sideWeight="0.61776584" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4387755" sideWeight="0.92199486" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3293092" sideWeight="0.6188056" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32909784" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44218552" sideWeight="0.99809885" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32890365" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -590,7 +625,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/Transform.py</url>
-          <line>96</line>
+          <line>112</line>
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/../pyLibrary/util/debug.py</url>
@@ -598,11 +633,11 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/SummarizeTalos.py</url>
-          <line>84</line>
+          <line>85</line>
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/SummarizeTalos.py</url>
-          <line>99</line>
+          <line>100</line>
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -612,36 +647,45 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/library/util/cnv.py">
+    <entry file="file://$PROJECT_DIR$/test_schema.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="13" selection-start="2043" selection-end="2043" vertical-scroll-proportion="0.0" />
+        <state line="20" column="29" selection-start="462" selection-end="462" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://C:/Python27/Lib/random.py">
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="880" column="0" selection-start="31551" selection-end="31551" vertical-scroll-proportion="0.33202356" />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://C:/Python27/Lib/string.py">
+    <entry file="file://$PROJECT_DIR$/src/library/util/map.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="145" column="0" selection-start="4841" selection-end="4841" vertical-scroll-proportion="0.0" />
+        <state line="16" column="8" selection-start="606" selection-end="606" vertical-scroll-proportion="0.3328841" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/elasticsearch.py">
+    <entry file="file://$PROJECT_DIR$/raw_json_blobs.tab">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="0" selection-start="1660" selection-end="1660" vertical-scroll-proportion="0.0">
+        <state line="2" column="59" selection-start="1881" selection-end="1881" vertical-scroll-proportion="0.04663923">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/library/util/startup.py">
+    <entry file="file://$PROJECT_DIR$/elasticsearch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="8" selection-start="1429" selection-end="1429" vertical-scroll-proportion="0.0" />
+        <state line="26" column="23" selection-start="517" selection-end="517" vertical-scroll-proportion="0.3328841">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="file://C:/Python27/Lib/threading.py">
+    <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="937" column="0" selection-start="35169" selection-end="35169" vertical-scroll-proportion="0.0">
+        <state line="65" column="0" selection-start="1803" selection-end="1803" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/cnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="44" column="23" selection-start="1591" selection-end="1606" vertical-scroll-proportion="0.023319615">
           <folding />
         </state>
       </provider>
@@ -651,65 +695,56 @@
         <state line="68" column="35" selection-start="2356" selection-end="2356" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sample.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="31" selection-start="737" selection-end="737" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/library/util/map.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="0" selection-start="1015" selection-end="1015" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.IntelliJIdea10/config/plugins/python/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1202" column="0" selection-start="49887" selection-end="49887" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../Bugzilla Anthropology/src/main/webapp/es/js/etl/bug_version.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="19" selection-start="1778" selection-end="1778" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/settings.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="23" selection-start="419" selection-end="419" vertical-scroll-proportion="0.0">
+        <state line="11" column="28" selection-start="269" selection-end="269" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sample.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="31" selection-start="737" selection-end="737" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/strings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="0" selection-start="678" selection-end="678" vertical-scroll-proportion="0.33552632">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/query.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="135" column="0" selection-start="3944" selection-end="3944" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/stats.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="102" column="0" selection-start="3009" selection-end="3009" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/map.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="55" column="0" selection-start="1773" selection-end="1773" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Extract_usingID.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="111" column="25" selection-start="3363" selection-end="3363" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_schema.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="29" selection-start="462" selection-end="462" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SummarizeTalos.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="65" selection-start="281" selection-end="281" vertical-scroll-proportion="0.0">
+        <state line="98" column="31" selection-start="2879" selection-end="2879" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Transform.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="0" selection-start="527" selection-end="750" vertical-scroll-proportion="0.22463769">
+        <state line="42" column="10" selection-start="1302" selection-end="1302" vertical-scroll-proportion="0.60181">
           <folding />
         </state>
       </provider>

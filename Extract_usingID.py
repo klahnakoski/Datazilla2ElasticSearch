@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import threading
 import requests
@@ -90,13 +91,16 @@ def extract_from_datazilla_using_id(settings):
 
 
 def reset(settings):
-    try:
-        ElasticSearch.delete_index(settings.elasticsearch)
-    except Exception, e:
-        pass
+#    try:
+#        ElasticSearch.delete_index(settings.elasticsearch)
+#    except Exception, e:
+#        pass
 
     with open("test_schema.json") as f:
         schema=CNV.JSON2object(f.read(), flexible=True)
+
+    # USE UNIQUE NAME EACH TIME RUN
+    settings.elasticsearch.index=settings.elasticsearch.index+CNV.datetime2string(datetime.utcnow(), "%Y%m%d_%H%M%S")
     es=ElasticSearch.create_index(settings.elasticsearch, schema)
 
     es.set_refresh_interval(-1)
@@ -127,6 +131,6 @@ settings.production.threads=nvl(settings.production.threads, 1)
 settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
 
-#reset(settings)
+reset(settings)
 extract_from_datazilla_using_id(settings)
 

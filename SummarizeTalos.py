@@ -57,6 +57,7 @@ def arrays_add(path, r):
 #    ]
 #})
 
+
 #THIS IS WHAT I MUST DO
 settings=startup.read_settings()
 parts=[0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000]
@@ -76,7 +77,7 @@ with open(settings.output_file, "r") as input_file:
                 all.add(id)
                 data=CNV.JSON2object(col[1]).json_blob
                 arrays_add("["+data.testrun.suite+"]", data)
-                output_file.write(line)
+                output_file.write(str(id)+"\t"+line)
             except Exception, e:
                 D.warning("can not process line:\n\t"+line, e)
 #def etl(col, output_file):
@@ -115,6 +116,14 @@ s=CNV.DataFrame2string(tab2)
 D.println("\n"+s)
 with open("talos_summary2.tab", "w") as output_file:
     output_file.write(s)
+
+biggest=df[df.length==63000]
+D.println(CNV.DataFrame2string(biggest))
+with open("talos_biggest.tab", "w") as output_file:
+    output_file.write(s)
+
+
+
 
 
 
