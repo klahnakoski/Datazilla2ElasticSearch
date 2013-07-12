@@ -51,8 +51,16 @@ def etl_main_loop(es, VAL, existing_ids, settings):
 
 
 def extract_from_datazilla_using_id(settings):
-    #FIND WHAT'S IN ES
     es=ElasticSearch(settings.elasticsearch)
+
+    if settings.elasticsearch.alias is None: settings.elasticsearch.alias=settings.elasticsearch.index
+    if settings.elasticsearch.alias==settings.elasticsearch.index:
+        possible_indexes=[a.index for a in es.get_aliases() if a.alias==settings.elasticsearch.alias]
+        if len(possible_indexes)==0:
+            D.error("expecting an index with '"+settings.elasticsearch.alias+"' as alias")
+        settings.elasticsearch.index=possible_indexes[0]
+
+    #FIND WHAT'S IN ES
     existing_ids=es.search({
         "query":{"filtered":{
             "query":{"match_all":{}},
@@ -104,8 +112,8 @@ def reset(settings):
         schema=CNV.JSON2object(f.read(), flexible=True)
 
     # USE UNIQUE NAME EACH TIME RUN
-    settings.elasticsearch.alias=settings.elasticsearch.index
-    settings.elasticsearch.index=settings.elasticsearch.index+CNV.datetime2string(datetime.utcnow(), "%Y%m%d_%H%M%S")
+    if settings.elasticsearch.alias is None: settings.elasticsearch.alias=settings.elasticsearch.index
+    settings.elasticsearch.index=settings.elasticsearch.alias+CNV.datetime2string(datetime.utcnow(), "%Y%m%d_%H%M%S")
     es=ElasticSearch.create_index(settings.elasticsearch, schema)
 
     es.set_refresh_interval(-1)
@@ -136,6 +144,6 @@ settings.production.threads=nvl(settings.production.threads, 1)
 settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
 
-reset(settings)
+#reset(settings)
 extract_from_datazilla_using_id(settings)
 
