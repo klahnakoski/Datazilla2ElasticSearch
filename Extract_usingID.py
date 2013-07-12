@@ -39,8 +39,7 @@ def etl(blob_id, es, settings):
 
 def etl_main_loop(es, VAL, existing_ids, settings):
     try:
-        for blob_id in range(settings.production.min,
-                             settings.production.max + settings.production.threads):
+        for blob_id in range(settings.production.min, settings.production.max):
             if blob_id % settings.production.threads != VAL: continue
             if blob_id in existing_ids: continue
             try:
@@ -89,6 +88,11 @@ def extract_from_datazilla_using_id(settings):
     finally:
         es.set_refresh_interval(1)
 
+    es.delete_all_but(settings.elasticsearch.alias, settings.elasticsearch.index)
+    es.add_alias(settings.elasticsearch.alias)
+
+
+
 
 def reset(settings):
 #    try:
@@ -100,6 +104,7 @@ def reset(settings):
         schema=CNV.JSON2object(f.read(), flexible=True)
 
     # USE UNIQUE NAME EACH TIME RUN
+    settings.elasticsearch.alias=settings.elasticsearch.index
     settings.elasticsearch.index=settings.elasticsearch.index+CNV.datetime2string(datetime.utcnow(), "%Y%m%d_%H%M%S")
     es=ElasticSearch.create_index(settings.elasticsearch, schema)
 
@@ -111,21 +116,15 @@ def reset(settings):
                 try:
                     if len(line.strip())==0: continue
                     col=line.split("\t")
-                    id=col[0]
+                    id=int(col[0])
+                    if id<settings.production.min or settings.production.max<=id: continue
                     data=CNV.JSON2object(col[1])
                     data=transform(data, datazilla_id=id)
-
-                    try:
-                        es.load([data], "datazilla.id")
-                    except Exception, e:
-                        D.warning("Can not load data (${length}bytes):\n\t${prefix}", {
-                            "length":len(CNV.object2JSON(data)),
-                            "prefix":CNV.object2JSON(data)[0:100]
-                        })
+                    es.load([data], "datazilla.id")
                 except Exception, e:
                      D.warning("Bad line (${length}bytes):\n\t${prefix}", {
                          "length":len(CNV.object2JSON(line)),
-                         "prefix":CNV.object2JSON(line)[0:100]
+                         "prefix":CNV.object2JSON(line)[0:130]
                      })
 
     es.set_refresh_interval(1)
@@ -134,7 +133,7 @@ def reset(settings):
 
 settings=startup.read_settings()
 settings.production.threads=nvl(settings.production.threads, 1)
-settings.output_file=nvl(settings.output_file, "Sample.tab")
+settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
 
 reset(settings)

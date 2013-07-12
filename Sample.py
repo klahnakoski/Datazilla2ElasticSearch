@@ -2,6 +2,7 @@ from random import random
 from util.debug import D
 from util.cnv import CNV
 from util.startup import startup
+from Transform import transform
 from elasticsearch import ElasticSearch
 
 
@@ -25,8 +26,7 @@ with open("Sample.tab", "w") as output_file:
 #                if 0.001<random(): continue
                 D.println(line)
 
-                data=CNV.JSON2object(col[1]).json_blob
-                data.datazilla.id=id
+                data=transform(CNV.JSON2object(col[1]), datazilla_id=id)
                 es.load([data], "datazilla.id")
                 output_file.write(line+"\n")
             except Exception, e:

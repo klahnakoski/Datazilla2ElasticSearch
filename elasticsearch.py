@@ -3,6 +3,8 @@ import requests
 import time
 from util.cnv import CNV
 from util.debug import D
+from util.basic import nvl
+from util.map import Map, MapList
 
 DEBUG=True
 
@@ -34,10 +36,45 @@ class ElasticSearch():
         return ElasticSearch(settings)
 
 
+
+
     @staticmethod
-    def delete_index(settings):
+    def delete_index(settings, index=None):
+        index=nvl(index, settings.index)
+
         ElasticSearch.delete(
-            settings.host+":"+str(settings.port)+"/"+settings.index,
+            settings.host+":"+str(settings.port)+"/"+index,
+        )
+
+    #RETURN LIST OF {"alias":a, "index":i} PAIRS
+    def get_aliases(self):
+        response=requests.get(self.settings.host+":"+str(self.settings.port)+"/_aliases")
+        data=CNV.JSON2object(response.content)
+        output=[]
+        for index, desc in data.items():
+            if desc["aliases"] is None or len(desc["aliases"].items())==0:
+                output.append({"index":index, "alias":None})
+            else:
+                for a, v in desc["aliases"].items():
+                    output.append({"index":index, "alias":a})
+        return MapList(output)
+
+
+    #DELETE ALL INDEXES WITH GIVEN PREFIX, EXCEPT name
+    def delete_all_but(self, prefix, name):
+        for a in self.get_aliases():
+            if a.index.startswith(prefix) and a.index!=name:
+                ElasticSearch.delete_index(self.settings, a.index)
+
+
+    def add_alias(self, alias):
+        requests.post(
+            self.settings.host+":"+str(self.settings.port)+"/_aliases",
+            CNV.object2JSON({
+                "actions":[
+                    {"add":{"index":self.settings.index, "alias":alias}}
+                ]
+            })
         )
 
 
@@ -84,7 +121,7 @@ class ElasticSearch():
     def search(self, query):
         try:
             response=ElasticSearch.post(self.path+"/_search", data=CNV.object2JSON(query))
-            if DEBUG: D.println(response.content[:100])
+            if DEBUG: D.println(response.content[:130])
             result=CNV.JSON2object(response.content)
             if result.error is None: return result
             D.error(result.error)
@@ -97,7 +134,7 @@ class ElasticSearch():
     def post(*list, **args):
         try:
             response=requests.post(*list, **args)
-            if DEBUG: D.println(response.content[:100])
+            if DEBUG: D.println(response.content[:130])
             return response
         except Exception, e:
             D.error("Problem with call to ${url}", {"url":list[0]}, e)
