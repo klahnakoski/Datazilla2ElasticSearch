@@ -15,9 +15,6 @@ from util.timer import Timer
 
 
 
-
-
-
 file_lock=threading.Lock()
 
 ## CONVERT DZ BLOB TO ES JSON
@@ -28,7 +25,7 @@ def etl(blob_id, es, settings):
     D.println("Add ${id} for revision ${revision} (${size} bytes)",
             {"id": blob_id, "revision": data.json_blob.test_build.revision,
              "size": len(content)})
-    data=transform(data, datazilla_id=blob_id)
+    data=transform(blob_id, data)
     with Timer("push to ES"):
         es.load([data], "datazilla.id")
 
@@ -127,7 +124,7 @@ def reset(settings):
                     id=int(col[0])
                     if id<settings.production.min or settings.production.max<=id: continue
                     data=CNV.JSON2object(col[1])
-                    data=transform(data, datazilla_id=id)
+                    data=transform(id, data)
                     es.load([data], "datazilla.id")
                 except Exception, e:
                      D.warning("Bad line (${length}bytes):\n\t${prefix}", {

@@ -26,7 +26,7 @@ with open("Sample.tab", "w") as output_file:
 #                if 0.001<random(): continue
                 D.println(line)
 
-                data=transform(CNV.JSON2object(col[1]), datazilla_id=id)
+                data=transform(id, CNV.JSON2object(col[1]))
                 es.load([data], "datazilla.id")
                 output_file.write(line+"\n")
             except Exception, e:

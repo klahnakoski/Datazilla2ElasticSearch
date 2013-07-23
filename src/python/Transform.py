@@ -12,7 +12,7 @@ DEBUG=False
 # A SIMPLE TRANSFORM OF DATA:  I WOULD ALSO LIKE TO ADD DIMENSIONAL TYPE INFORMATION
 # WHICH WOULD GIVE DEAR READER A BETTER FEEL FOR THE TOTALITY OF THIS DATA
 # BUT THEN AGAIN, SIMPLE IS BETTER, YES?
-def transform(datazilla, datazilla_id, keep_arrays_smaller_than=25):
+def transform(id, datazilla, keep_arrays_smaller_than=25):
     r=datazilla.json_blob
 
     #ADD DATAZILLA MARKUP
