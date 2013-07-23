@@ -13,7 +13,23 @@ class DZ_to_ES():
 
 
     def __init__(self, pushlog_settings):
-        self.pushlog=get_pushlog(pushlog_settings)
+        with DB(pushlog_settings) as db:
+            all_pushlogs=db.query("""
+                SELECT
+                    pl.`date`,
+                    left(ch.node, 12) revision,
+                    coalesce(bm.alt_name, br.name) branch
+                FROM
+                    changesets ch
+                LEFT JOIN
+                    pushlogs pl ON pl.id = ch.pushlog_id
+                LEFT JOIN
+                    branches br ON br.id = pl.branch_id
+                LEFT JOIN
+                    branch_map bm ON br.id = bm.id
+            """)
+
+        self.pushlog=Q.index(all_pushlogs, ["branch", "revision"])
 
 
 
@@ -79,7 +95,7 @@ class DZ_to_ES():
             branch=r.test_build.branch
             if branch[-8:]=="-Non-PGO": branch=branch[0:-8]
             possible_dates=self.pushlog[branch][r.test_build.revision]
-            r.test_build.push_date=possible_dates[0].date
+            r.test_build.push_date=int(possible_dates[0].date)*1000
         except Exception, e:
             D.warning(r.test_build.branch+"@"+r.test_build.revision+" has no pushlog", e)
         
@@ -87,24 +103,8 @@ class DZ_to_ES():
 
 
 
-def get_pushlog(settings):
-    with DB(settings) as db:
-        all_pushlogs=db.query("""
-            SELECT
-                pl.`date`,
-                left(ch.node, 12) revision,
-                coalesce(bm.alt_name, br.name) branch
-            FROM
-                changesets ch
-            LEFT JOIN
-                pushlogs pl ON pl.id = ch.pushlog_id
-            LEFT JOIN
-                branches br ON br.id = pl.branch_id
-            LEFT JOIN
-                branch_map bm ON br.id = bm.id
-        """)
 
-        return Q.index(all_pushlogs, ["branch", "revision"])
+
 
 
 

@@ -130,7 +130,7 @@ def reset(settings):
                      D.warning("Bad line (${length}bytes):\n\t${prefix}", {
                          "length":len(CNV.object2JSON(line)),
                          "prefix":CNV.object2JSON(line)[0:130]
-                     })
+                     }, e)
 
     es.set_refresh_interval(1)
     time.sleep(2)
