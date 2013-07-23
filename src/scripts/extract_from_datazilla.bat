@@ -1,4 +1,4 @@
 
 SET PYTHONPATH=./pyLibrary;./src/python
 
-python Extract_usingID.py --settings_file settings.json
+python src\python\Extract_usingID.py --settings_file settings.json

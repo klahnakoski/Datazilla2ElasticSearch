@@ -76,7 +76,9 @@ class DZ_to_ES():
 
         #ADD PUSH LOG INFO
         try:
-            possible_dates=self.pushlog[r.test_build.branch][r.test_build.revision]
+            branch=r.test_build.branch
+            if branch[-8:]=="-Non-PGO": branch=branch[0:-8]
+            possible_dates=self.pushlog[branch][r.test_build.revision]
             r.test_build.push_date=possible_dates[0].date
         except Exception, e:
             D.warning(r.test_build.branch+"@"+r.test_build.revision+" has no pushlog", e)

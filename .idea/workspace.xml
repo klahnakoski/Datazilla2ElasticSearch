@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2be14c04-396c-482c-b241-310fccc83074" name="Default" comment="More changes for D2E">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyLibrary" afterPath="$PROJECT_DIR$/pyLibrary" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/python/Extract_usingID.py" afterPath="$PROJECT_DIR$/src/python/Extract_usingID.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/python/Transform.py" afterPath="$PROJECT_DIR$/src/python/Transform.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scripts/extract_from_datazilla.bat" afterPath="$PROJECT_DIR$/src/scripts/extract_from_datazilla.bat" />
     </list>
     <ignored path="Datazilla2ElasticSearch.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -83,25 +83,16 @@
       <file leaf-file-name="settings.json" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/settings.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="18" selection-start="466" selection-end="466" vertical-scroll-proportion="0.0">
+            <state line="25" column="18" selection-start="594" selection-end="594" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="extract_from_datazilla.bat" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="extract_from_datazilla.bat" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/scripts/extract_from_datazilla.bat">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="0" selection-start="1" selection-end="41" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Sample.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/python/Sample.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="58" selection-start="790" selection-end="790" vertical-scroll-proportion="0.0">
+            <state line="3" column="18" selection-start="60" selection-end="60" vertical-scroll-proportion="0.076754384">
               <folding />
             </state>
           </provider>
@@ -110,7 +101,7 @@
       <file leaf-file-name="Extract_usingID.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/python/Extract_usingID.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="0" selection-start="741" selection-end="741" vertical-scroll-proportion="0.0">
+            <state line="145" column="0" selection-start="4884" selection-end="4884" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -125,10 +116,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Transform.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Transform.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/python/Transform.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="101" column="46" selection-start="4028" selection-end="4028" vertical-scroll-proportion="0.38352942">
+            <state line="85" column="16" selection-start="3612" selection-end="3612" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -147,15 +138,6 @@
         <entry file="file://$PROJECT_DIR$/../pyLibrary/util/query.py">
           <provider selected="true" editor-type-id="text-editor">
             <state line="13" column="6" selection-start="605" selection-end="605" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="debug.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pyLibrary/util/debug.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="68" column="0" selection-start="2388" selection-end="2388" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -194,13 +176,13 @@
         <option value="$PROJECT_DIR$/elasticsearch.py" />
         <option value="$PROJECT_DIR$/Extract_usingID.py" />
         <option value="$PROJECT_DIR$/SummarizeTalos.py" />
-        <option value="$PROJECT_DIR$/src/scripts/extract_from_datazilla.bat" />
         <option value="$PROJECT_DIR$/src/scripts/SummarizeTalos.bat" />
         <option value="$PROJECT_DIR$/src/python/Sample.py" />
         <option value="$PROJECT_DIR$/pyLibrary/util/query.py" />
+        <option value="$PROJECT_DIR$/src/python/Transform.py" />
         <option value="$PROJECT_DIR$/src/python/Extract_usingID.py" />
         <option value="$PROJECT_DIR$/settings.json" />
-        <option value="$PROJECT_DIR$/src/python/Transform.py" />
+        <option value="$PROJECT_DIR$/src/scripts/extract_from_datazilla.bat" />
       </list>
     </option>
   </component>
@@ -596,12 +578,12 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="54" y="-8" width="1554" height="916" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.386277" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.386277" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32939914" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -692,6 +674,10 @@
           <url>file://$PROJECT_DIR$/SummarizeTalos.py</url>
           <line>81</line>
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/src/python/Transform.py</url>
+          <line>83</line>
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
@@ -700,16 +686,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pyLibrary/util/stats.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="102" column="0" selection-start="3009" selection-end="3009" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/pandas/core/internals.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1798" column="0" selection-start="60847" selection-end="60847" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test_schema.json">
       <provider selected="true" editor-type-id="text-editor">
         <state line="12" column="40" selection-start="325" selection-end="325" vertical-scroll-proportion="0.0">
@@ -773,13 +749,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/settings.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="18" selection-start="466" selection-end="466" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pyLibrary/util/map.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="48" column="0" selection-start="1608" selection-end="1608" vertical-scroll-proportion="0.0">
@@ -787,23 +756,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/python/Extract_usingID.py">
+    <entry file="file://C:/Python27/Lib/httplib.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="0" selection-start="741" selection-end="741" vertical-scroll-proportion="0.0">
+        <state line="365" column="0" selection-start="12080" selection-end="12080" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/scripts/extract_from_datazilla.bat">
+    <entry file="file://C:/Python27/Lib/ssl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="0" selection-start="1" selection-end="41" vertical-scroll-proportion="0.0">
+        <state line="159" column="0" selection-start="5231" selection-end="5231" vertical-scroll-proportion="1.3561643">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/python/Transform.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="101" column="46" selection-start="4028" selection-end="4028" vertical-scroll-proportion="0.38352942">
+        <state line="85" column="16" selection-start="3612" selection-end="3612" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="18" selection-start="594" selection-end="594" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/python/Extract_usingID.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="145" column="0" selection-start="4884" selection-end="4884" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scripts/extract_from_datazilla.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="3" column="18" selection-start="60" selection-end="60" vertical-scroll-proportion="0.076754384">
           <folding />
         </state>
       </provider>

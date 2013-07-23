@@ -124,7 +124,7 @@ def reset(settings):
                     id=int(col[0])
                     if id<settings.production.min or settings.production.max<=id: continue
                     data=CNV.JSON2object(col[1])
-                    data=transform(id, data)
+                    data=transformer.transform(id, data)
                     es.load([data], "datazilla.id")
                 except Exception, e:
                      D.warning("Bad line (${length}bytes):\n\t${prefix}", {
@@ -141,7 +141,8 @@ settings.production.threads=nvl(settings.production.threads, 1)
 settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
 
-#reset(settings)
+
 transformer=DZ_to_ES(settings.pushlog)
+reset(settings)
 extract_from_datazilla_using_id(settings)
 
