@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="2be14c04-396c-482c-b241-310fccc83074" name="Default" comment="More changes for D2E">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyLibrary" afterPath="$PROJECT_DIR$/pyLibrary" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/python/Extract_usingID.py" afterPath="$PROJECT_DIR$/src/python/Extract_usingID.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/python/Transform.py" afterPath="$PROJECT_DIR$/src/python/Transform.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/python/elasticsearch.py" afterPath="$PROJECT_DIR$/src/python/elasticsearch.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_schema.json" afterPath="$PROJECT_DIR$/test_schema.json" />
     </list>
     <ignored path="Datazilla2ElasticSearch.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -94,7 +91,7 @@
       <file leaf-file-name="Transform.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/python/Transform.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="20" selection-start="221" selection-end="263" vertical-scroll-proportion="0.040572792">
+            <state line="114" column="0" selection-start="4525" selection-end="4525" vertical-scroll-proportion="0.016781837">
               <folding />
             </state>
           </provider>
@@ -327,8 +324,8 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Favorites" />
       <pane id="PackagesPane" />
+      <pane id="Favorites" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -597,25 +594,25 @@
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
   <component name="ToolWindowManager">
-    <frame x="54" y="-8" width="1554" height="916" extended-state="6" />
+    <frame x="1607" y="-897" width="1589" height="1187" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44091487" sideWeight="0.99809885" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3939009" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32909784" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3939009" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32814527" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32909784" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950467" sideWeight="0.61776584" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4387755" sideWeight="0.92199486" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33065057" sideWeight="0.6060991" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3184797" sideWeight="0.67185473" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32909784" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44091487" sideWeight="0.99809885" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32890365" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -740,6 +737,32 @@
         <state line="39" column="0" selection-start="1264" selection-end="1264" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/python/elasticsearch.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="103" column="0" selection-start="2904" selection-end="2904" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/python/Transform.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="114" column="0" selection-start="4525" selection-end="4525" vertical-scroll-proportion="0.016781837">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyLibrary/util/debug.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="69" column="0" selection-start="2404" selection-end="2404" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/httplib.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="775" column="0" selection-start="26533" selection-end="26533" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
     <entry file="file://C:/Python27/Lib/site-packages/MySQLdb/connections.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="186" column="0" selection-start="5477" selection-end="5477" vertical-scroll-proportion="0.0" />
@@ -757,51 +780,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pyLibrary/util/cnv.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="0" selection-start="758" selection-end="758" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/python/Extract_usingID.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="129" column="54" selection-start="4453" selection-end="4453" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pyLibrary/util/debug.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="0" selection-start="2404" selection-end="2404" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/httplib.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="775" column="0" selection-start="26533" selection-end="26533" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/python/elasticsearch.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="103" column="0" selection-start="2904" selection-end="2904" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="23" column="0" selection-start="758" selection-end="758" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test_schema.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="41" selection-start="1007" selection-end="1007" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="36" column="41" selection-start="1007" selection-end="1007" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/python/Transform.py">
+    <entry file="file://$PROJECT_DIR$/src/python/Extract_usingID.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="20" selection-start="221" selection-end="263" vertical-scroll-proportion="0.040572792">
-          <folding />
-        </state>
+        <state line="129" column="54" selection-start="4453" selection-end="4453" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
   </component>

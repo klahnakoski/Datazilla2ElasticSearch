@@ -30,8 +30,14 @@ class DZ_to_ES():
             """)
 
         self.pushlog=Q.index(all_pushlogs, ["branch", "revision"])
+        self.unknown_branches=set()
 
-
+    def __del__(self):
+        try:
+            D.println("Branches missing from pushlog:\n${list}", {"list":self.unknown_branches})
+        except Exception, e:
+            pass
+        
 
     # A SIMPLE TRANSFORM OF DATA:  I WOULD ALSO LIKE TO ADD DIMENSIONAL TYPE INFORMATION
     # WHICH WOULD GIVE DEAR READER A BETTER FEEL FOR THE TOTALITY OF THIS DATA
@@ -94,10 +100,13 @@ class DZ_to_ES():
         try:
             branch=r.test_build.branch
             if branch[-8:]=="-Non-PGO": branch=branch[0:-8]
-            possible_dates=self.pushlog[branch][r.test_build.revision]
-            r.test_build.push_date=int(possible_dates[0].date)*1000
+            if branch in self.pushlog:
+                possible_dates=self.pushlog[branch][r.test_build.revision]
+                r.test_build.push_date=int(possible_dates[0].date)*1000
+            else:
+                self.unknown_branches.add(branch)
         except Exception, e:
-            D.warning(r.test_build.branch+"@"+r.test_build.revision+" has no pushlog", e)
+            D.warning("${branch} @ ${revision} has no pushlog", r.test_build, e)
         
         return r
 
