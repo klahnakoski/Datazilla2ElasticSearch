@@ -8,7 +8,7 @@ from util.basic import nvl
 from util.debug import D
 from util.startup import startup
 from util.cnv import CNV
-from Transform import transform
+from Transform import DZ_to_ES
 from elasticsearch import ElasticSearch
 from util.timer import Timer
 
@@ -25,7 +25,7 @@ def etl(blob_id, es, settings):
     D.println("Add ${id} for revision ${revision} (${size} bytes)",
             {"id": blob_id, "revision": data.json_blob.test_build.revision,
              "size": len(content)})
-    data=transform(blob_id, data)
+    data=transformer.transform(blob_id, data)
     with Timer("push to ES"):
         es.load([data], "datazilla.id")
 
@@ -142,5 +142,6 @@ settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
 
 #reset(settings)
+transformer=DZ_to_ES(settings.pushlog)
 extract_from_datazilla_using_id(settings)
 
