@@ -6,7 +6,7 @@
 		"index.store.throttle.max_bytes_per_sec":"2mb"
 	},
 	"mappings":{
-		"test_results":{
+		${type}:{
 			"dynamic_templates":[
 				{"default_moment":{
 					"mapping":{"index":"no", "type":"double"},
@@ -18,6 +18,7 @@
 				}},
 				{"default_strings":{
 					"mapping":{"index":"not_analyzed", "type":"string"},
+					"match":"*",
 					"match_mapping_type" : "string"
 				}}
 			],
@@ -34,7 +35,9 @@
 				},
 				"test_build":{
 					"dynamic":true,
-					"push_date":{"type":"long"}
+					"properties":{
+						"push_date":{"type":"long"}
+					}
 				}
 
 			},

@@ -97,7 +97,7 @@ class ElasticSearch():
             data="".join(lines),
             headers={"Content-Type":"text"}
         )
-        items=CNV.JSON2object(response.content)["items"]
+        items=response["items"]
 
         for i, item in enumerate(items):
             if not item.index.ok:
@@ -120,11 +120,7 @@ class ElasticSearch():
 
     def search(self, query):
         try:
-            response=ElasticSearch.post(self.path+"/_search", data=CNV.object2JSON(query))
-            if DEBUG: D.println(response.content[:130])
-            result=CNV.JSON2object(response.content)
-            if result.error is None: return result
-            D.error(result.error)
+            return ElasticSearch.post(self.path+"/_search", data=CNV.object2JSON(query))
         except Exception, e:
             D.error("Problem with search", e)
 
@@ -135,7 +131,10 @@ class ElasticSearch():
         try:
             response=requests.post(*list, **args)
             if DEBUG: D.println(response.content[:130])
-            return response
+            details=CNV.JSON2object(response.content)
+            if details.error is not None:
+                D.error(details.error)
+            return details
         except Exception, e:
             D.error("Problem with call to ${url}", {"url":list[0]}, e)
 
