@@ -155,6 +155,6 @@ settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
 transformer=DZ_to_ES(settings.pushlog)
 #RESET ONLY IF NEW Transform IS USED
-#reset(settings)
+reset(settings)
 extract_from_datazilla_using_id(settings)
 
