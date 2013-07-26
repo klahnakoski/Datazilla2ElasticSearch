@@ -33,10 +33,33 @@
 						"error_msg":{"index":"not_analyzed", "type":"string"}
 					}
 				},
+				"results":{
+					"dynamic":true,
+					"properties":{
+						"index":{"type":"long"},
+						"series":{"type":"long"},
+						"last_20":{"type":"long"},
+						"moments":{
+							"dynamic":true,
+							"properties":{
+								"s0":{"type":"long"},
+								"s1":{"type":"long"},
+								"s2":{"type":"long"},
+								"s3":{"type":"long"},
+								"s4":{"type":"long"}
+							}
+						}
+					}
+				},
 				"test_build":{
 					"dynamic":true,
 					"properties":{
-						"push_date":{"type":"long"}
+						"push_date":{"type":"long"},
+						"branch":{"index":"not_analyzed", "type":"string"},
+						"revision":{"index":"not_analyzed", "type":"string"},
+						"name":{"index":"not_analyzed", "type":"string"},
+						"version":{"index":"not_analyzed", "type":"string"},
+						"id":{"index":"not_analyzed", "type":"long"}
 					}
 				}
 
