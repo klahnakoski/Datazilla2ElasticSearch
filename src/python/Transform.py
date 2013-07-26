@@ -27,8 +27,6 @@ class DZ_to_ES():
                     branches br ON br.id = pl.branch_id
                 LEFT JOIN
                     branch_map bm ON br.id = bm.id
-    LIMIT
-        1000
             """)
 
         self.pushlog=Q.index(all_pushlogs, ["branch", "revision"])

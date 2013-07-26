@@ -73,13 +73,19 @@ with open(settings.output_file, "r") as input_file:
                 col=line.split("\t")
                 id=int(col[0])
                 if id % 1000==0: D.println("loading id "+str(id))
+
+                data=CNV.JSON2object(col[1]).json_blob
+                if data.testrun.date<CNV.datetime2unix(CNV.string2datetime("20130720", "%Y%m%d")): continue
+
                 if id in all: continue
                 all.add(id)
-                data=CNV.JSON2object(col[1]).json_blob
+
                 arrays_add("["+data.test_build.branch+"]["+data.testrun.suite+"]", data)
                 output_file.write(str(id)+"\t"+line)
             except Exception, e:
                 D.warning("can not process line:\n\t"+line, e)
+
+        D.println("First id >= date: ${min}", {"min":min(*all)})
 #def etl(col, output_file):
 #    try:
 #        data = CNV.JSON2object(col["json"]).json_blob

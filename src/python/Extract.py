@@ -21,6 +21,8 @@ def etl(es, settings, id):
     try:
         with Timer("read from DZ"):
             content = requests.get(settings.production.blob_url + "/" + str(id)).content
+        if content.startswith("Id not found"): return False
+
         data = CNV.JSON2object(content)
         D.println("Add ${id} for revision ${revision} (${size} bytes)",
                 {"id": id, "revision": data.json_blob.test_build.revision,
@@ -153,6 +155,6 @@ settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
 transformer=DZ_to_ES(settings.pushlog)
 #RESET ONLY IF NEW Transform IS USED
-reset(settings)
+#reset(settings)
 extract_from_datazilla_using_id(settings)
 
