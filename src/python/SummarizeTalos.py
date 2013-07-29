@@ -44,7 +44,7 @@ def arrays_add(id, path, r):
 
 
 settings=startup.read_settings()
-#D.settings(settings.debug)
+D.settings(settings.debug)
 all=set()
 
 
@@ -82,19 +82,23 @@ with open(settings.output_file, "r") as input_file:
 
 
 df=DataFrame(arrays, columns=["id", "path", "length", "count"])
-length_dim=pandas.cut(df.length, parts, labels=[("     "+str(p))[-5:]+" to "+str(parts[i+1]-1) for i,p in enumerate(parts[0:-1])], right=False)
-summary=df.groupby(["path", length_dim]).size()
+colNames=[str(p)+" to "+str(parts[i+1]-1) for i,p in enumerate(parts[0:-1])]
+
+# http://pandas.pydata.org/pandas-docs/stable/groupby.html#na-group-handling
+length_dim=pandas.cut(df.length, parts, labels=colNames, right=False)
+summary=df.groupby(["path", length_dim], sort=False).size()
+#summary=summary.reindex(length_dim, level="length")
 table=summary.unstack("length")
-s=CNV.DataFrame2string(table)
+s=CNV.DataFrame2string(table)#, columns=colNames)
 D.println("\n"+s)
-with open("talos_summary1.tab", "w") as output_file:
+with open("talos_big_array_summary.tab", "w") as output_file:
     output_file.write(s)
 
 sum2=df.groupby(["path", "length"]).size()
 tab2=sum2.unstack("length")
-s=CNV.DataFrame2string(tab2)
+s=CNV.DataFrame2string(tab2)#, columns=colNames)
 D.println("\n"+s)
-with open("talos_summary2.tab", "w") as output_file:
+with open("talos_every_population.tab", "w") as output_file:
     output_file.write(s)
 
 biggest=df[df.length==63000]
