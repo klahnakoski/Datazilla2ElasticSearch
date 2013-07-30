@@ -32,12 +32,12 @@ def etl(es, settings, id):
             es.load([data], "datazilla.id")
 
         with file_lock:
-            with open(settings.output_file, "a") as myfile:
+            with open(settings.output_file, "a", 2**24) as myfile:
                 id=str(id)
                 myfile.write(id + "\t" + content + "\n")
         return True
     except Exception, e:
-        D.warning("Failure to etl", e)
+        D.warning("Failure to etl (content length=${length})", {"length":len(content)}, e)
         return False
     
 
@@ -86,13 +86,14 @@ def extract_from_datazilla_using_id(settings):
             D.error("expecting an index with '"+settings.elasticsearch.alias+"' as alias")
         settings.elasticsearch.index=possible_indexes[0]
 
+    existing_ids = get_exiting_ids(es, settings)
+    missing_ids=set(range(settings.production.min, settings.production.max))-existing_ids
+
     #FASTER IF NO INDEXING IS ON
     es.set_refresh_interval(-1)
 
-
     #FILE IS FASTER THAN DNETWORK
-
-    if os.path.isfile(settings.output_file):
+    if len(missing_ids)>10000 and os.path.isfile(settings.output_file):
         with open(settings.output_file, "r") as myfile:
             for line in myfile:
                 try:
@@ -100,6 +101,8 @@ def extract_from_datazilla_using_id(settings):
                     col=line.split("\t")
                     id=int(col[0])
                     if id<settings.production.min or settings.production.max<=id: continue
+                    if id in existing_ids: continue
+                    
                     data=CNV.JSON2object(col[1])
                     data=transformer.transform(id, data)
                     es.load([data], "datazilla.id")
@@ -112,8 +115,6 @@ def extract_from_datazilla_using_id(settings):
 
     #COPY MISSING DATA TO ES
     try:
-        existing_ids = get_exiting_ids(es, settings)
-        missing_ids=set(range(settings.production.min, settings.production.max))-existing_ids
         functions=[functools.partial(etl, *[es, settings]) for i in range(settings.production.threads)]
 
         num_not_found=0
