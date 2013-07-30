@@ -33,7 +33,8 @@ def etl(es, settings, id):
 
         with file_lock:
             with open(settings.output_file, "a") as myfile:
-                myfile.write(str(id) + "\t" + content + "\n")
+                id=str(id)
+                myfile.write(id + "\t" + content + "\n")
         return True
     except Exception, e:
         D.warning("Failure to etl", e)
@@ -77,13 +78,36 @@ def get_exiting_ids(es, settings):
 def extract_from_datazilla_using_id(settings):
     es=ElasticSearch(settings.elasticsearch)
 
-    #SETUP NEW INDEX
+    #FIND SPECIFIC INDEX
     if settings.elasticsearch.alias is None: settings.elasticsearch.alias=settings.elasticsearch.index
     if settings.elasticsearch.alias==settings.elasticsearch.index:
         possible_indexes=[a.index for a in es.get_aliases() if a.alias==settings.elasticsearch.alias]
         if len(possible_indexes)==0:
             D.error("expecting an index with '"+settings.elasticsearch.alias+"' as alias")
         settings.elasticsearch.index=possible_indexes[0]
+
+    #FASTER IF NO INDEXING IS ON
+    es.set_refresh_interval(-1)
+
+
+    #FILE IS FASTER THAN DNETWORK
+
+    if os.path.isfile(settings.output_file):
+        with open(settings.output_file, "r") as myfile:
+            for line in myfile:
+                try:
+                    if len(line.strip())==0: continue
+                    col=line.split("\t")
+                    id=int(col[0])
+                    if id<settings.production.min or settings.production.max<=id: continue
+                    data=CNV.JSON2object(col[1])
+                    data=transformer.transform(id, data)
+                    es.load([data], "datazilla.id")
+                except Exception, e:
+                     D.warning("Bad line (${length}bytes):\n\t${prefix}", {
+                         "length":len(CNV.object2JSON(line)),
+                         "prefix":CNV.object2JSON(line)[0:130]
+                     }, e)
 
 
     #COPY MISSING DATA TO ES
@@ -124,37 +148,16 @@ def reset(settings):
     settings.elasticsearch.index=settings.elasticsearch.alias+CNV.datetime2string(datetime.utcnow(), "%Y%m%d_%H%M%S")
     es=ElasticSearch.create_index(settings.elasticsearch, schema)
 
-    es.set_refresh_interval(-1)
-
-    if os.path.isfile(settings.output_file):
-        with open(settings.output_file, "r") as myfile:
-            for line in myfile:
-                try:
-                    if len(line.strip())==0: continue
-                    col=line.split("\t")
-                    id=int(col[0])
-                    if id<settings.production.min or settings.production.max<=id: continue
-                    data=CNV.JSON2object(col[1])
-                    data=transformer.transform(id, data)
-                    es.load([data], "datazilla.id")
-                except Exception, e:
-                     D.warning("Bad line (${length}bytes):\n\t${prefix}", {
-                         "length":len(CNV.object2JSON(line)),
-                         "prefix":CNV.object2JSON(line)[0:130]
-                     }, e)
-
-    es.set_refresh_interval(1)
-    time.sleep(2)
-
+   
 
 settings=startup.read_settings()
 settings.production.threads=nvl(settings.production.threads, 1)
 settings.output_file=nvl(settings.output_file, "raw_json_blobs.tab")
 
-
+D.settings(settings.debug)
 
 transformer=DZ_to_ES(settings.pushlog)
 #RESET ONLY IF NEW Transform IS USED
-reset(settings)
+#reset(settings)
 extract_from_datazilla_using_id(settings)
 
