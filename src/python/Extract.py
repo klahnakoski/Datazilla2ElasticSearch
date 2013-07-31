@@ -43,32 +43,38 @@ def etl(es, settings, id):
 
 def get_exiting_ids(es, settings):
     #FIND WHAT'S IN ES
-    existing_ids = es.search({
-        "query": {
-            "filtered": {
-                "query": {"match_all": {}},
-                "filter": {
-                    "range":{"datazilla.id":{
-                        "gte": settings.production.min,
-                        "lt": settings.production.max + settings.production.threads
-                    }}
-                }
-            }
-        },
-        "from": 0, 
-        "size": 0,
-        "sort": [],
-        "facets": {
-            "ids": {"terms": {"field": "datazilla.id", "size": 400000}}
-        }
-    })
     bad_ids = []
     int_ids = set()
-    for t in existing_ids.facets.ids.terms:
-        try:
-            int_ids.add(int(t.term))
-        except Exception, e:
-            bad_ids.append(t.term)
+
+    interval_size=400000
+    for mini, maxi in [(x, min(x+interval_size, settings.production.max)) for x in range(settings.production.min, settings.production.max, interval_size)]:
+        existing_ids = es.search({
+            "query": {
+                "filtered": {
+                    "query": {"match_all": {}},
+                    "filter": {
+                        "range":{"datazilla.id":{
+                            "gte": mini,
+                            "lt": maxi
+                        }}
+                    }
+                }
+            },
+            "from": 0,
+            "size": 0,
+            "sort": [],
+            "facets": {
+                "ids": {"terms": {"field": "datazilla.id", "size": interval_size}}
+            }
+        })
+
+        for t in existing_ids.facets.ids.terms:
+            try:
+                int_ids.add(int(t.term))
+            except Exception, e:
+                bad_ids.append(t.term)
+
+
     existing_ids = int_ids
     D.println("Number of ids in ES: " + str(len(existing_ids)))
     D.println("BAD ids in ES: " + str(bad_ids))

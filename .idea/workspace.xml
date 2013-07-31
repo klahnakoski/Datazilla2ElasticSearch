@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2be14c04-396c-482c-b241-310fccc83074" name="Default" comment="More changes for D2E">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/python/SummarizeTalos.py" afterPath="$PROJECT_DIR$/src/python/SummarizeTalos.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyLibrary" afterPath="$PROJECT_DIR$/pyLibrary" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/python/Extract.py" afterPath="$PROJECT_DIR$/src/python/Extract.py" />
     </list>
     <ignored path="Datazilla2ElasticSearch.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -69,8 +69,8 @@
       <property name="field_breakpoints_groupByClasses" value="true" />
       <property name="method_breakpoints_groupByClasses" value="true" />
       <property name="exception_breakpoints_viewId" value="TABLE" />
-      <property name="field_breakpoints_viewId" value="TABLE" />
       <property name="exception_breakpoints_groupByClasses" value="true" />
+      <property name="field_breakpoints_viewId" value="TABLE" />
       <property name="method_breakpoints_groupByMethods" value="false" />
     </ui_properties>
   </component>
@@ -97,19 +97,37 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="talos_settings.json" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/talos_settings.json">
+      <file leaf-file-name="Extract.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/python/Extract.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="17" selection-start="412" selection-end="412" vertical-scroll-proportion="0.5847751">
+            <state line="58" column="26" selection-start="1925" selection-end="1925" vertical-scroll-proportion="0.63265306">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Extract.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/python/Extract.py">
+      <file leaf-file-name="cursors.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://C:/Python27/Lib/site-packages/MySQLdb/cursors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="44" selection-start="906" selection-end="906" vertical-scroll-proportion="0.0">
+            <state line="339" column="0" selection-start="11047" selection-end="11047" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="map.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyLibrary/util/map.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="0" selection-start="846" selection-end="846" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="query.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyLibrary/util/query.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="59" column="0" selection-start="1923" selection-end="1923" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -118,16 +136,7 @@
       <file leaf-file-name="debug.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pyLibrary/util/debug.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="74" column="0" selection-start="2502" selection-end="2502" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="cnv.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pyLibrary/util/cnv.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="0" selection-start="1414" selection-end="1414" vertical-scroll-proportion="0.0">
+            <state line="18" column="16" selection-start="775" selection-end="775" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -136,7 +145,7 @@
       <file leaf-file-name="Transform.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/python/Transform.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="44" column="10" selection-start="1333" selection-end="1333" vertical-scroll-proportion="0.0">
+            <state line="31" column="0" selection-start="817" selection-end="817" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -171,8 +180,8 @@
         <option value="$PROJECT_DIR$/../pyLibrary/util/cnv.py" />
         <option value="$PROJECT_DIR$/pyLibrary/util/cnv.py" />
         <option value="$PROJECT_DIR$/src/python/SummarizeTalos.py" />
-        <option value="$PROJECT_DIR$/src/python/Extract.py" />
         <option value="$PROJECT_DIR$/talos_settings.json" />
+        <option value="$PROJECT_DIR$/src/python/Extract.py" />
       </list>
     </option>
   </component>
@@ -209,6 +218,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="Favorites" />
       <pane id="ProjectPane">
         <subPane>
@@ -267,7 +277,6 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -284,8 +293,8 @@
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -293,6 +302,24 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.extract_talos">
+    <configuration default="false" name="app" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:/Python27/python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <module name="Datazilla2ElasticSearch" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app.py" />
+      <option name="PARAMETERS" value="--settings_file settings.json" />
+      <RunnerSettings RunnerId="PyDebugRunner" />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="PyDebugRunner" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
     <configuration default="true" type="PythonUnitTestConfigurationType" factoryName="Python's unittest">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -315,25 +342,6 @@
         <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="C:/Python27/python.exe" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <module name="" />
-      <option name="SCRIPT_NAME" value="app" />
-      <option name="PARAMETERS" value="--settings_file settings.json" />
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="false" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-      </method>
-    </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -343,6 +351,25 @@
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:/Python27/python.exe" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <module name="Datazilla2ElasticSearch" />
+      <option name="SCRIPT_NAME" value="app" />
+      <option name="PARAMETERS" value="--settings_file settings.json" />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="false" />
         <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
@@ -447,7 +474,7 @@
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
-      <module name="" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/python/Extract.py" />
       <option name="PARAMETERS" value="--settings_file talos_settings.json" />
       <RunnerSettings RunnerId="PyDebugRunner" />
@@ -464,7 +491,7 @@
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
-      <module name="" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="src/python/SummarizeTalos.py" />
       <option name="PARAMETERS" value="--settings_file summary_settings.json" />
       <RunnerSettings RunnerId="PyDebugRunner" />
@@ -480,7 +507,7 @@
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
-      <module name="" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Sample.py" />
       <option name="PARAMETERS" value="--settings_file settings.json" />
       <RunnerSettings RunnerId="PyDebugRunner" />
@@ -497,18 +524,19 @@
       <option name="SDK_HOME" value="C:/Python27/python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
-      <module name="" />
+      <module name="Datazilla2ElasticSearch" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/python/Extract.py" />
       <option name="PARAMETERS" value="--settings_file b2g_settings.json" />
       <RunnerSettings RunnerId="PyDebugRunner" />
       <ConfigurationWrapper RunnerId="PyDebugRunner" />
       <method />
     </configuration>
-    <list size="4">
-      <item index="0" class="java.lang.String" itemvalue="Python.extract_talos" />
-      <item index="1" class="java.lang.String" itemvalue="Python.SummarizeTalos" />
-      <item index="2" class="java.lang.String" itemvalue="Python.Sample" />
-      <item index="3" class="java.lang.String" itemvalue="Python.extract_b2g" />
+    <list size="5">
+      <item index="0" class="java.lang.String" itemvalue="Python.app" />
+      <item index="1" class="java.lang.String" itemvalue="Python.extract_talos" />
+      <item index="2" class="java.lang.String" itemvalue="Python.SummarizeTalos" />
+      <item index="3" class="java.lang.String" itemvalue="Python.Sample" />
+      <item index="4" class="java.lang.String" itemvalue="Python.extract_b2g" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -535,24 +563,24 @@
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1296" height="692" extended-state="6" />
+    <frame x="63" y="0" width="1535" height="898" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32909784" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24949698" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.43823147" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32814527" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32909784" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32915568" sideWeight="0.61776584" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43694493" sideWeight="0.92199486" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4373368" sideWeight="0.92199486" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24497992" sideWeight="0.56176853" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24541833" sideWeight="0.5612789" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43872115" sideWeight="0.99567634" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32909784" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32814527" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24949698" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44083226" sideWeight="0.99809885" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32890365" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -640,16 +668,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../pyLibrary/util/cnv.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="88" column="0" selection-start="2731" selection-end="3010" vertical-scroll-proportion="0.19113573" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/python/SummarizeTalos.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="90" column="0" selection-start="2694" selection-end="2694" vertical-scroll-proportion="0.3315508" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/scripts/SummarizeTalos.bat">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
@@ -672,19 +690,12 @@
     </entry>
     <entry file="file://$USER_HOME$/.IntelliJIdea10/config/plugins/python/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="958" column="0" selection-start="41277" selection-end="41277" vertical-scroll-proportion="0.3166227">
-          <folding />
-        </state>
+        <state line="958" column="0" selection-start="41277" selection-end="41277" vertical-scroll-proportion="0.3166227" />
       </provider>
     </entry>
     <entry file="file://C:/Python27/Lib/site-packages/requests/structures.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="70" column="0" selection-start="1922" selection-end="1922" vertical-scroll-proportion="0.04336735" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pyLibrary/util/map.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="0" selection-start="1203" selection-end="1203" vertical-scroll-proportion="0.04336735" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/python/Transform.py">
@@ -696,9 +707,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pyLibrary/util/debug.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="0" selection-start="2502" selection-end="2502" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/python/elasticsearch.py">
@@ -708,28 +717,51 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pyLibrary/util/cnv.py">
+    <entry file="file://$PROJECT_DIR$/src/scripts/talos_to_es.bat">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="0" selection-start="1414" selection-end="1414" vertical-scroll-proportion="0.0">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyLibrary/util/debug.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="16" selection-start="775" selection-end="775" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/MySQLdb/cursors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="339" column="0" selection-start="11047" selection-end="11047" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyLibrary/util/map.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="0" selection-start="846" selection-end="846" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyLibrary/util/query.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="59" column="0" selection-start="1923" selection-end="1923" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/python/Transform.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="0" selection-start="817" selection-end="817" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/python/Extract.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="44" selection-start="906" selection-end="906" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scripts/talos_to_es.bat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/talos_settings.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="17" selection-start="412" selection-end="412" vertical-scroll-proportion="0.5847751">
+        <state line="58" column="26" selection-start="1925" selection-end="1925" vertical-scroll-proportion="0.63265306">
           <folding />
         </state>
       </provider>
