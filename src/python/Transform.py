@@ -61,21 +61,20 @@ class DZ_to_ES():
             k=v[0]
             v=v[1]
             k=replace(k, ".", "_dot_")
+
+            try:
+                m=Z_moment.new_instance(v).dict,
+            except Exception, e:
+                D.error("can not reduce series to moments", e)
+
+            new_results[k]={
+                "index":i,
+                "last_20":v[-20:],
+                "moments":m
+            }
             if len(v)<=keep_arrays_smaller_than:
-                new_results[k]={
-                    "index":i,
-                    "series":v,
-                    "last_20":v[-20:]
-                }
-            else:
-                try:
-                    new_results[k]={
-                        "index":i,
-                        "moments":Z_moment.new_instance(v).dict,
-                        "last_20":v[-20:]
-                    }
-                except Exception, e:
-                    D.error("can not reduce series to moments", e)
+                new_results[k].series=v
+
         r.results=new_results
 
         #CONVERT FROM <name>:<samples> TO {"name":<name>, "samples":<samples>}

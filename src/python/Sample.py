@@ -3,7 +3,7 @@ from util.debug import D
 from util.cnv import CNV
 from util.startup import startup
 from Transform import transform
-from elasticsearch import ElasticSearch
+from util.elasticsearch import ElasticSearch
 
 
 settings=startup.read_settings()

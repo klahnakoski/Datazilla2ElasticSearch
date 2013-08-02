@@ -3,13 +3,12 @@ import functools
 import os
 import threading
 import requests
-import time
 from util.basic import nvl
 from util.debug import D
 from util.startup import startup
 from util.cnv import CNV
 from Transform import DZ_to_ES
-from elasticsearch import ElasticSearch
+from util.elasticsearch import ElasticSearch
 from util.timer import Timer
 from util.multithread import Multithread
 
