@@ -1,6 +1,5 @@
 requests==1.2.3
--e git://github.com/klahnakoski/pyLibrary.git#egg=library
-MySQL-python
+pymysql
 numpy
 python-dateutil
 pandas

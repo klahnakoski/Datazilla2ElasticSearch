@@ -1,6 +1,6 @@
 from util.startup import startup
 from util.cnv import CNV
-from util.debug import D
+from util.logs import Log
 from util.timer import Timer
 from util.maths import is_number
 
@@ -39,12 +39,12 @@ def arrays_add(id, path, r):
                     r[i]=arrays_add(id, path+"["+str(i)+"]", v)
 #        return r
     except Exception, e:
-        D.warning("Can not summarize: ${json}", {"json":CNV.object2JSON(r)})
+        Log.warning("Can not summarize: {{json}}", {"json":CNV.object2JSON(r)})
 
 
 
 settings=startup.read_settings()
-D.settings(settings.debug)
+Log.settings(settings.debug)
 all=set()
 
 
@@ -63,7 +63,7 @@ with open(settings.output_file, "r") as input_file:
                 data=CNV.JSON2object(json).json_blob
                 date=CNV.unix2datetime(data.testrun.date)
 
-                if id % 1000==0: D.println("loading id "+str(id)+" date: "+CNV.datetime2string(date, "%Y-%m-%d %H:%M:%S"))
+                if id % 1000==0: Log.println("loading id "+str(id)+" date: "+CNV.datetime2string(date, "%Y-%m-%d %H:%M:%S"))
 
                 if date<MINIMUM_DATE:
                     continue
@@ -74,10 +74,10 @@ with open(settings.output_file, "r") as input_file:
                 arrays_add(id, "["+data.test_build.branch+"]["+data.testrun.suite+"]", data)
                 output_file.write(str(id)+"\t"+json)
             except Exception, e:
-                D.warning("can not process line:\n\t"+line, e)
+                Log.warning("can not process line:\n\t"+line, e)
 
         smallest=min(*all)
-        D.println("First id >= date: ${min}", {"min":smallest})
+        Log.println("First id >= date: {{min}}", {"min":smallest})
 
 
 
@@ -90,20 +90,20 @@ summary=df.groupby(["path", length_dim], sort=False).size()
 #summary=summary.reindex(length_dim, level="length")
 table=summary.unstack("length")
 s=CNV.DataFrame2string(table)#, columns=colNames)
-D.println("\n"+s)
+Log.println("\n"+s)
 with open("talos_big_array_summary.tab", "w") as output_file:
     output_file.write(s)
 
 sum2=df.groupby(["path", "length"]).size()
 tab2=sum2.unstack("length")
 s=CNV.DataFrame2string(tab2)#, columns=colNames)
-D.println("\n"+s)
+Log.println("\n"+s)
 with open("talos_every_population.tab", "w") as output_file:
     output_file.write(s)
 
 biggest=df[df.length==63000]
 s=CNV.DataFrame2string(biggest)
-D.println("\n"+s)
+Log.println("\n"+s)
 with open("talos_biggest.tab", "w") as output_file:
     output_file.write(s)
 

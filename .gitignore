@@ -3,3 +3,7 @@
 *settings.json
 data/*
 *.tab
+dz2es/util/.svn
+results/*
+.idea
+*.iml

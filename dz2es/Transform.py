@@ -2,12 +2,13 @@ from math import floor, ceil
 from string import replace
 from util.cnv import CNV
 from util.db import DB
-from util.debug import D
+from util.logs import Log
 from util.query import Q
 from util.stats import Z_moment
 
 
-DEBUG=False
+DEBUG = False
+
 
 class DZ_to_ES():
 
@@ -34,10 +35,10 @@ class DZ_to_ES():
 
     def __del__(self):
         try:
-            D.println("Branches missing from pushlog:\n${list}", {"list":self.unknown_branches})
+            Log.println("Branches missing from pushlog:\n{{list}}", {"list": self.unknown_branches})
         except Exception, e:
             pass
-        
+
 
     # A SIMPLE TRANSFORM OF DATA:  I WOULD ALSO LIKE TO ADD DIMENSIONAL TYPE INFORMATION
     # WHICH WOULD GIVE DEAR READER A BETTER FEEL FOR THE TOTALITY OF THIS DATA
@@ -65,7 +66,7 @@ class DZ_to_ES():
             try:
                 m=Z_moment.new_instance(v).dict,
             except Exception, e:
-                D.error("can not reduce series to moments", e)
+                Log.error("can not reduce series to moments", e)
 
             new_results[k]={
                 "index":i,
@@ -114,16 +115,9 @@ class DZ_to_ES():
             else:
                 self.unknown_branches.add(branch)
         except Exception, e:
-            D.warning("${branch} @ ${revision} has no pushlog", r.test_build, e)
+            Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
         
         return r
-
-
-
-
-
-
-
 
 
 
@@ -135,38 +129,41 @@ def summarize(r, keep_arrays_smaller_than=25):
 
     try:
         if isinstance(r, dict):
-            for k, v in [(k,v) for k,v in r.items()]:
-                new_v=summarize(v)
+            for k, v in [(k, v) for k, v in r.items()]:
+                new_v = summarize(v)
                 if isinstance(new_v, Z_moment):
                     #CONVERT MOMENTS' TUPLE TO NAMED HASH (FOR EASIER ES INDEXING)
-                    new_v={"moment":new_v.dict}
+                    new_v = {"moment": new_v.dict}
 
-
-                    if isinstance(v, list) and len(v)<=keep_arrays_smaller_than:
+                    if isinstance(v, list) and len(v) <= keep_arrays_smaller_than:
                         #KEEP THE SMALL SAMPLES
-                        new_v["samples"]=dict([("x"+("0"+str(i))[-2:],v) for i, v in enumerate(v)])
+                        new_v["samples"] = {
+                            ("x%02d" % i): v
+                            for i, v in enumerate(v)
+                        }
 
-                r[k]=new_v
+                r[k] = new_v
         elif isinstance(r, list):
             try:
-                bottom=0.0
-                top=0.9
+                bottom = 0.0
+                top = 0.9
 
                 ## keep_middle - THE PROPORTION [0..1] OF VALUES TO KEEP, EXTREMES ARE REJECTED
-                values=[float(v) for v in r]
+                values = [float(v) for v in r]
 
-                length=len(values)
-                min=int(floor(length*bottom))
-                max=int(ceil(length*top))
-                values=sorted(values)[min:max]
-                if DEBUG: D.println("${num} of ${total} used in moment", {"num":len(values), "total":length})
+                length = len(values)
+                min = int(floor(length * bottom))
+                max = int(ceil(length * top))
+                values = sorted(values)[min:max]
+                if DEBUG:
+                    Log.println("{{num}} of {{total}} used in moment", {"num": len(values), "total": length})
 
                 return Z_moment.new_instance(values)
             except Exception, e:
                 for i, v in enumerate(r):
-                    r[i]=summarize(v)
+                    r[i] = summarize(v)
         return r
     except Exception, e:
-        D.warning("Can not summarize: ${json}", {"json":CNV.object2JSON(r)})
+        Log.warning("Can not summarize: {{json}}", {"json": CNV.object2JSON(r)})
 
 

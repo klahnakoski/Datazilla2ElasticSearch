@@ -6,7 +6,7 @@
 		"index.store.throttle.max_bytes_per_sec":"2mb"
 	},
 	"mappings":{
-		${type}:{
+		{{type}}:{
 			"dynamic_templates":[
 				{"default_moment":{
 					"mapping":{"index":"no", "type":"double"},
