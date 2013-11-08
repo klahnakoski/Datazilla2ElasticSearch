@@ -15,7 +15,7 @@ from dz2es.util.timer import Timer
 from dz2es.util.cnv import CNV
 from dz2es.util.db import DB
 from dz2es.util.logs import Log
-from dz2es.util.query import Q
+from dz2es.util.queries import Q
 from dz2es.util.stats import Z_moment
 
 

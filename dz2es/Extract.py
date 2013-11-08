@@ -11,10 +11,10 @@ from datetime import datetime
 import functools
 import requests
 from dz2es.util.files import File
-from dz2es.util.query import Q
+from dz2es.util.queries import Q
 from dz2es.util.struct import nvl, Null
 from dz2es.util.logs import Log
-from dz2es.util.startup import startup
+from dz2es.util import startup
 from dz2es.util.cnv import CNV
 from dz2es.util.threads import Lock, Thread, Queue
 from transform import DZ_to_ES
@@ -126,7 +126,7 @@ def extract_from_datazilla_using_id(settings, transformer):
             for g, d in Q.groupby(json_for_es, size=1000):
                 es.add(d)
 
-        with Thread.run(adder):
+        with Thread.run("adder", adder):
             with open(settings.param.output_file, "r") as myfile:
                 for line in myfile:
                     try:
@@ -136,7 +136,7 @@ def extract_from_datazilla_using_id(settings, transformer):
                         if id < settings.production.min or settings.production.max <= id: continue
                         if id in existing_ids: continue
 
-                        data = CNV.JSON2object(col[1])
+                        data = CNV.JSON2object(col[-1])
                         data = transformer.transform(id, data)
                         json_for_es.add({"id": data.datazilla.id, "value": data})
                         Log.note("Added {{id}} from file", {"id": data.datazilla.id})
@@ -188,7 +188,12 @@ def reset(settings):
 
 def main():
     try:
-        settings = startup.read_settings()
+        settings = startup.read_settings(defs={
+            "name": ["--restart", "--reset", "--redo"],
+            "help": "use this to force a reprocessing of all data",
+            "action": "store_true",
+            "dest": "restart"
+        })
         Log.start(settings.debug)
 
         settings.production.threads = nvl(settings.production.threads, 1)
@@ -197,7 +202,8 @@ def main():
         transformer = DZ_to_ES(settings.pushlog)
 
         #RESET ONLY IF NEW Transform IS USED
-        # reset(settings)
+        if settings.args.restart:
+            reset(settings)
         extract_from_datazilla_using_id(settings, transformer)
     finally:
         Log.stop()

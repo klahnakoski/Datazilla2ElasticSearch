@@ -12,16 +12,44 @@
 					"mapping":{"index":"no", "type":"double"},
 					"match":"*.moments.s*"
 				}},
-				{"xperf":{
-					"mapping":{"index":"not_analyzed", "type":"string"},
-					"match":"results_xperf.*"
-				}},
+                {"xperf":{
+                    "mapping":{"index":"not_analyzed", "type":"string"},
+                    "match":"results_xperf.*"
+                }},
+                {"results":{
+                    "mapping":{
+                        "type":"object",
+                        "dynamic":true,
+                        "properties":{
+                            "index":{"type":"long"},
+                            "series":{"type":"long"},
+                            "last_20":{"type":"long"},
+                            "moments":{
+                                "dynamic":true,
+                                "properties":{
+                                    "s0":{"type":"long"},
+                                    "s1":{"type":"long"},
+                                    "s2":{"type":"long"},
+                                    "s3":{"type":"long"},
+                                    "s4":{"type":"long"}
+                                }
+                            }
+                        }
+                    },
+                    "match":"results.*"
+                }},
 				{"default_strings":{
 					"mapping":{"index":"not_analyzed", "type":"string"},
 					"match":"*",
 					"match_mapping_type" : "string"
 				}}
 			],
+            "_all":{
+                "enabled":false
+            },
+            "_source":{
+                "compress":true
+            },
 			"properties":{
 				"datazilla":{
 					"properties":{
@@ -34,43 +62,32 @@
 					}
 				},
 				"results":{
-					"dynamic":true,
-					"properties":{
-						"index":{"type":"long"},
-						"series":{"type":"long"},
-						"last_20":{"type":"long"},
-						"moments":{
-							"dynamic":true,
-							"properties":{
-								"s0":{"type":"long"},
-								"s1":{"type":"long"},
-								"s2":{"type":"long"},
-								"s3":{"type":"long"},
-								"s4":{"type":"long"}
-							}
-						}
-					}
+                    "type":"object",
+                    "dynamic":true
 				},
 				"test_build":{
-					"dynamic":true,
+					"type":"object",
 					"properties":{
+                        "id":{"index":"not_analyzed", "type":"long"},
 						"push_date":{"type":"long"},
 						"branch":{"index":"not_analyzed", "type":"string"},
 						"revision":{"index":"not_analyzed", "type":"string"},
 						"name":{"index":"not_analyzed", "type":"string"},
-						"version":{"index":"not_analyzed", "type":"string"},
-						"id":{"index":"not_analyzed", "type":"long"}
+						"version":{"index":"not_analyzed", "type":"string"}
 					}
-				}
-
-			},
-			"_all":{
-				"enabled":false
-			},
-			"_source":{
-				"compress":true
-			},
-			"dynamic" : true
+				},
+                "testrun":{
+                    "type":"object",
+                    "properties": {
+                        "suite": {"index": "not_analyzed", "type":"string"},
+                        "date": {"type":"long"},
+                        "options":{
+                            "dynamic": true,
+                            "type":"object"
+                        }
+                    }
+                }
+            }
 		}
 	}
 }
