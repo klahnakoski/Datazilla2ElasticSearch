@@ -1,8 +1,17 @@
-from dz2es.Transform import DZ_to_ES
-from util.logs import Log
-from util.cnv import CNV
-from util.startup import startup
-from util.elasticsearch import ElasticSearch
+################################################################################
+## This Source Code Form is subject to the terms of the Mozilla Public
+## License, v. 2.0. If a copy of the MPL was not distributed with this file,
+## You can obtain one at http://mozilla.org/MPL/2.0/.
+################################################################################
+## Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+################################################################################
+
+
+from transform import DZ_to_ES
+from dz2es.util.logs import Log
+from dz2es.util.cnv import CNV
+from dz2es.util.startup import startup
+from dz2es.util.elasticsearch import ElasticSearch
 
 
 settings = startup.read_settings()

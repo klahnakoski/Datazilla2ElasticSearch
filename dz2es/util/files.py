@@ -1,10 +1,12 @@
-################################################################################
-## This Source Code Form is subject to the terms of the Mozilla Public
-## License, v. 2.0. If a copy of the MPL was not distributed with this file,
-## You can obtain one at http://mozilla.org/MPL/2.0/.
-################################################################################
-## Author: Kyle Lahnakoski (kyle@lahnakoski.com)
-################################################################################
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
 
 
 
@@ -14,13 +16,14 @@ import os
 import shutil
 from .struct import listwrap, nvl
 from .cnv import CNV
-from .struct import Null
 
 
-class File():
+class File(object):
 
     def __init__(self, filename):
-        assert filename != Null
+        if filename == None:
+            from .logs import Log
+            Log.error("File must be given a filename")
         #USE UNIX STANDARD
         self._filename = "/".join(filename.split(os.sep))
 
@@ -88,7 +91,7 @@ class File():
             if e.strerror=="The system cannot find the path specified":
                 return
             from .logs import Log
-            Log.warning("Could not remove file", e)
+            Log.error("Could not remove file", e)
 
     def backup(self):
         names=self._filename.split("/")[-1].split(".")

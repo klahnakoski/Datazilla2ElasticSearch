@@ -1,17 +1,20 @@
-################################################################################
-## This Source Code Form is subject to the terms of the Mozilla Public
-## License, v. 2.0. If a copy of the MPL was not distributed with this file,
-## You can obtain one at http://mozilla.org/MPL/2.0/.
-################################################################################
-## Author: Kyle Lahnakoski (kyle@lahnakoski.com)
-################################################################################
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
 
 
-from datetime import datetime, time
+from datetime import datetime
+import time
 from decimal import Decimal
 import json
 import re
-from .struct import Null
+
 
 try:
     # StringBuilder IS ABOUT 2x FASTER THAN list()
@@ -75,7 +78,7 @@ else:
 def _value2json(value, appender):
     if isinstance(value, basestring):
         _string2json(value, appender)
-    elif value == Null or value is None:
+    elif value == None:
         appender("null")
     elif value is True:
         appender('true')
@@ -150,29 +153,31 @@ def _string2json(value, appender):
 
 
 #REMOVE VALUES THAT CAN NOT BE JSON-IZED
-def json_scrub(r):
-    return _scrub(r)
+def json_scrub(value):
+    return _scrub(value)
 
 
-def _scrub(r):
-    if r == Null:
+def _scrub(value):
+    if value == None:
         return None
-    elif isinstance(r, dict):
+    elif isinstance(value, datetime):
+        return long(time.mktime(value.timetuple())*1000)
+    elif isinstance(value, dict):
         output = {}
-        for k, v in r.iteritems():
+        for k, v in value.iteritems():
             v = _scrub(v)
             output[k] = v
         return output
-    elif hasattr(r, '__iter__'):
+    elif hasattr(value, '__iter__'):
         output = []
-        for v in r:
+        for v in value:
             v = _scrub(v)
             output.append(v)
         return output
-    elif isinstance(r, Decimal):
-        return float(r)
+    elif isinstance(value, Decimal):
+        return float(value)
     else:
-        return r
+        return value
 
 
 

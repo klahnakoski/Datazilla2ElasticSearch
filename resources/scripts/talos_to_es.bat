@@ -1,4 +1,4 @@
 
-SET PYTHONPATH=./pyLibrary;./src/python
+SET PYTHONPATH=.
 
-python src\python\Extract.py --settings_file talos_settings.json
+python dz2es\Extract.py --settings_file talos_settings.json

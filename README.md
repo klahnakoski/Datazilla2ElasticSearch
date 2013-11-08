@@ -17,12 +17,6 @@ Clone from github:
 
     git clone https://github.com/klahnakoski/Datazilla2ElasticSearch.git
 
-Initialize the Submodules:
-
-    git submodule init
-    
-    git submodule update
-
 Pull other python dependencies:
 
     pip install -r requirements.txt
@@ -53,7 +47,9 @@ You will require a ```settings.json``` file that holds all your pointers
 			"min": 1490000,
 			"max": 3000000
 		},
-		"output_file":"data/raw_json_blobs.tab"
+		"param":{
+		    "output_file":"data/raw_json_blobs.tab"
+		}
 	}
 
 

@@ -1,4 +1,4 @@
 
-SET PYTHONPATH=./pyLibrary;./src/python
+SET PYTHONPATH=.
 
-python src\python\Extract.py --settings_file b2g_settings.json
+pypy dz2es\Extract.py --settings_file b2g_settings.json

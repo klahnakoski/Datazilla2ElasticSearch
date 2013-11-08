@@ -1,10 +1,4 @@
+SET PYTHONPATH=.
 
-SET PYTHONPATH=.\pyLibrary;.\src\python
+python .\dz2es\SummarizeTalos.py --settings_file talos_settings.json
 
-<<<<<<< HEAD
-python .\src\python\SummarizeTalos.py --settings_file talos_settings.json
-=======
-SET PYTHONPATH=./pyLibrary;./src/python
-
-python .\src\python\SummarizeTalos.py --settings_file summary_settings.json
->>>>>>> origin

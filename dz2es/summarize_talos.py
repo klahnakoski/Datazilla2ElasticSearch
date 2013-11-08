@@ -1,8 +1,19 @@
-from util.startup import startup
-from util.cnv import CNV
-from util.logs import Log
-from util.timer import Timer
-from util.maths import is_number
+################################################################################
+## This Source Code Form is subject to the terms of the Mozilla Public
+## License, v. 2.0. If a copy of the MPL was not distributed with this file,
+## You can obtain one at http://mozilla.org/MPL/2.0/.
+################################################################################
+## Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+################################################################################
+
+
+
+from dz2es.util.maths import Math
+from dz2es.util.startup import startup
+from dz2es.util.cnv import CNV
+from dz2es.util.logs import Log
+from dz2es.util.timer import Timer
+
 
 with Timer("load pandas"):
     import pandas
@@ -59,7 +70,7 @@ with open(settings.output_file, "r") as input_file:
                 if id<MINIMUM_ID: continue
 
                 json=col[1]
-                if is_number(json): json=col[2]
+                if Math.is_number(json): json=col[2]
                 data=CNV.JSON2object(json).json_blob
                 date=CNV.unix2datetime(data.testrun.date)
 

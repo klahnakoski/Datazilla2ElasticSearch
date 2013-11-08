@@ -1,15 +1,15 @@
-################################################################################
-## This Source Code Form is subject to the terms of the Mozilla Public
-## License, v. 2.0. If a copy of the MPL was not distributed with this file,
-## You can obtain one at http://mozilla.org/MPL/2.0/.
-################################################################################
-## Author: Kyle Lahnakoski (kyle@lahnakoski.com)
-################################################################################
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
 
 from math import sqrt
 from .struct import nvl
-from .struct import Null
-from .maths import Math
 from .logs import Log
 
 
@@ -61,7 +61,7 @@ def z_moment2stats(z_moment, unbiased=True):
 
 
 
-class Stats():
+class Stats(object):
 
     def __init__(self, **args):
         if "count" not in args:
@@ -116,7 +116,7 @@ class Stats():
 
 
 
-class Z_moment():
+class Z_moment(object):
     """
     ZERO-CENTERED MOMENTS
     """
@@ -137,21 +137,21 @@ class Z_moment():
     @property
     def dict(self):
     #RETURN HASH OF SUMS
-        return dict([("s"+unicode(i), m) for i, m in enumerate(self.S)])
+        return {"s"+unicode(i): m for i, m in enumerate(self.S)}
 
 
     @staticmethod
-    def new_instance(values=Null):
-        if values == Null: return Z_moment()
-        values=[float(v) for v in values if v != Null]
+    def new_instance(values=None):
+        if values == None: return Z_moment()
+        values=[float(v) for v in values if v != None]
 
-        return Z_moment(*[
+        return Z_moment(
             len(values),
             sum([n for n in values]),
             sum([pow(n, 2) for n in values]),
             sum([pow(n, 3) for n in values]),
             sum([pow(n, 4) for n in values])
-        ])
+        )
 
 
 
