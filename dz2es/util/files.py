@@ -82,12 +82,22 @@ class File(object):
         return output()
 
     def append(self, content):
-        if not self.parent.exists: self.parent.create()
+        if not self.parent.exists:
+            self.parent.create()
         with open(self._filename, "a") as output_file:
             output_file.write(content)
 
     def add(self, content):
         return self.append(content)
+
+    def extend(self, content):
+        if not self.parent.exists:
+            self.parent.create()
+        with open(self._filename, "a") as output_file:
+            for c in content:
+                output_file.write(c)
+
+
 
     def delete(self):
         try:

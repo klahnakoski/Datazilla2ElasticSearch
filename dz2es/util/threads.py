@@ -325,7 +325,6 @@ class Signal(object):
 
 
 
-
 class ThreadedQueue(Queue):
     """
     TODO: Check that this queue is not dropping items at shutdown
@@ -340,14 +339,19 @@ class ThreadedQueue(Queue):
             #output_queue IS A MULTI-THREADED QUEUE, SO THIS WILL BLOCK UNTIL THE 5K ARE READY
             from .queries import Q
             for i, g in Q.groupby(self, size=size):
-                queue.extend(g)
-                if please_stop:
+                try:
+                    queue.extend(g)
+                    if please_stop:
+                        from logs import Log
+                        Log.warning("ThreadedQueue stopped early, with {{num}} items left in queue", {
+                            "num":len(self)
+                        })
+                        return
+                except Exception, e:
                     from logs import Log
-                    Log.warning("ThreadedQueue stopped early, with {{num}} items left in queue", {
-                        "num":len(self)
-                    })
-                    return
-        self.thread=Thread.run("threaded queue", push_to_queue)
+                    Log.warning("Can not push data to given queue", e)
+
+        self.thread = Thread.run("threaded queue", push_to_queue)
 
 
     def __enter__(self):
