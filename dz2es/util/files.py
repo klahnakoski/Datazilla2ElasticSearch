@@ -79,7 +79,7 @@ class File(object):
             with codecs.open(self._filename, "r", encoding="utf-8") as f:
                 for line in f:
                     yield line
-        return output
+        return output()
 
     def append(self, content):
         if not self.parent.exists: self.parent.create()

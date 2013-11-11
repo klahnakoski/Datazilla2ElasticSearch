@@ -108,7 +108,7 @@ def extract_from_datazilla_using_id(settings, transformer):
 
     existing_ids = get_existing_ids(es, settings)
     missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
-    Log.note("Number missing: {{num}}", {"num": missing_ids})
+    Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     #FASTER IF NO INDEXING IS ON
     es.set_refresh_interval(-1)
 
