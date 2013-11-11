@@ -140,7 +140,7 @@ def extract_from_datazilla_using_id(settings, transformer):
 
     #COPY MISSING DATA TO ES
     try:
-        with ThreadedQueue(File(settings.param.output_file), size=1000) as file_sink:
+        with ThreadedQueue(File(settings.param.output_file), size=50) as file_sink:
             functions = [functools.partial(etl, *[es, file_sink, settings, transformer]) for i in range(settings.production.threads)]
 
             num_not_found = 0
