@@ -22,8 +22,8 @@
                         "dynamic":true,
                         "properties":{
                             "index":{"type":"long"},
-                            "series":{"type":"long"},
-                            "last_20":{"type":"long"},
+                            "series":{"store":"yes", "type":"long"},
+                            "last_20":{"term_vector":"yes", "type":"long"},
                             "moments":{
                                 "dynamic":true,
                                 "properties":{

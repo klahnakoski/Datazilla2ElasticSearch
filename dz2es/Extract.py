@@ -16,17 +16,18 @@ from dz2es.util.struct import nvl, Null
 from dz2es.util.logs import Log
 from dz2es.util import startup
 from dz2es.util.cnv import CNV
-from dz2es.util.threads import Lock, Thread, Queue
+from dz2es.util.threads import ThreadedQueue
 from transform import DZ_to_ES
 from dz2es.util.elasticsearch import ElasticSearch
 from dz2es.util.timer import Timer
 from dz2es.util.multithread import Multithread
 
 
-file_lock = Lock()
 
-## CONVERT DZ BLOB TO ES JSON
-def etl(es, settings, transformer, id):
+def etl(es, file_sink,  settings, transformer, id):
+    """
+    PULL FROM DZ AND PUSH TO es AND file_sink
+    """
     try:
         url = settings.production.blob_url + "/" + str(id)
         with Timer("read from DZ"):
@@ -45,11 +46,9 @@ def etl(es, settings, transformer, id):
                     {"id": id, "revision": data.json_blob.test_build.revision,
                      "size": len(content)})
         data = transformer.transform(id, data)
-        with Timer("push to ES"):
-            es.add([{"id": data.datazilla.id, "value": data}])
 
-        with file_lock:
-            File(settings.param.output_file).append(str(id) + "\t" + content + "\n")
+        es.add([{"id": data.datazilla.id, "value": data}])
+        file_sink.add(str(id) + "\t" + content + "\n")
         return True
     except Exception, e:
         Log.warning("Failure to etl (content length={{length}})", {"length": len(content)}, e)
@@ -62,10 +61,7 @@ def get_existing_ids(es, settings):
     int_ids = set()
 
     interval_size = 400000
-    for mini, maxi in [
-        (x, min(x + interval_size, settings.production.max))
-        for x in range(settings.production.min, settings.production.max, interval_size)
-    ]:
+    for mini, maxi in Q.range(settings.production.min, settings.production.max, interval_size):
         existing_ids = es.search({
             "query": {
                 "filtered": {
@@ -112,29 +108,25 @@ def extract_from_datazilla_using_id(settings, transformer):
 
     existing_ids = get_existing_ids(es, settings)
     missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
-
+    Log.note("Number missing: {{num}}", {"num": missing_ids})
     #FASTER IF NO INDEXING IS ON
     es.set_refresh_interval(-1)
 
     #FILE IS FASTER THAN NETWORK
     if len(missing_ids) > 10000 and File(settings.param.output_file).exists:
         #ASYNCH PUSH TO ES IN BLOCKS OF 1000
-        json_for_es = Queue()
-
-        def adder(please_stop):
-            please_stop.on_go(lambda: json_for_es.add(Thread.STOP))
-            for g, d in Q.groupby(json_for_es, size=1000):
-                es.add(d)
-
-        with Thread.run("adder", adder):
-            with open(settings.param.output_file, "r") as myfile:
-                for line in myfile:
+        with Timer("Scan file for missing ids"):
+            with ThreadedQueue(es, size=100) as json_for_es:
+                for line in File(settings.param.output_file):
                     try:
-                        if len(line.strip()) == 0: continue
+                        if len(line.strip()) == 0:
+                            continue
                         col = line.split("\t")
                         id = int(col[0])
-                        if id < settings.production.min or settings.production.max <= id: continue
-                        if id in existing_ids: continue
+                        if id < settings.production.min or settings.production.max <= id:
+                            continue
+                        if id in existing_ids:
+                            continue
 
                         data = CNV.JSON2object(col[-1])
                         data = transformer.transform(id, data)
@@ -145,25 +137,25 @@ def extract_from_datazilla_using_id(settings, transformer):
                             "length": len(CNV.object2JSON(line)),
                             "prefix": CNV.object2JSON(line)[0:130]
                         }, e)
-            json_for_es.add(Thread.STOP)
 
     #COPY MISSING DATA TO ES
     try:
-        functions = [functools.partial(etl, *[es, settings, transformer]) for i in range(settings.production.threads)]
+        with ThreadedQueue(File(settings.param.output_file), size=1000) as file_sink:
+            functions = [functools.partial(etl, *[es, file_sink, settings, transformer]) for i in range(settings.production.threads)]
 
-        num_not_found = 0
-        with Multithread(functions) as many:
-            for result in many.execute([
-                {"id": id}
-                for id in missing_ids
-            ]):
-                if not result:
-                    num_not_found += 1
-                    if num_not_found > 100:
-                        many.stop()
-                        break
-                else:
-                    num_not_found = 0
+            num_not_found = 0
+            with Multithread(functions) as many:
+                for result in many.execute([
+                    {"id": id}
+                    for id in missing_ids
+                ]):
+                    if not result:
+                        num_not_found += 1
+                        if num_not_found > 100:
+                            many.stop()
+                            break
+                    else:
+                        num_not_found = 0
     except (KeyboardInterrupt, SystemExit):
         Log.println("Shutdown Started, please be patient")
     except Exception, e:
