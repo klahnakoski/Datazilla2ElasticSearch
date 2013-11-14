@@ -76,6 +76,14 @@
 						"version":{"index":"not_analyzed", "type":"string"}
 					}
 				},
+                "results_aux": {
+                    "type":"object",
+                    "dynamic":true,.
+                    "properties":{
+                        "mainthread_writebytes":{
+                            "index":"not_analyzed"
+                        }
+                        }}
                 "testrun":{
                     "type":"object",
                     "properties": {

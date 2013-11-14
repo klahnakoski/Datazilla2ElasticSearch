@@ -175,9 +175,9 @@ class Thread(object):
         #ENSURE THERE IS A SHARED please_stop SIGNAL
         self.kwargs = kwargs.copy()
         self.kwargs["please_stop"]=self.kwargs.get("please_stop", Signal())
-        self.please_stop=self.kwargs["please_stop"]
+        self.please_stop = self.kwargs["please_stop"]
 
-        self.stopped=Signal()
+        self.stopped = Signal()
 
 
     def __enter__(self):
@@ -189,6 +189,9 @@ class Thread(object):
 
         # TODO: AFTER A WHILE START KILLING THREAD
         self.join()
+        self.args = None
+        self.kwargs = None
+
 
     def start(self):
         try:
