@@ -101,10 +101,12 @@ def extract_from_datazilla_using_id(settings, transformer):
     if settings.elasticsearch.alias == Null:
         settings.elasticsearch.alias = settings.elasticsearch.index
     if settings.elasticsearch.alias == settings.elasticsearch.index:
-        possible_indexes = [a.index for a in es.get_aliases() if a.alias == settings.elasticsearch.alias]
-        if len(possible_indexes) == 0:
-            Log.error("expecting an index with '" + settings.elasticsearch.alias + "' as alias")
-        settings.elasticsearch.index = possible_indexes[0]
+        candidates = es.get_proto(settings.elasticsearch.alias)
+        if not candidates:
+            es = reset(settings)
+        else:
+            settings.elasticsearch.index = candidates[-1]
+            es = ElasticSearch(settings.elasticsearch)
 
     existing_ids = get_existing_ids(es, settings)
     missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
@@ -174,8 +176,9 @@ def reset(settings):
     # USE UNIQUE NAME EACH TIME RUN
     if settings.elasticsearch.alias == Null:
         settings.elasticsearch.alias = settings.elasticsearch.index
-    settings.elasticsearch.index = settings.elasticsearch.alias + CNV.datetime2string(datetime.utcnow(), "%Y%m%d_%H%M%S")
+    settings.elasticsearch.index = ElasticSearch.proto_name(settings.elasticsearch.alias)
     es = ElasticSearch.create_index(settings.elasticsearch, schema)
+    return es
 
 
 def main():
