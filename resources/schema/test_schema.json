@@ -78,12 +78,8 @@
 				},
                 "results_aux": {
                     "type":"object",
-                    "dynamic":true,.
-                    "properties":{
-                        "mainthread_writebytes":{
-                            "index":"not_analyzed"
-                        }
-                        }}
+                    "dynamic":true
+                },
                 "testrun":{
                     "type":"object",
                     "properties": {

@@ -28,22 +28,24 @@ class DZ_to_ES():
 
     def __init__(self, pushlog_settings):
         with Timer("get pushlog"):
-            # with DB(pushlog_settings) as db:
-            #     all_pushlogs=db.query("""
-            #         SELECT
-            #             pl.`date`,
-            #             left(ch.node, 12) revision,
-            #             coalesce(bm.alt_name, br.name) branch
-            #         FROM
-            #             changesets ch
-            #         LEFT JOIN
-            #             pushlogs pl ON pl.id = ch.pushlog_id
-            #         LEFT JOIN
-            #             branches br ON br.id = pl.branch_id
-            #         LEFT JOIN
-            #             branch_map bm ON br.id = bm.id
-            #     """)
-            all_pushlogs=[]
+            if pushlog_settings.disable:
+                all_pushlogs = []
+            else:
+                with DB(pushlog_settings) as db:
+                    all_pushlogs=db.query("""
+                        SELECT
+                            pl.`date`,
+                            left(ch.node, 12) revision,
+                            coalesce(bm.alt_name, br.name) branch
+                        FROM
+                            changesets ch
+                        LEFT JOIN
+                            pushlogs pl ON pl.id = ch.pushlog_id
+                        LEFT JOIN
+                            branches br ON br.id = pl.branch_id
+                        LEFT JOIN
+                            branch_map bm ON br.id = bm.id
+                    """)
             self.pushlog = Q.index(all_pushlogs, ["branch", "revision"])
             self.unknown_branches = set()
 
@@ -106,6 +108,9 @@ class DZ_to_ES():
             r.testrun.date*=1000
 
             def mainthread_transform(r):
+                if r == None:
+                    return None
+
                 for i in r.mainthread_readbytes:
                     r.mainthread[i[1].replace(".", "\.")].readbytes = i[0]
                 r.mainthread_readbytes = None
