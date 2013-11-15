@@ -123,7 +123,7 @@ class Log(object):
         if not settings.log: return
 
         globals()["logging_multi"]=Log_usingMulti()
-        globals()["main_log"]=logging_multi
+        globals()["main_log"] = Log_usingThread(logging_multi)
 
         for log in listwrap(settings.log):
             Log.add_log(Log.new_instance(log))
@@ -240,7 +240,11 @@ class Log_usingLogger(BaseLog):
 
     def write(self, template, params):
         # http://docs.python.org/2/library/logging.html#logging.LogRecord
-        self.logger.info(expand_template(template, params))
+        data=expand_template(template, params)
+        try:
+            self.logger.info(data)
+        except Exception, e:
+            sys.stdout.write("Can not write to file\n")
 
 
 def make_log_from_settings(settings):
@@ -338,15 +342,16 @@ class Log_usingThread(BaseLog):
 
         self.queue=Queue()
 
-        def worker():
-            while True:
+        def worker(please_stop):
+            while not please_stop:
+                Thread.sleep(1)
                 logs = self.queue.pop_all()
                 for log in logs:
                     if log==Thread.STOP:
-                        break
+                        please_stop.go()
 
                     logger.write(**log)
-                Thread.sleep(1)
+
         self.thread=Thread("log thread", worker)
         self.thread.start()
 

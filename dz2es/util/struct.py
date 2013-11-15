@@ -51,6 +51,9 @@ class Struct(dict):
         return dict.__str__(object.__getattribute__(self, "__dict__"))
 
     def __getitem__(self, key):
+        if not isinstance(key, str):
+            key = key.encode("utf-8")
+
         d = object.__getattribute__(self, "__dict__")
 
         if key.find(".") >= 0:
@@ -66,6 +69,9 @@ class Struct(dict):
         Struct.__setitem__(self, key, value)
 
     def __setitem__(self, key, value):
+        if not isinstance(key, str):
+            raise Exception("expecting unicode keys")
+
         try:
             d = object.__getattribute__(self, "__dict__")
             value = unwrap(value)
@@ -89,6 +95,9 @@ class Struct(dict):
             raise e
 
     def __getattribute__(self, key):
+        if not isinstance(key, str):
+            raise Exception("expecting unicode keys")
+
         d = object.__getattribute__(self, "__dict__")
         if key not in SPECIAL:
             return wrap(getdefault(d, key))
@@ -127,6 +136,9 @@ class Struct(dict):
 
 
     def __delitem__(self, key):
+        if not isinstance(key, str):
+            raise Exception("expecting unicode keys")
+
         d = object.__getattribute__(self, "__dict__")
 
         if key.find(".") == -1:
