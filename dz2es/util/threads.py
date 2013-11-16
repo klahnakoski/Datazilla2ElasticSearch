@@ -336,7 +336,7 @@ class ThreadedQueue(Queue):
     def __init__(self, queue, size):
         Queue.__init__(self)
 
-        def push_to_queue(please_stop):
+        def size_pusher(please_stop):
             please_stop.on_go(lambda : self.add(Thread.STOP))
 
             #output_queue IS A MULTI-THREADED QUEUE, SO THIS WILL BLOCK UNTIL THE 5K ARE READY
@@ -354,7 +354,7 @@ class ThreadedQueue(Queue):
                     from logs import Log
                     Log.warning("Can not push data to given queue", e)
 
-        self.thread = Thread.run("threaded queue", push_to_queue)
+        self.thread = Thread.run("threaded queue", size_pusher)
 
 
     def __enter__(self):

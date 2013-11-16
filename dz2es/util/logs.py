@@ -238,13 +238,14 @@ class Log_usingLogger(BaseLog):
         self.logger=logging.Logger("unique name", level=logging.INFO)
         self.logger.addHandler(make_log_from_settings(settings))
 
+        # TURNS OUT LOGGERS ARE REALLY SLOW TOO
+        self.queue = threads.Queue()
+        self.thread = Thread("log to logger", time_delta_pusher, appender=self.logger.info, queue=self.queue, interval=timedelta(seconds=0.3))
+        self.thread.start()
+
     def write(self, template, params):
         # http://docs.python.org/2/library/logging.html#logging.LogRecord
-        data=expand_template(template, params)
-        try:
-            self.logger.info(data)
-        except Exception, e:
-            sys.stdout.write("Can not write to file\n")
+        self.queue.add({"template": template, "params": params})
 
 
 def make_log_from_settings(settings):
@@ -269,6 +270,36 @@ def make_log_from_settings(settings):
     return constructor(**params)
 
 
+def time_delta_pusher(please_stop, appender, queue, interval):
+    """
+    appender - THE FUNCTION THAT ACCEPTS A STRING
+    queue - FILLED WITH LINES TO WRITE
+    interval - timedelta
+    USE IN A THREAD TO BATCH LOGS BY TIME INTERVAL
+    """
+
+    if not isinstance(interval, timedelta):
+        Log.error("Expecting interval to be a timedelta")
+
+    while not please_stop:
+        next_run = datetime.utcnow() + interval
+        logs = queue.pop_all()
+        if logs:
+            lines = []
+            for log in logs:
+                try:
+                    if log == Thread.STOP:
+                        please_stop.go()
+                        next_run = datetime.utcnow()
+                        break
+                    lines.append(expand_template(log.get("template", None), log.get("params", None)))
+                except Exception, e:
+                    pass
+            try:
+                appender("\n".join(lines)+"\n")
+            except Exception, e:
+                pass
+        Thread.sleep(till=next_run)
 
 
 class Log_usingStream(BaseLog):
@@ -278,45 +309,23 @@ class Log_usingStream(BaseLog):
         assert stream
 
         if isinstance(stream, basestring):
-            self.stream=eval(stream)
-            name=stream
+            self.stream = eval(stream)
+            name = stream
         else:
-            self.stream=stream
-            name="stream"
+            self.stream = stream
+            name = "stream"
 
         #WRITE TO STREAMS CAN BE *REALLY* SLOW, WE WILL USE A THREAD
         from threads import Queue
-        self.queue=Queue()
 
-        def worker(please_stop):
-            queue=self.queue
-
-            while not please_stop:
-                next_run = datetime.utcnow() + timedelta(seconds=0.3)
-                logs = queue.pop_all()
-                if logs:
-                    lines=[]
-                    for log in logs:
-                        try:
-                            if log==Thread.STOP:
-                                please_stop.go()
-                                next_run = datetime.utcnow()
-                                break
-                            lines.append(expand_template(log.get("template", None), log.get("params", None)))
-                        except Exception, e:
-                            pass
-                    try:
-                        self.stream.write("\n".join(lines))
-                        self.stream.write("\n")
-                    except Exception, e:
-                        pass
-                Thread.sleep(till=next_run)
-        self.thread=Thread("log to "+name, worker)
+        self.queue = Queue()
+        self.thread = Thread("log to " + name, time_delta_pusher, appender=self.stream.write, queue=self.queue, interval=timedelta(seconds=0.3))
         self.thread.start()
+
 
     def write(self, template, params):
         try:
-            self.queue.add({"template":template, "params":params})
+            self.queue.add({"template": template, "params": params})
             return self
         except Exception, e:
             raise e  #OH NO!
@@ -349,8 +358,8 @@ class Log_usingThread(BaseLog):
                 for log in logs:
                     if log==Thread.STOP:
                         please_stop.go()
-
-                    logger.write(**log)
+                    else:
+                        logger.write(**log)
 
         self.thread=Thread("log thread", worker)
         self.thread.start()
