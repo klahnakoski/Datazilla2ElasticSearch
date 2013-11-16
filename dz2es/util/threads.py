@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import threading
 import thread
 import time
+from dz2es.util.struct import nvl
 
 
 DEBUG = True
@@ -43,12 +44,15 @@ class Lock(object):
         self.monitor.notify_all()
 
 
-# SIMPLE MESSAGE QUEUE, multiprocessing.Queue REQUIRES SERIALIZATION, WHICH IS HARD TO USE JUST BETWEEN THREADS
 class Queue(object):
-    def __init__(self):
-        self.keep_running=True
-        self.lock=Lock("lock for queue")
-        self.queue=[]
+    """
+    SIMPLE MESSAGE QUEUE, multiprocessing.Queue REQUIRES SERIALIZATION, WHICH IS HARD TO USE JUST BETWEEN THREADS
+    """
+    def __init__(self, max_length=None):
+        self.max = nvl(max_length, 2**30)
+        self.keep_running = True
+        self.lock = Lock("lock for queue")
+        self.queue = []
 
     def __iter__(self):
         while self.keep_running:
@@ -63,12 +67,16 @@ class Queue(object):
     def add(self, value):
         with self.lock:
             if self.keep_running:
+                # while self.keep_running and len(self.queue) > self.max:
+                #     self.lock.wait()
                 self.queue.append(value)
         return self
 
     def extend(self, values):
         with self.lock:
             if self.keep_running:
+                # while self.keep_running and len(self.queue) > self.max:
+                #     self.lock.wait()
                 self.queue.extend(values)
 
     def __len__(self):
@@ -333,8 +341,8 @@ class ThreadedQueue(Queue):
     TODO: Check that this queue is not dropping items at shutdown
     DISPATCH TO ANOTHER (SLOWER) queue IN BATCHES OF GIVEN size
     """
-    def __init__(self, queue, size):
-        Queue.__init__(self)
+    def __init__(self, queue, size, max_length=None):
+        Queue.__init__(self, max_length=max_length)
 
         def size_pusher(please_stop):
             please_stop.on_go(lambda : self.add(Thread.STOP))
