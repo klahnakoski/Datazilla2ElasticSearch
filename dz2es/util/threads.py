@@ -48,8 +48,8 @@ class Queue(object):
     """
     SIMPLE MESSAGE QUEUE, multiprocessing.Queue REQUIRES SERIALIZATION, WHICH IS HARD TO USE JUST BETWEEN THREADS
     """
-    def __init__(self, max_length=None):
-        self.max = nvl(max_length, 2**30)
+    def __init__(self, max=None):
+        self.max = nvl(max, 2**30)
         self.keep_running = True
         self.lock = Lock("lock for queue")
         self.queue = []
@@ -67,17 +67,17 @@ class Queue(object):
     def add(self, value):
         with self.lock:
             if self.keep_running:
-                # while self.keep_running and len(self.queue) > self.max:
-                #     self.lock.wait()
                 self.queue.append(value)
+            while self.keep_running and len(self.queue) > self.max:
+                self.lock.wait()
         return self
 
     def extend(self, values):
         with self.lock:
             if self.keep_running:
-                # while self.keep_running and len(self.queue) > self.max:
-                #     self.lock.wait()
                 self.queue.extend(values)
+            while self.keep_running and len(self.queue) > self.max:
+                self.lock.wait()
 
     def __len__(self):
         with self.lock:
@@ -341,8 +341,8 @@ class ThreadedQueue(Queue):
     TODO: Check that this queue is not dropping items at shutdown
     DISPATCH TO ANOTHER (SLOWER) queue IN BATCHES OF GIVEN size
     """
-    def __init__(self, queue, size, max_length=None):
-        Queue.__init__(self, max_length=max_length)
+    def __init__(self, queue, size, max=None):
+        Queue.__init__(self, max=max)
 
         def size_pusher(please_stop):
             please_stop.on_go(lambda : self.add(Thread.STOP))

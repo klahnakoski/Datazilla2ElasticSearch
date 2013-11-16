@@ -118,7 +118,7 @@ def extract_from_datazilla_using_id(settings, transformer):
     if len(missing_ids) > 10000 and File(settings.param.output_file).exists:
         #ASYNCH PUSH TO ES IN BLOCKS OF 1000
         with Timer("Scan file for missing ids"):
-            with ThreadedQueue(es, size=1000, max=100000) as json_for_es:
+            with ThreadedQueue(es, size=1000, max=10000) as json_for_es:
                 for line in File(settings.param.output_file):
                     try:
                         if len(line.strip()) == 0:
