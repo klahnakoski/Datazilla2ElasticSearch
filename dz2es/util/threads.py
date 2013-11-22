@@ -49,6 +49,9 @@ class Queue(object):
     SIMPLE MESSAGE QUEUE, multiprocessing.Queue REQUIRES SERIALIZATION, WHICH IS HARD TO USE JUST BETWEEN THREADS
     """
     def __init__(self, max=None):
+        """
+        max - LIMIT THE NUMBER IN THE QUEUE, IF TOO MANY add() AND extend() WILL BLOCK
+        """
         self.max = nvl(max, 2**30)
         self.keep_running = True
         self.lock = Lock("lock for queue")
