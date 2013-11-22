@@ -42,12 +42,13 @@ def etl(es, file_sink,  settings, transformer, id):
             return False
 
         data = CNV.JSON2object(content)
+        content = CNV.object2JSON(data)  #ENSURE content HAS NO crlf
         Log.println("Add {{id}} for revision {{revision}} ({{size}} bytes)",
                     {"id": id, "revision": data.json_blob.test_build.revision,
                      "size": len(content)})
         data = transformer.transform(id, data)
 
-        es.add([{"id": data.datazilla.id, "value": data}])
+        es.add({"id": data.datazilla.id, "value": data})
         file_sink.add(str(id) + "\t" + content + "\n")
         return True
     except Exception, e:
@@ -135,7 +136,8 @@ def extract_from_datazilla_using_id(settings, transformer):
                         json_for_es.add({"id": data.datazilla.id, "value": data})
                         Log.note("Added {{id}} from file", {"id": data.datazilla.id})
                     except Exception, e:
-                        Log.warning("Bad line ({{length}}bytes):\n\t{{prefix}}", {
+                        Log.warning("Bad line id={{id}} ({{length}}bytes):\n\t{{prefix}}", {
+                            "id": id,
                             "length": len(CNV.object2JSON(line)),
                             "prefix": CNV.object2JSON(line)[0:130]
                         }, e)
