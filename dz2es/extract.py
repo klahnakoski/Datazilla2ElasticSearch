@@ -11,6 +11,7 @@ from datetime import datetime
 import functools
 import requests
 from dz2es.util.files import File
+from dz2es.util.maths import Math
 from dz2es.util.queries import Q
 from dz2es.util.struct import nvl, Null
 from dz2es.util.logs import Log
@@ -104,19 +105,24 @@ def extract_from_datazilla_using_id(settings, transformer):
     if settings.elasticsearch.alias == settings.elasticsearch.index:
         candidates = es.get_proto(settings.elasticsearch.alias)
         if not candidates:
-            es = reset(settings)
+            if settings.args.restart:
+                es = reset(settings)
+            else:
+                es = ElasticSearch(settings.elasticsearch)
         else:
             settings.elasticsearch.index = candidates[-1]
             es = ElasticSearch(settings.elasticsearch)
 
     existing_ids = get_existing_ids(es, settings)
+    holes = set(range(settings.production.min, Math.max(existing_ids))) - existing_ids
     missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
+    Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON
     es.set_refresh_interval(-1)
 
     #FILE IS FASTER THAN NETWORK
-    if len(missing_ids) > 10000 and File(settings.param.output_file).exists:
+    if (len(holes) > 10000 or settings.args.restart) and File(settings.param.output_file).exists:
         #ASYNCH PUSH TO ES IN BLOCKS OF 1000
         with Timer("Scan file for missing ids"):
             with ThreadedQueue(es, size=1000) as json_for_es:
