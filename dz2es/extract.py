@@ -116,15 +116,15 @@ def extract_from_datazilla_using_id(settings, transformer):
             es = ElasticSearch(settings.elasticsearch)
 
     existing_ids = get_existing_ids(es, settings)
-    holes = set(range(settings.production.min, nvl(Math.max(existing_ids), settings.production.min))) - existing_ids
+    # holes = set(range(settings.production.min, nvl(Math.max(existing_ids), settings.production.min))) - existing_ids
     missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
-    Log.note("Number in holes: {{num}}", {"num": len(holes)})
+    # Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON
     es.set_refresh_interval(-1)
 
     #FILE IS FASTER THAN NETWORK
-    if (len(holes) > 10000 or settings.args.restart) and File(settings.param.output_file).exists:
+    if (len(missing_ids) > 1000 or settings.args.restart) and File(settings.param.output_file).exists:
         #ASYNCH PUSH TO ES IN BLOCKS OF 1000
         with Timer("Scan file for missing ids"):
             with ThreadedQueue(es, size=1000) as json_for_es:
@@ -143,12 +143,15 @@ def extract_from_datazilla_using_id(settings, transformer):
                         data = transformer.transform(id, data)
                         json_for_es.add({"id": data.datazilla.id, "value": data})
                         Log.note("Added {{id}} from file", {"id": data.datazilla.id})
+
+                        existing_ids.add(id)
                     except Exception, e:
                         Log.warning("Bad line id={{id}} ({{length}}bytes):\n\t{{prefix}}", {
                             "id": id,
                             "length": len(CNV.object2JSON(line)),
                             "prefix": CNV.object2JSON(line)[0:130]
                         }, e)
+        missing_ids = missing_ids - existing_ids
 
     #COPY MISSING DATA TO ES
     try:
@@ -159,7 +162,7 @@ def extract_from_datazilla_using_id(settings, transformer):
             with Multithread(functions) as many:
                 for result in many.execute([
                     {"id": id}
-                    for id in missing_ids
+                    for id in missing_ids - existing_ids
                 ]):
                     if not result:
                         num_not_found += 1
