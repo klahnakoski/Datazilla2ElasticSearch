@@ -104,8 +104,10 @@ def extract_from_datazilla_using_id(settings, transformer):
         settings.elasticsearch.alias = settings.elasticsearch.index
     if settings.elasticsearch.alias == settings.elasticsearch.index:
         candidates = es.get_proto(settings.elasticsearch.alias)
+        current = es.get_index(settings.elasticsearch.alias)
         if not candidates:
-            if settings.args.restart:
+            if not current or settings.args.restart:
+                settings.args.restart = True
                 es = reset(settings)
             else:
                 es = ElasticSearch(settings.elasticsearch)
@@ -114,7 +116,7 @@ def extract_from_datazilla_using_id(settings, transformer):
             es = ElasticSearch(settings.elasticsearch)
 
     existing_ids = get_existing_ids(es, settings)
-    holes = set(range(settings.production.min, Math.max(existing_ids))) - existing_ids
+    holes = set(range(settings.production.min, nvl(Math.max(existing_ids), settings.production.min))) - existing_ids
     missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     Log.note("Number in holes: {{num}}", {"num": len(holes)})
