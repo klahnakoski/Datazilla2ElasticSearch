@@ -112,22 +112,22 @@ def extract_from_datazilla_using_id(settings, transformer):
             else:
                 es = ElasticSearch(settings.elasticsearch)
         else:
-            settings.elasticsearch.index = candidates[-1]
+            settings.elasticsearch.index = candidates.last()
             es = ElasticSearch(settings.elasticsearch)
 
     existing_ids = get_existing_ids(es, settings)
-    # holes = set(range(settings.production.min, nvl(Math.max(existing_ids), settings.production.min))) - existing_ids
+    holes = set(range(settings.production.min, nvl(Math.max(existing_ids), settings.production.min))) - existing_ids
     missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
-    # Log.note("Number in holes: {{num}}", {"num": len(holes)})
+    Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON
     es.set_refresh_interval(-1)
 
     #FILE IS FASTER THAN NETWORK
-    if (len(missing_ids) > 1000 or settings.args.restart) and File(settings.param.output_file).exists:
+    if (len(holes) > 10000 or settings.args.scan_file or settings.args.restart) and File(settings.param.output_file).exists:
         #ASYNCH PUSH TO ES IN BLOCKS OF 1000
         with Timer("Scan file for missing ids"):
-            with ThreadedQueue(es, size=1000) as json_for_es:
+            with ThreadedQueue(es, size=5000) as json_for_es:
                 for line in File(settings.param.output_file):
                     try:
                         if len(line.strip()) == 0:
@@ -196,12 +196,17 @@ def reset(settings):
 
 def main():
     try:
-        settings = startup.read_settings(defs={
+        settings = startup.read_settings(defs=[{
             "name": ["--restart", "--reset", "--redo"],
-            "help": "use this to force a reprocessing of all data",
+            "help": "force a reprocessing of all data",
             "action": "store_true",
             "dest": "restart"
-        })
+        },{
+            "name": ["--file", "--scan_file", "--scanfile"],
+            "help": "scan file for missing ids",
+            "action": "store_true",
+            "dest": "scan_file"
+        }])
         Log.start(settings.debug)
 
         settings.production.threads = nvl(settings.production.threads, 1)

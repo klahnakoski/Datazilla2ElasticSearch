@@ -155,7 +155,7 @@ class ElasticSearch(object):
         RETURN True IF THIS INDEX HAS NOT BEEN ASSIGNED IT'S ALIAS
         """
         for a in self.get_aliases():
-            if a.index==index and a.alias:
+            if a.index == index and a.alias:
                 return False
         return True
 

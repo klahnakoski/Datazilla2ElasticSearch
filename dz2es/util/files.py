@@ -77,19 +77,11 @@ class File(object):
     def __iter__(self):
         #NOT SURE HOW TO MAXIMIZE FILE READ SPEED
         #http://stackoverflow.com/questions/8009882/how-to-read-large-file-line-by-line-in-python
+        #http://effbot.org/zone/wide-finder.htm
         def output():
-            remainder = ""
             with io.open(self._filename, "rb") as f:
-                while True:
-                    block = f.read(self.buffering)
-                    if block == "":
-                        if remainder == "":
-                            return
-                        yield remainder
-                    lines = (remainder + block).split("\n")
-                    for line in lines[:-1]:
-                        yield line.decode("utf-8")
-                    remainder = lines[-1]
+                for line in f:
+                    yield line.decode("utf-8")
 
         return output()
 
