@@ -183,7 +183,8 @@ def extract_from_datazilla_using_id(settings, transformer):
 
 
 def reset(settings):
-    # Log.error("reset not allowed")
+    if settings.args.no_restart:
+        Log.error("reset not allowed")
     schema_json = File(settings.param.schema_file).read()
     schema = CNV.JSON2object(schema_json, {"type": settings.elasticsearch.type}, flexible=True)
 
@@ -198,6 +199,11 @@ def reset(settings):
 def main():
     try:
         settings = startup.read_settings(defs=[{
+           "name": ["--no_restart", "--no_reset", "--no_redo", "--norestart", "--noreset", "--noredo"],
+           "help": "do not allow creation of new index (for debugging rouge resets)",
+           "action": "store_true",
+           "dest": "no_restart"
+       },{
             "name": ["--restart", "--reset", "--redo"],
             "help": "force a reprocessing of all data",
             "action": "store_true",
