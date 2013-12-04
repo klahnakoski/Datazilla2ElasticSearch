@@ -183,7 +183,7 @@ def extract_from_datazilla_using_id(settings, transformer):
 
 
 def reset(settings):
-    Log.error("reset not allowed");
+    # Log.error("reset not allowed")
     schema_json = File(settings.param.schema_file).read()
     schema = CNV.JSON2object(schema_json, {"type": settings.elasticsearch.type}, flexible=True)
 

@@ -20,19 +20,17 @@ from dz2es.util.stats import Z_moment
 
 
 DEBUG = False
-
+ARRAY_TOO_BIG = 1000
 
 
 class DZ_to_ES():
-
-
     def __init__(self, pushlog_settings):
         with Timer("get pushlog"):
             if pushlog_settings.disable:
                 all_pushlogs = []
             else:
                 with DB(pushlog_settings) as db:
-                    all_pushlogs=db.query("""
+                    all_pushlogs = db.query("""
                         SELECT
                             pl.`date`,
                             left(ch.node, 12) revision,
@@ -59,29 +57,28 @@ class DZ_to_ES():
     # A SIMPLE TRANSFORM OF DATA:  I WOULD ALSO LIKE TO ADD DIMENSIONAL TYPE INFORMATION
     # WHICH WOULD GIVE DEAR READER A BETTER FEEL FOR THE TOTALITY OF THIS DATA
     # BUT THEN AGAIN, SIMPLE IS BETTER, YES?
-    def transform(self, id, datazilla, keep_arrays_smaller_than=25):
+    def transform(self, id, datazilla, keep_arrays_smaller_than=ARRAY_TOO_BIG):
         try:
-            r=datazilla.json_blob
+            r = datazilla.json_blob
 
             #ADD DATAZILLA MARKUP
-            r.datazilla={
-                "id":id,
-                "date_loaded":datazilla.date_loaded*1000,
-                "error_flag":datazilla.error_flag,
-                "test_run_id":datazilla.test_run_id,
-                "processed_flag":datazilla.processed_flag,
-                "error_msg":datazilla.error_msg
+            r.datazilla = {
+                "id": id,
+                "date_loaded": datazilla.date_loaded * 1000,
+                "error_flag": datazilla.error_flag,
+                "test_run_id": datazilla.test_run_id,
+                "processed_flag": datazilla.processed_flag,
+                "error_msg": datazilla.error_msg
             }
 
-
-            new_results={}
-            for i,v in enumerate(r.results.items()):
-                k=v[0]
-                v=v[1]
-                k=replace(k, ".", "_dot_")
+            new_results = {}
+            for i, v in enumerate(r.results.items()):
+                k = v[0]
+                v = v[1]
+                k = replace(k, ".", "_dot_")
 
                 try:
-                    m=CNV.z_moment2dict(Z_moment.new_instance(v))
+                    m = CNV.z_moment2dict(Z_moment.new_instance(v))
                 except Exception, e:
                     Log.error("can not reduce series to moments", e)
 
@@ -97,15 +94,15 @@ class DZ_to_ES():
 
             #CONVERT FROM <name>:<samples> TO {"name":<name>, "samples":<samples>}
             #USING stack() WOULD BE CLEARER, BUT DOES NOT HANDLE THE TOO-LARGE SEQUENCES
-        #    r.results=Q.stack([r.results], column="name")
-        #    r.results=[{
-        #        "name":k,
-        #        "moments": Z_moment.new_instance(v).dict,
-        #        "samples": (dict(("s"+right("00"+str(i), 2), s) for i, s in enumerate(v)) if len(v)<=keep_arrays_smaller_than else Null)
-        #    } for k,v in r.results.items()]
+            #    r.results=Q.stack([r.results], column="name")
+            #    r.results=[{
+            #        "name":k,
+            #        "moments": Z_moment.new_instance(v).dict,
+            #        "samples": (dict(("s"+right("00"+str(i), 2), s) for i, s in enumerate(v)) if len(v)<=keep_arrays_smaller_than else Null)
+            #    } for k,v in r.results.items()]
 
             #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
-            r.testrun.date*=1000
+            r.testrun.date *= 1000
 
             def mainthread_transform(r):
                 if r == None:
@@ -121,7 +118,7 @@ class DZ_to_ES():
 
                 for i in r.mainthread_readcount:
                     r.mainthread[i[1].replace(".", "\.")].readcount = i[0]
-                r.mainthread_readcount=None
+                r.mainthread_readcount = None
 
                 for i in r.mainthread_writecount:
                     r.mainthread[i[1].replace(".", "\.")].writecount = i[0]
@@ -129,23 +126,23 @@ class DZ_to_ES():
 
             #COLAPSE THESE TO SIMPLE MOMENTS
             if r.results_aux:
-                r.results_aux.responsivness     ={"moments":CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.responsivness   ))}
-                r.results_aux["Private bytes"]  ={"moments":CNV.z_moment2dict(Z_moment.new_instance(r.results_aux["Private bytes"]))}
-                r.results_aux.Main_RSS          ={"moments":CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.Main_RSS        ))}
-                r.results_aux.shutdown          ={"moments":CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.shutdown        ))}
+                r.results_aux.responsivness = {"moments": CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.responsivness))}
+                r.results_aux["Private bytes"] = {"moments": CNV.z_moment2dict(Z_moment.new_instance(r.results_aux["Private bytes"]))}
+                r.results_aux.Main_RSS = {"moments": CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.Main_RSS))}
+                r.results_aux.shutdown = {"moments": CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.shutdown))}
 
             mainthread_transform(r.results_aux)
             mainthread_transform(r.results_xperf)
 
-        #    summarize(r.dict, keep_arrays_smaller_than)
+            #    summarize(r.dict, keep_arrays_smaller_than)
 
             #ADD PUSH LOG INFO
             try:
-                branch=r.test_build.branch
-                if branch[-8:]=="-Non-PGO": branch=branch[0:-8]
+                branch = r.test_build.branch
+                if branch[-8:] == "-Non-PGO": branch = branch[0:-8]
                 if branch in self.pushlog:
-                    possible_dates=self.pushlog[branch][r.test_build.revision]
-                    r.test_build.push_date=int(possible_dates[0].date)*1000
+                    possible_dates = self.pushlog[branch][r.test_build.revision]
+                    r.test_build.push_date = int(possible_dates[0].date) * 1000
                 else:
                     self.unknown_branches.add(branch)
             except Exception, e:
@@ -156,16 +153,13 @@ class DZ_to_ES():
             Log.error("Transformation failure", e)
 
 
-
-
 # RESPONSIBLE FOR CONVERTING LONG ARRAYS OF NUMBERS TO THEIR REPRESENTATIVE
 # MOMENTS
 def summarize(path, r, keep_arrays_smaller_than=25):
-
     try:
         if isinstance(r, dict):
             for k, v in [(k, v) for k, v in r.items()]:
-                new_v = summarize(path+"."+k, v, keep_arrays_smaller_than)
+                new_v = summarize(path + "." + k, v, keep_arrays_smaller_than)
                 if isinstance(new_v, Z_moment):
                     #CONVERT MOMENTS' TUPLE TO NAMED HASH (FOR EASIER ES INDEXING)
                     new_v = {"moment": CNV.z_moment2dict(new_v)}
@@ -198,7 +192,7 @@ def summarize(path, r, keep_arrays_smaller_than=25):
                 return Z_moment.new_instance(values)
             except Exception, e:
                 for i, v in enumerate(r):
-                    r[i] = summarize(path+"[]", v, keep_arrays_smaller_than)
+                    r[i] = summarize(path + "[]", v, keep_arrays_smaller_than)
         return r
     except Exception, e:
         Log.warning("Can not summarize: {{json}}", {"json": CNV.object2JSON(r)})

@@ -3,7 +3,7 @@ from dz2es.util.cnv import CNV
 from dz2es.util.db import DB
 from dz2es.util.files import File
 from dz2es.util.logs import Log
-from dz2es.util.startup import startup
+from dz2es.util import startup
 from dz2es.util.struct import nvl, Struct
 from dz2es.util.threads import ThreadedQueue
 

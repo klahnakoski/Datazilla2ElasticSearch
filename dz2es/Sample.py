@@ -10,7 +10,7 @@
 from transform import DZ_to_ES
 from dz2es.util.logs import Log
 from dz2es.util.cnv import CNV
-from dz2es.util.startup import startup
+from dz2es.util import startup
 from dz2es.util.elasticsearch import ElasticSearch
 
 
