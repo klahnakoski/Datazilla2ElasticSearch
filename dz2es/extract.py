@@ -203,7 +203,7 @@ def main():
            "help": "do not allow creation of new index (for debugging rouge resets)",
            "action": "store_true",
            "dest": "no_restart"
-       },{
+        },{
             "name": ["--restart", "--reset", "--redo"],
             "help": "force a reprocessing of all data",
             "action": "store_true",

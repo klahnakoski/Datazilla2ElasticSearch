@@ -108,21 +108,29 @@ class DZ_to_ES():
                 if r == None:
                     return None
 
+                output = Struct()
+
                 for i in r.mainthread_readbytes:
-                    r.mainthread[i[1].replace(".", "\.")].readbytes = i[0]
+                    output[i[1].replace(".", "\.")].name = i[1]
+                    output[i[1].replace(".", "\.")].readbytes = i[0]
                 r.mainthread_readbytes = None
 
                 for i in r.mainthread_writebytes:
-                    r.mainthread[i[1].replace(".", "\.")].writebytes = i[0]
+                    output[i[1].replace(".", "\.")].name = i[1]
+                    output[i[1].replace(".", "\.")].writebytes = i[0]
                 r.mainthread_writebytes = None
 
                 for i in r.mainthread_readcount:
-                    r.mainthread[i[1].replace(".", "\.")].readcount = i[0]
+                    output[i[1].replace(".", "\.")].name = i[1]
+                    output[i[1].replace(".", "\.")].readcount = i[0]
                 r.mainthread_readcount = None
 
                 for i in r.mainthread_writecount:
-                    r.mainthread[i[1].replace(".", "\.")].writecount = i[0]
+                    output[i[1].replace(".", "\.")].name = i[1]
+                    output[i[1].replace(".", "\.")].writecount = i[0]
                 r.mainthread_writecount = None
+
+                r.mainthread = output.values()
 
             #COLAPSE THESE TO SIMPLE MOMENTS
             if r.results_aux:

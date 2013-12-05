@@ -77,7 +77,11 @@
 					}
 				},
                 "results_aux": {
-                    "type":"object",
+                    "type":"nested",
+                    "dynamic":true
+                },
+                "results_xperf": {
+                    "type":"nested",
                     "dynamic":true
                 },
                 "testrun":{
