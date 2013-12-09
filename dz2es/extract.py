@@ -110,6 +110,7 @@ def extract_from_datazilla_using_id(settings, transformer):
                 settings.args.restart = True
                 es = reset(settings)
             else:
+                settings.elasticsearch.index = current
                 es = ElasticSearch(settings.elasticsearch)
         else:
             settings.elasticsearch.index = candidates.last()
