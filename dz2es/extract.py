@@ -7,7 +7,6 @@
 ################################################################################
 
 
-from datetime import datetime
 import functools
 import requests
 from dz2es.util.files import File
@@ -24,14 +23,13 @@ from dz2es.util.timer import Timer
 from dz2es.util.multithread import Multithread
 
 
-
-def etl(es, file_sink,  settings, transformer, id):
+def etl(es, file_sink, settings, transformer, id):
     """
     PULL FROM DZ AND PUSH TO es AND file_sink
     """
     try:
         url = settings.production.blob_url + "/" + str(id)
-        with Timer("read from DZ"):
+        with Timer("read {{id}} from DZ", {"id": id}):
             content = requests.get(url).content
     except Exception, e:
         Log.warning("Failure to read from {{url}}", {"url": url}, e)
@@ -39,7 +37,7 @@ def etl(es, file_sink,  settings, transformer, id):
 
     try:
         if content.startswith("Id not found"):
-            Log.note("{{id}} not found", {"id":id})
+            Log.note("{{id}} not found", {"id": id})
             return False
 
         data = CNV.JSON2object(content)
@@ -118,7 +116,7 @@ def extract_from_datazilla_using_id(settings, transformer):
 
     existing_ids = get_existing_ids(es, settings)
     holes = set(range(settings.production.min, nvl(Math.max(existing_ids), settings.production.min))) - existing_ids
-    missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
+    missing_ids = Q.sort(set(range(settings.production.min, settings.production.max)) - existing_ids)
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON
@@ -163,7 +161,7 @@ def extract_from_datazilla_using_id(settings, transformer):
             with Multithread(functions) as many:
                 for result in many.execute([
                     {"id": id}
-                    for id in missing_ids - existing_ids
+                    for id in missing_ids
                 ]):
                     if not result:
                         num_not_found += 1
@@ -200,19 +198,24 @@ def reset(settings):
 def main():
     try:
         settings = startup.read_settings(defs=[{
-           "name": ["--no_restart", "--no_reset", "--no_redo", "--norestart", "--noreset", "--noredo"],
-           "help": "do not allow creation of new index (for debugging rouge resets)",
-           "action": "store_true",
-           "dest": "no_restart"
-        },{
+            "name": ["--no_restart", "--no_reset", "--no_redo", "--norestart", "--noreset", "--noredo"],
+            "help": "do not allow creation of new index (for debugging rouge resets)",
+            "action": "store_true",
+            "dest": "no_restart"
+        }, {
             "name": ["--restart", "--reset", "--redo"],
             "help": "force a reprocessing of all data",
             "action": "store_true",
             "dest": "restart"
-        },{
+        }, {
             "name": ["--file", "--scan_file", "--scanfile"],
             "help": "scan file for missing ids",
             "action": "store_true",
+            "dest": "scan_file"
+        }, {
+            "name": ["--nofile", "--no_file", "--no-file"],
+            "help": "do not scan file for missing ids",
+            "action": "store_false",
             "dest": "scan_file"
         }])
         Log.start(settings.debug)

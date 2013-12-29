@@ -37,11 +37,10 @@ class ElasticSearch(object):
         if not settings.port:
             settings.port = 9200
         self.debug = nvl(settings.debug, DEBUG)
-        globals()["DEBUG"] = DEBUG or self.debug
+        globals()["DEBUG"] = True if DEBUG or self.debug else False
 
         self.settings = settings
         self.path = settings.host + ":" + unicode(settings.port) + "/" + settings.index + "/" + settings.type
-
 
     @staticmethod
     def create_index(settings, schema):
@@ -56,7 +55,6 @@ class ElasticSearch(object):
         time.sleep(2)
         es = ElasticSearch(settings)
         return es
-
 
     @staticmethod
     def delete_index(settings, index=None):
@@ -81,17 +79,14 @@ class ElasticSearch(object):
                     output.append({"index": index, "alias": a})
         return struct.wrap(output)
 
-
     def get_metadata(self):
         if not self.metadata:
             response = self.get(self.settings.host + ":" + unicode(self.settings.port) + "/_cluster/state")
             self.metadata = response.metadata
         return self.metadata
 
-
     def get_schema(self):
         return self.get_metadata().indicies[self.settings.index]
-
 
     #DELETE ALL INDEXES WITH GIVEN PREFIX, EXCEPT name
     def delete_all_but(self, prefix, name):
@@ -102,13 +97,11 @@ class ElasticSearch(object):
             if re.match(re.escape(prefix) + "\\d{8}_\\d{6}", a.index) and a.index != name:
                 ElasticSearch.delete_index(self.settings, a.index)
 
-
     @staticmethod
     def proto_name(prefix, timestamp=None):
         if not timestamp:
             timestamp = datetime.utcnow()
         return prefix + CNV.datetime2string(timestamp, "%Y%m%d_%H%M%S")
-
 
     def add_alias(self, alias):
         self.metadata = None
@@ -150,7 +143,6 @@ class ElasticSearch(object):
 
         return output.last()
 
-
     def is_proto(self, index):
         """
         RETURN True IF THIS INDEX HAS NOT BEEN ASSIGNED IT'S ALIAS
@@ -159,7 +151,6 @@ class ElasticSearch(object):
             if a.index == index and a.alias:
                 return False
         return True
-
 
     def delete_record(self, query):
         if isinstance(query, dict):
@@ -208,14 +199,12 @@ class ElasticSearch(object):
         if self.debug:
             Log.note("{{num}} items added", {"num": len(lines) / 2})
 
-
     # RECORDS MUST HAVE id AND json AS A STRING OR
     # HAVE id AND value AS AN OBJECT
     def add(self, record):
         if isinstance(record, list):
             Log.error("add() has changed to only accept one record, no lists")
         self.extend([record])
-
 
     # -1 FOR NO REFRESH
     def set_refresh_interval(self, seconds):
@@ -235,33 +224,43 @@ class ElasticSearch(object):
                 "error": response.content
             })
 
-
     def search(self, query):
         try:
+            if DEBUG:
+                Log.note("Query:\n{{query|indent}}", {"query": query})
             return ElasticSearch.post(self.path + "/_search", data=CNV.object2JSON(query))
         except Exception, e:
-            Log.error("Problem with search", e)
+            Log.error("Problem with search (path={{path}}):\n{{query|indent}}", {
+                "path": self.path + "/_search",
+                "query": query
+            }, e)
 
     def threaded_queue(self, size):
         return ThreadedQueue(self, size)
 
     @staticmethod
-    def post(*list, **args):
+    def post(*args, **kwargs):
         try:
-            response = requests.post(*list, **args)
-            if DEBUG: Log.note(response.content[:130])
+            response = requests.post(*args, **kwargs)
+            if DEBUG:
+                Log.note(response.content[:130])
             details = CNV.JSON2object(response.content)
             if details.error:
                 Log.error(details.error)
             return details
         except Exception, e:
-            Log.error("Problem with call to {{url}}", {"url": list[0]}, e)
+            if args[0][0:4] != "http":
+                suggestion = " (did you forget \"http://\" prefix on the host name?)"
+            else:
+                suggestion = ""
+            Log.error("Problem with call to {{url}}" + suggestion, {"url": args[0]}, e)
 
     @staticmethod
     def get(*list, **args):
         try:
             response = requests.get(*list, **args)
-            if DEBUG: Log.note(response.content[:130])
+            if DEBUG:
+                Log.note(response.content[:130])
             details = CNV.JSON2object(response.content)
             if details.error:
                 Log.error(details.error)
@@ -273,20 +272,21 @@ class ElasticSearch(object):
     def put(*list, **args):
         try:
             response = requests.put(*list, **args)
-            if DEBUG: Log.note(response.content)
+            if DEBUG:
+                Log.note(response.content)
             return response
         except Exception, e:
             Log.error("Problem with call to {{url}}", {"url": list[0]}, e)
 
     @staticmethod
-    def delete(*list, **args):
+    def delete(*args, **kwargs):
         try:
-            response = requests.delete(*list, **args)
-            if DEBUG: Log.note(response.content)
+            response = requests.delete(*args, **kwargs)
+            if DEBUG:
+                Log.note(response.content)
             return response
         except Exception, e:
-            Log.error("Problem with call to {{url}}", {"url": list[0]}, e)
-
+            Log.error("Problem with call to {{url}}", {"url": args[0]}, e)
 
     @staticmethod
     def scrub(r):
