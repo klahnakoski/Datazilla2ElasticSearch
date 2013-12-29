@@ -1,16 +1,16 @@
 
 
 # SIMPLE TUPLE-OF-STRINGS LOOKUP TO OBJECT
-from dzAlerts.util import struct
-from dzAlerts.util.logs import Log
-from dzAlerts.util.strings import indent, expand_template
-from dzAlerts.util.struct import Null
+from .. import struct
+from ..logs import Log
+from ..strings import indent, expand_template
+from ..struct import Null
 
 
 class UniqueIndex(object):
     """
     DEFINE A SET OF ATTRIBUTES THAT UNIQUELY IDENTIFIES EACH OBJECT IN A list.
-    THIS ALLOWS set-LIKE COMPARISIONS (UNION, INTERSECTION, DIFFERENCE, ETC) WHILE
+    THIS ALLOWS set-LIKE COMPARISONS (UNION, INTERSECTION, DIFFERENCE, ETC) WHILE
     STILL MAINTAINING list-LIKE FEATURES
     """
     def __init__(self, keys):
