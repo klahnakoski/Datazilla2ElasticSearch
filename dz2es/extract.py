@@ -116,7 +116,7 @@ def extract_from_datazilla_using_id(settings, transformer):
 
     existing_ids = get_existing_ids(es, settings)
     holes = set(range(settings.production.min, nvl(Math.max(existing_ids), settings.production.min))) - existing_ids
-    missing_ids = Q.sort(set(range(settings.production.min, settings.production.max)) - existing_ids)
+    missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON
@@ -161,7 +161,7 @@ def extract_from_datazilla_using_id(settings, transformer):
             with Multithread(functions) as many:
                 for result in many.execute([
                     {"id": id}
-                    for id in missing_ids
+                    for id in Q.sort(missing_ids)
                 ]):
                     if not result:
                         num_not_found += 1
@@ -208,7 +208,7 @@ def main():
             "action": "store_true",
             "dest": "restart"
         }, {
-            "name": ["--file", "--scan_file", "--scanfile"],
+            "name": ["--file", "--scan_file", "--scanfile", "--use_file", "--usefile"],
             "help": "scan file for missing ids",
             "action": "store_true",
             "dest": "scan_file"
