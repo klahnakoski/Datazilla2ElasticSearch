@@ -8,9 +8,11 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
+from __future__ import unicode_literals
+from datetime import timedelta
 import re
 from .jsons import json_encoder
-import struct
+from . import struct
 
 
 def datetime(value):
@@ -55,7 +57,7 @@ def outdent(value):
                 num = min(num, len(l) - len(l.lstrip()))
         return u"\n".join([l[num:] for l in lines])
     except Exception, e:
-        from .logs import Log
+        from ...env.logs import Log
 
         Log.error("can not outdent value", e)
 
@@ -124,7 +126,7 @@ def _expand(template, seq):
     elif isinstance(template, list):
         return "".join(_expand(t, seq) for t in template)
     else:
-        from .logs import Log
+        from ...env.logs import Log
 
         Log.error("can not handle")
 
@@ -154,7 +156,7 @@ def _simple_expand(template, seq):
                     val = toString(val)
                     return val
             except Exception, f:
-                from logs import Log
+                from ..env.logs import Log
 
                 Log.error(u"Can not expand " + "|".join(ops) + u" in template:\n" + indent(template), e)
 
@@ -166,6 +168,9 @@ def toString(val):
         return u""
     elif isinstance(val, (dict, list, set)):
         return json_encoder.encode(val, pretty=True)
+    elif isinstance(val, timedelta):
+        duration = val.total_seconds()
+        return unicode(round(duration, 3))+" seconds"
     return unicode(val)
 
 

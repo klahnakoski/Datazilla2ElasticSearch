@@ -1,8 +1,16 @@
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
 
-
-# SIMPLE TUPLE-OF-STRINGS LOOKUP TO OBJECT
+from __future__ import unicode_literals
 from .. import struct
-from ..logs import Log
+from ..env.logs import Log
 from ..strings import indent, expand_template
 from ..struct import Null
 
@@ -10,9 +18,10 @@ from ..struct import Null
 class UniqueIndex(object):
     """
     DEFINE A SET OF ATTRIBUTES THAT UNIQUELY IDENTIFIES EACH OBJECT IN A list.
-    THIS ALLOWS set-LIKE COMPARISONS (UNION, INTERSECTION, DIFFERENCE, ETC) WHILE
+    THIS ALLOWS set-LIKE COMPARISIONS (UNION, INTERSECTION, DIFFERENCE, ETC) WHILE
     STILL MAINTAINING list-LIKE FEATURES
     """
+
     def __init__(self, keys):
         self._data = {}
         self._keys = struct.unwrap(keys)
@@ -134,6 +143,7 @@ class Index(object):
     """
     USING DATABASE TERMINOLOGY, THIS IS A NON-UNIQUE INDEX
     """
+
     def __init__(self, keys):
         self._data = {}
         self._keys = struct.unwrap(keys)
@@ -231,4 +241,3 @@ class Index(object):
 
     def intersect(self, other):
         return self.__and__(other)
-

@@ -1,22 +1,23 @@
-################################################################################
-## This Source Code Form is subject to the terms of the Mozilla Public
-## License, v. 2.0. If a copy of the MPL was not distributed with this file,
-## You can obtain one at http://mozilla.org/MPL/2.0/.
-################################################################################
-## Author: Kyle Lahnakoski (kyle@lahnakoski.com)
-################################################################################
-
-
-
-from math import floor, ceil
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
+from __future__ import unicode_literals
 from string import replace
+import dz2es
+from dz2es.util.math.maths import Math
 from dz2es.util.struct import Struct
 from dz2es.util.timer import Timer
 from dz2es.util.cnv import CNV
-from dz2es.util.db import DB
-from dz2es.util.logs import Log
+from dz2es.util.sql.db import DB
+from dz2es.util.env.logs import Log
 from dz2es.util.queries import Q
-from dz2es.util.stats import Z_moment
+from dz2es.util.stats import Z_moment, z_moment2stats
 
 
 DEBUG = False
@@ -72,23 +73,13 @@ class DZ_to_ES():
             }
 
             new_results = {}
-            for i, v in enumerate(r.results.items()):
-                k = v[0]
-                v = v[1]
-                k = replace(k, ".", "_dot_")
+            for i, (k, v) in enumerate(r.results.items()):
+                k = replace(k, ".", "_dot_")  # '.' MAKES SEARCH DIFFICULT IN ES
 
                 try:
-                    m = CNV.z_moment2dict(Z_moment.new_instance(v))
+                    new_results[k] = stats(v)
                 except Exception, e:
                     Log.error("can not reduce series to moments", e)
-
-                new_results[k] = Struct(
-                    index=i,
-                    last_20=v[-20:],
-                    moments=m
-                )
-                if len(v) <= keep_arrays_smaller_than:
-                    new_results[k].series = v
 
             r.results = new_results
 
@@ -147,7 +138,8 @@ class DZ_to_ES():
             #ADD PUSH LOG INFO
             try:
                 branch = r.test_build.branch
-                if branch[-8:] == "-Non-PGO": branch = branch[0:-8]
+                if branch.endswith("-Non-PGO"):
+                    branch = branch[0:-8]
                 if branch in self.pushlog:
                     possible_dates = self.pushlog[branch][r.test_build.revision]
                     r.test_build.push_date = int(possible_dates[0].date) * 1000
@@ -184,20 +176,7 @@ def summarize(path, r, keep_arrays_smaller_than=25):
                 r[k] = new_v
         elif isinstance(r, list):
             try:
-                bottom = 0.0
-                top = 0.9
-
-                ## keep_middle - THE PROPORTION [0..1] OF VALUES TO KEEP, EXTREMES ARE REJECTED
-                values = [float(v) for v in r]
-
-                length = len(values)
-                min = int(floor(length * bottom))
-                max = int(ceil(length * top))
-                values = sorted(values)[min:max]
-                if DEBUG:
-                    Log.println("{{num}} of {{total}} used in moment", {"num": len(values), "total": length})
-
-                return Z_moment.new_instance(values)
+                return stats(r)
             except Exception, e:
                 for i, v in enumerate(r):
                     r[i] = summarize(path + "[]", v, keep_arrays_smaller_than)
@@ -206,3 +185,18 @@ def summarize(path, r, keep_arrays_smaller_than=25):
         Log.warning("Can not summarize: {{json}}", {"json": CNV.object2JSON(r)})
 
 
+def stats(values):
+    """
+    RETURN LOTS OF AGGREGATES
+    """
+    z = Z_moment.new_instance(values)
+    s = Struct()
+    for k, v in z.dict:
+        s[k] = v
+    for k, v in z_moment2stats(z):
+        s[k] = v
+    s.max = Math.max(values)
+    s.min = Math.min(values)
+    s.median = dz2es.util.stats.median(values, simple=False)
+
+    return Struct(samples=values, stats=stats)

@@ -1,26 +1,27 @@
-################################################################################
-## This Source Code Form is subject to the terms of the Mozilla Public
-## License, v. 2.0. If a copy of the MPL was not distributed with this file,
-## You can obtain one at http://mozilla.org/MPL/2.0/.
-################################################################################
-## Author: Kyle Lahnakoski (kyle@lahnakoski.com)
-################################################################################
-
-
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
+from __future__ import unicode_literals
 import functools
 import requests
-from dz2es.util.files import File
-from dz2es.util.maths import Math
+from dz2es.util.env.files import File
+from dz2es.util.math.maths import Math
 from dz2es.util.queries import Q
 from dz2es.util.struct import nvl, Null
-from dz2es.util.logs import Log
-from dz2es.util import startup
+from dz2es.util.env.logs import Log
+from dz2es.util.env import startup
 from dz2es.util.cnv import CNV
-from dz2es.util.threads import ThreadedQueue
+from dz2es.util.thread.threads import ThreadedQueue
 from transform import DZ_to_ES
-from dz2es.util.elasticsearch import ElasticSearch
+from dz2es.util.env.elasticsearch import ElasticSearch
 from dz2es.util.timer import Timer
-from dz2es.util.multithread import Multithread
+from dz2es.util.thread.multithread import Multithread
 
 
 def etl(es, file_sink, settings, transformer, id):
@@ -61,7 +62,7 @@ def get_existing_ids(es, settings):
     int_ids = set()
 
     interval_size = 400000
-    for mini, maxi in Q.range(settings.production.min, settings.production.max, interval_size):
+    for mini, maxi in Q.intervals(settings.production.min, settings.production.max, interval_size):
         existing_ids = es.search({
             "query": {
                 "filtered": {

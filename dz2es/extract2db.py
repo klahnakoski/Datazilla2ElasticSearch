@@ -1,11 +1,20 @@
-
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Author: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
+from __future__ import unicode_literals
 from dz2es.util.cnv import CNV
-from dz2es.util.db import DB
-from dz2es.util.files import File
-from dz2es.util.logs import Log
-from dz2es.util import startup
+from dz2es.util.sql.db import DB
+from dz2es.util.env.files import File
+from dz2es.util.env.logs import Log
+from dz2es.util.env import startup
 from dz2es.util.struct import nvl, Struct
-from dz2es.util.threads import ThreadedQueue
+from dz2es.util.thread.threads import ThreadedQueue
 
 
 def file2db(db, table_name, filename):
