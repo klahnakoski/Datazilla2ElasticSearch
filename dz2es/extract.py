@@ -10,8 +10,8 @@
 from __future__ import unicode_literals
 import functools
 import requests
+from dz2es.util.collections import MAX
 from dz2es.util.env.files import File
-from dz2es.util.math.maths import Math
 from dz2es.util.queries import Q
 from dz2es.util.struct import nvl, Null
 from dz2es.util.env.logs import Log
@@ -20,7 +20,7 @@ from dz2es.util.cnv import CNV
 from dz2es.util.thread.threads import ThreadedQueue
 from transform import DZ_to_ES
 from dz2es.util.env.elasticsearch import ElasticSearch
-from dz2es.util.timer import Timer
+from dz2es.util.times.timer import Timer
 from dz2es.util.thread.multithread import Multithread
 
 
@@ -31,7 +31,7 @@ def etl(es, file_sink, settings, transformer, id):
     try:
         url = settings.production.blob_url + "/" + str(id)
         with Timer("read {{id}} from DZ", {"id": id}):
-            content = requests.get(url).content
+            content = requests.get(url, timeout=nvl(settings.production.timeout, 30)).content
     except Exception, e:
         Log.warning("Failure to read from {{url}}", {"url": url}, e)
         return False
@@ -43,13 +43,16 @@ def etl(es, file_sink, settings, transformer, id):
 
         data = CNV.JSON2object(content)
         content = CNV.object2JSON(data)  #ENSURE content HAS NO crlf
-        Log.println("Add {{id}} for revision {{revision}} ({{size}} bytes)",
-                    {"id": id, "revision": data.json_blob.test_build.revision,
-                     "size": len(content)})
-        data = transformer.transform(id, data)
 
-        es.add({"id": data.datazilla.id, "value": data})
-        file_sink.add(str(id) + "\t" + content + "\n")
+        if data.test_run_id:
+            Log.println("Add {{id}} for revision {{revision}} ({{size}} bytes)",
+                        {"id": id, "revision": data.json_blob.test_build.revision,
+                         "size": len(content)})
+            data = transformer.transform(id, data)
+
+            es.extend({"value": d} for d in data)
+            file_sink.add(str(id) + "\t" + content + "\n")
+
         return True
     except Exception, e:
         Log.warning("Failure to etl (content length={{length}})", {"length": len(content)}, e)
@@ -116,7 +119,7 @@ def extract_from_datazilla_using_id(settings, transformer):
             es = ElasticSearch(settings.elasticsearch)
 
     existing_ids = get_existing_ids(es, settings)
-    holes = set(range(settings.production.min, nvl(Math.max(existing_ids), settings.production.min))) - existing_ids
+    holes = set(range(settings.production.min, nvl(MAX(existing_ids), settings.production.min))) - existing_ids
     missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     Log.note("Number in holes: {{num}}", {"num": len(holes)})
@@ -127,7 +130,7 @@ def extract_from_datazilla_using_id(settings, transformer):
     if (len(holes) > 10000 or settings.args.scan_file or settings.args.restart) and File(settings.param.output_file).exists:
         #ASYNCH PUSH TO ES IN BLOCKS OF 1000
         with Timer("Scan file for missing ids"):
-            with ThreadedQueue(es, size=5000) as json_for_es:
+            with ThreadedQueue(es, size=1000) as json_for_es:
                 for line in File(settings.param.output_file):
                     try:
                         if len(line.strip()) == 0:
@@ -140,11 +143,14 @@ def extract_from_datazilla_using_id(settings, transformer):
                             continue
 
                         data = CNV.JSON2object(col[-1])
-                        data = transformer.transform(id, data)
-                        json_for_es.add({"id": data.datazilla.id, "value": data})
-                        Log.note("Added {{id}} from file", {"id": data.datazilla.id})
+                        if data.test_run_id:
+                            data = transformer.transform(id, data)
+                            json_for_es.extend({"value": d} for d in data)
+                            Log.note("Added {{id}} from file", {"id": id})
 
-                        existing_ids.add(id)
+                            existing_ids.add(id)
+                        else:
+                            Log.note("Skipped {{id}} from file", {"id": id})
                     except Exception, e:
                         Log.warning("Bad line id={{id}} ({{length}}bytes):\n\t{{prefix}}", {
                             "id": id,
@@ -192,7 +198,8 @@ def reset(settings):
     if settings.elasticsearch.alias == Null:
         settings.elasticsearch.alias = settings.elasticsearch.index
     settings.elasticsearch.index = ElasticSearch.proto_name(settings.elasticsearch.alias)
-    es = ElasticSearch.create_index(settings.elasticsearch, schema)
+
+    es = ElasticSearch.create_index(settings.elasticsearch, schema, limit_replicas=True)
     return es
 
 
