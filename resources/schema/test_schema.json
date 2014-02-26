@@ -1,41 +1,20 @@
 {
 	"settings":{
-		"index.number_of_shards":6,
-		"index.number_of_replicas":0,
-		"index.store.throttle.type":"merge",
-		"index.store.throttle.max_bytes_per_sec":"2mb"
+        "index":{
+            "number_of_shards":3,
+            "number_of_replicas":2,
+            "store":{
+                "throttle.type":"merge",
+                "throttle.max_bytes_per_sec":"2mb"
+            }
+        }
 	},
 	"mappings":{
 		{{type}}:{
 			"dynamic_templates":[
-				{"default_moment":{
-					"mapping":{"index":"no", "type":"double"},
-					"match":"*.moments.s*"
-				}},
                 {"xperf":{
                     "mapping":{"index":"not_analyzed", "type":"string"},
                     "match":"results_xperf.*"
-                }},
-                {"results":{
-                    "mapping":{
-                        "type":"object",
-                        "dynamic":true,
-                        "properties":{
-                            "index":{"type":"long"},
-                            "series":{"store":"yes", "term_vector":"yes", "type":"long"},
-                            "moments":{
-                                "dynamic":true,
-                                "properties":{
-                                    "s0":{"type":"long"},
-                                    "s1":{"type":"long"},
-                                    "s2":{"type":"long"},
-                                    "s3":{"type":"long"},
-                                    "s4":{"type":"long"}
-                                }
-                            }
-                        }
-                    },
-                    "match":"results.*"
                 }},
 				{"default_strings":{
 					"mapping":{"index":"not_analyzed", "type":"string"},
@@ -62,7 +41,15 @@
 				},
 				"results":{
                     "type":"object",
-                    "dynamic":true
+                    "properties":{
+                        "test_name":{"index":"not_analyzed", "type":"string"},
+                        "ordering":{"type":"integer"},
+                        "stats":{
+                            "type":"object",
+                            "dynamic":true
+                        },
+                        "samples":{"type":"double"}
+                    }
 				},
 				"test_build":{
 					"type":"object",

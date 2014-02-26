@@ -59,12 +59,21 @@ class PyPyJSONEncoder(object):
 
     def encode(self, value, pretty=False):
         if pretty:
-            return unicode(json.dumps(json_scrub(value), indent=4, sort_keys=True, separators=(',', ': ')))
+            return pretty_json(value)
 
-        _buffer = UnicodeBuilder(1024)
-        _value2json(value, _buffer)
-        output = _buffer.build()
-        return output
+        try:
+            _buffer = UnicodeBuilder(1024)
+            _value2json(value, _buffer)
+            output = _buffer.build()
+            return output
+        except Exception, e:
+            #THE PRETTY JSON WILL PROVIDE MORE DETAIL ABOUT THE SERIALIZATION CONCERNS
+            from .env.logs import Log
+
+            try:
+                pretty_json(value)
+            except Exception, f:
+                Log.error("problem serializing object", f)
 
 
 class cPythonJSONEncoder(object):
@@ -73,7 +82,7 @@ class cPythonJSONEncoder(object):
 
     def encode(self, value, pretty=False):
         if pretty:
-            return unicode(json.dumps(json_scrub(value), ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': ')))
+            return pretty_json(value)
 
         return unicode(json.dumps(json_scrub(value), ensure_ascii=False))
 
@@ -134,6 +143,8 @@ def _value2json(value, _buffer):
         append(_buffer, unicode(long(time.mktime(value.timetuple()) * 1000)))
     elif hasattr(value, '__iter__'):
         _iter2json(value, _buffer)
+    elif hasattr(value, '__json__'):
+        append(value.__json__(), _buffer)
     else:
         raise Exception(repr(value) + " is not JSON serializable")
 
@@ -165,8 +176,8 @@ def _dict2json(value, _buffer):
         append(_buffer, prefix)
         prefix = u", \""
         if isinstance(k, str):
-            k = unicode(k.decode("utf8"))
-        append(_buffer, ESCAPE.sub(replace, k))
+            k = k.decode("utf8")
+        append(_buffer, ESCAPE.sub(replace, unicode(k)))
         append(_buffer, u"\": ")
         _value2json(v, _buffer)
     append(_buffer, u"}")
@@ -214,6 +225,8 @@ def _scrub(value):
         return output
     elif type is Decimal:
         return float(value)
+    elif hasattr(value, '__json__'):
+        return json._default_decoder.decode(value.__json__())
     elif hasattr(value, '__iter__'):
         output = []
         for v in value:
@@ -247,8 +260,56 @@ def expand_dot(value):
         return value
 
 
+def pretty_json(value):
+    try:
+        if isinstance(value, dict):
+            try:
+                if not value:
+                    return "{}"
+                items = list(value.items())
+                if len(items) == 1:
+                    return "{\"" + items[0][0] + "\": " + pretty_json(items[0][1]).strip() + "}"
+
+                values = ["\"" + ESCAPE.sub(replace, unicode(k)) + "\": " + indent(pretty_json(v)).strip() for k, v in items if v != None]
+                return "{\n\t" + ",\n\t".join(values) + "\n}"
+            except Exception, e:
+                from .env.logs import Log
+                from .collections import OR
+
+                if OR(not isinstance(k, basestring) for k in value.keys()):
+                    Log.error("JSON must have string keys: {{keys}}:", {
+                        "keys": [k for k in value.keys()]
+                    }, e)
+
+                Log.error("problem making dict pretty: keys={{keys}}:", {
+                    "keys": [k for k in value.keys()]
+                }, e)
+        elif isinstance(value, list):
+            if not value:
+                return "[]"
+            if len(value) == 1:
+                return "[" + indent(pretty_json(value[0])) + "]"
+
+            return "[\n" + ",\n".join([indent(pretty_json(v)) for v in value]) + "\n]"
+        elif hasattr(value, '__json__'):
+            j = value.__json__()
+            return pretty_json(json_decoder.decode(j))
+        elif hasattr(value, '__iter__'):
+            return pretty_json(list(value))
+        else:
+            return json_encoder.encode(value)
+
+    except Exception, e:
+        from .env.logs import Log
+
+        Log.error("Problem turning value to json", e)
 
 
-
-
-
+def indent(value, prefix="\t"):
+    try:
+        content = value.rstrip()
+        suffix = value[len(content):]
+        lines = content.splitlines()
+        return prefix + (u"\n" + prefix).join(lines) + suffix
+    except Exception, e:
+        raise Exception(u"Problem with indent of value (" + e.message + u")\n" + value)
