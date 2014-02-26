@@ -8,11 +8,11 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-from dz2es.util.math.maths import Math
+from dz2es.util.maths import Math
 from dz2es.util.env import startup
 from dz2es.util.cnv import CNV
 from dz2es.util.env.logs import Log
-from dz2es.util.timer import Timer
+from dz2es.util.times.timer import Timer
 
 
 with Timer("load pandas"):

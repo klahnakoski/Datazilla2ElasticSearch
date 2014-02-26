@@ -8,16 +8,16 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-from string import replace
+from math import sqrt
+
 import dz2es
-from dz2es.util.math.maths import Math
+from dz2es.util.collections import MIN, MAX
+from dz2es.util.maths.stats import Z_moment, z_moment2stats
 from dz2es.util.struct import Struct
-from dz2es.util.timer import Timer
-from dz2es.util.cnv import CNV
+from dz2es.util.times.timer import Timer
 from dz2es.util.sql.db import DB
 from dz2es.util.env.logs import Log
 from dz2es.util.queries import Q
-from dz2es.util.stats import Z_moment, z_moment2stats
 
 
 DEBUG = False
@@ -58,7 +58,7 @@ class DZ_to_ES():
     # A SIMPLE TRANSFORM OF DATA:  I WOULD ALSO LIKE TO ADD DIMENSIONAL TYPE INFORMATION
     # WHICH WOULD GIVE DEAR READER A BETTER FEEL FOR THE TOTALITY OF THIS DATA
     # BUT THEN AGAIN, SIMPLE IS BETTER, YES?
-    def transform(self, id, datazilla, keep_arrays_smaller_than=ARRAY_TOO_BIG):
+    def transform(self, id, datazilla):
         try:
             r = datazilla.json_blob
 
@@ -71,26 +71,6 @@ class DZ_to_ES():
                 "processed_flag": datazilla.processed_flag,
                 "error_msg": datazilla.error_msg
             }
-
-            new_results = {}
-            for i, (k, v) in enumerate(r.results.items()):
-                k = replace(k, ".", "_dot_")  # '.' MAKES SEARCH DIFFICULT IN ES
-
-                try:
-                    new_results[k] = stats(v)
-                except Exception, e:
-                    Log.error("can not reduce series to moments", e)
-
-            r.results = new_results
-
-            #CONVERT FROM <name>:<samples> TO {"name":<name>, "samples":<samples>}
-            #USING stack() WOULD BE CLEARER, BUT DOES NOT HANDLE THE TOO-LARGE SEQUENCES
-            #    r.results=Q.stack([r.results], column="name")
-            #    r.results=[{
-            #        "name":k,
-            #        "moments": Z_moment.new_instance(v).dict,
-            #        "samples": (dict(("s"+right("00"+str(i), 2), s) for i, s in enumerate(v)) if len(v)<=keep_arrays_smaller_than else Null)
-            #    } for k,v in r.results.items()]
 
             #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
             r.testrun.date *= 1000
@@ -125,15 +105,13 @@ class DZ_to_ES():
 
             #COLAPSE THESE TO SIMPLE MOMENTS
             if r.results_aux:
-                r.results_aux.responsivness = {"moments": CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.responsivness))}
-                r.results_aux["Private bytes"] = {"moments": CNV.z_moment2dict(Z_moment.new_instance(r.results_aux["Private bytes"]))}
-                r.results_aux.Main_RSS = {"moments": CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.Main_RSS))}
-                r.results_aux.shutdown = {"moments": CNV.z_moment2dict(Z_moment.new_instance(r.results_aux.shutdown))}
+                r.results_aux.responsivness.stats = stats(r.results_aux.responsivness)
+                r.results_aux["Private bytes"].stats = stats(r.results_aux["Private bytes"])
+                r.results_aux.Main_RSS.stats = stats(r.results_aux.Main_RSS)
+                r.results_aux.shutdown.stats = stats(r.results_aux.shutdown)
 
             mainthread_transform(r.results_aux)
             mainthread_transform(r.results_xperf)
-
-            #    summarize(r.dict, keep_arrays_smaller_than)
 
             #ADD PUSH LOG INFO
             try:
@@ -148,42 +126,25 @@ class DZ_to_ES():
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
 
-            return r
+            new_records = []
+            for i, (k, v) in enumerate(r.results.items()):
+                new_record = r.copy()
+                new_record.results = None
+                new_record.result = {
+                    "test_name": k,
+                    "ordering": i,
+                    "samples": v
+                }
+                try:
+                    new_record.result.stats = stats(v)
+                except Exception, e:
+                    Log.warning("can not reduce series to moments", e)
+
+                new_records.append(new_record)
+
+            return new_records
         except Exception, e:
             Log.error("Transformation failure", e)
-
-
-# RESPONSIBLE FOR CONVERTING LONG ARRAYS OF NUMBERS TO THEIR REPRESENTATIVE
-# MOMENTS
-def summarize(path, r, keep_arrays_smaller_than=25):
-    try:
-        if isinstance(r, dict):
-            for k, v in [(k, v) for k, v in r.items()]:
-                new_v = summarize(path + "." + k, v, keep_arrays_smaller_than)
-                if isinstance(new_v, Z_moment):
-                    #CONVERT MOMENTS' TUPLE TO NAMED HASH (FOR EASIER ES INDEXING)
-                    new_v = {"moment": CNV.z_moment2dict(new_v)}
-
-                    if isinstance(v, list) and len(v) <= keep_arrays_smaller_than:
-                        #KEEP THE SMALL SAMPLES
-                        new_v["samples"] = {
-                            ("x%02d" % i): v
-                            for i, v in enumerate(v)
-                        }
-                    else:
-                        Log.note("Series {{path}} is not stored", {"path": path})
-
-                r[k] = new_v
-        elif isinstance(r, list):
-            try:
-                return stats(r)
-            except Exception, e:
-                for i, v in enumerate(r):
-                    r[i] = summarize(path + "[]", v, keep_arrays_smaller_than)
-        return r
-    except Exception, e:
-        Log.warning("Can not summarize: {{json}}", {"json": CNV.object2JSON(r)})
-
 
 def stats(values):
     """
@@ -191,12 +152,13 @@ def stats(values):
     """
     z = Z_moment.new_instance(values)
     s = Struct()
-    for k, v in z.dict:
+    for k, v in z.dict.items():
         s[k] = v
-    for k, v in z_moment2stats(z):
+    for k, v in z_moment2stats(z).items():
         s[k] = v
-    s.max = Math.max(values)
-    s.min = Math.min(values)
+    s.max = MAX(values)
+    s.min = MIN(values)
     s.median = dz2es.util.stats.median(values, simple=False)
+    s.std = sqrt(s.variance)
 
-    return Struct(samples=values, stats=stats)
+    return s

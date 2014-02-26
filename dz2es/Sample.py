@@ -39,7 +39,7 @@ with open("Sample.tab", "w") as output_file:
                 Log.println(line)
 
                 data = transformer.transform(id, CNV.JSON2object(col[1]))
-                es.add({"id": data.datazilla.id, "value": data})
+                es.extend({"value": d} for d in data)
                 output_file.write(line + "\n")
             except Exception, e:
                 Log.warning("can not process line:\n\t" + line, e)
