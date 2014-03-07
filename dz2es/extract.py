@@ -237,15 +237,16 @@ def main():
         }])
         Log.start(settings.debug)
 
-        settings.production.threads = nvl(settings.production.threads, 1)
-        settings.param.output_file = nvl(settings.param.output_file, "./results/raw_json_blobs.tab")
+        with startup.SingleInstance(flavor_id=settings.args.filename):
+            settings.production.threads = nvl(settings.production.threads, 1)
+            settings.param.output_file = nvl(settings.param.output_file, "./results/raw_json_blobs.tab")
 
-        transformer = DZ_to_ES(settings.pushlog)
+            transformer = DZ_to_ES(settings.pushlog)
 
-        #RESET ONLY IF NEW Transform IS USED
-        if settings.args.restart:
-            reset(settings)
-        extract_from_datazilla_using_id(settings, transformer)
+            #RESET ONLY IF NEW Transform IS USED
+            if settings.args.restart:
+                reset(settings)
+            extract_from_datazilla_using_id(settings, transformer)
     finally:
         Log.stop()
 
