@@ -11,9 +11,9 @@
 from __future__ import unicode_literals
 import sys
 from .cube import Cube
-from ..struct import listwrap, StructList
+from ..queries.index import value2key
+from ..struct import listwrap, StructList, wrap, Struct
 from ..env.logs import Log
-from .. import struct
 from ..collections.multiset import Multiset
 
 
@@ -33,26 +33,27 @@ def groupby(data, keys=None, size=None, min_size=None, max_size=None, contiguous
     if isinstance(data, Cube):
         return data.groupby(keys)
 
-
     keys = listwrap(keys)
 
-    def keys2string(x):
-        #REACH INTO dict TO GET PROPERTY VALUE
-        return u"|".join([unicode(x[k]) for k in keys])
+    def value2hash(x):
+        return value2key(keys, x)
 
     def get_keys(d):
-        return struct.wrap({k: d[k] for k in keys})
+        output = Struct()
+        for k in keys:
+            output[k] = d[k]
+        return output
 
     if contiguous:
         try:
             if not data:
-                return struct.wrap([])
+                return wrap([])
 
             agg = []
             acc = []
-            curr_key = keys2string(data[0])
+            curr_key = value2hash(data[0])
             for d in data:
-                key = keys2string(d)
+                key = value2hash(d)
                 if key != curr_key:
                     agg.append((get_keys(acc[0]), acc))
                     curr_key = key
@@ -60,18 +61,17 @@ def groupby(data, keys=None, size=None, min_size=None, max_size=None, contiguous
                 else:
                     acc.append(d)
             agg.append((get_keys(acc[0]), acc))
-            return struct.wrap(agg)
+            return wrap(agg)
         except Exception, e:
             Log.error("Problem grouping contiguous values", e)
 
     try:
         agg = {}
         for d in data:
-            key = keys2string(d)
-            if key in agg:
-                pair = agg[key]
-            else:
-                pair = (get_keys(d), StructList([]))
+            key = value2hash(d)
+            pair = agg.get(key, None)
+            if pair is None:
+                pair = (get_keys(d), StructList())
                 agg[key] = pair
             pair[1].append(d)
 

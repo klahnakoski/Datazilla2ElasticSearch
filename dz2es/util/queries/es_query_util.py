@@ -13,13 +13,13 @@ from datetime import datetime
 from .. import struct
 from ..cnv import CNV
 from .. import strings
-from dzAlerts.util.collections import COUNT
+from ..collections import COUNT
 from ..maths import stats
 from ..env.elasticsearch import ElasticSearch
 from ..env.logs import Log
 from ..maths import Math
 from ..queries import domains, MVEL, filters
-from ..struct import nvl, StructList, Struct, split_field, join_field
+from ..struct import nvl, StructList, Struct, split_field, join_field, wrap
 from ..times import durations
 
 
@@ -60,7 +60,7 @@ def loadColumns(es, frum):
     if diff:
         es = ElasticSearch(frum)
 
-    output = struct.wrap(frum).copy()
+    output = wrap(frum).copy()
     schema = es.get_schema()
     properties = schema.properties
     output.es = es
@@ -102,7 +102,7 @@ def post(es, esQuery, limit):
 
 
 def buildESQuery(query):
-    output = struct.wrap({
+    output = wrap({
         "query": {"match_all": {}},
         "from": 0,
         "size": 100 if DEBUG else 0,
@@ -138,6 +138,14 @@ def parseColumns(index_name, parent_path, esProperties):
 
         childColumns = None
 
+        if property.type == "nested" and property.properties:
+            # NESTED TYPE IS A NEW TYPE DEFINITION
+            if path not in INDEX_CACHE:
+                INDEX_CACHE[path] = INDEX_CACHE[parent_path].copy()
+                INDEX_CACHE[path].name = path
+            INDEX_CACHE[path].columns = childColumns
+            continue
+
         if property.properties:
             childColumns = parseColumns(index_name, path, property.properties)
             columns.extend(childColumns)
@@ -146,14 +154,6 @@ def parseColumns(index_name, parent_path, esProperties):
                 "type": "object",
                 "useSource": True
             })
-
-        if property.type == "nested" and property.properties:
-            # NESTED TYPE IS A NEW TYPE DEFINITION
-            if path not in INDEX_CACHE:
-                INDEX_CACHE[path] = INDEX_CACHE[parent_path].copy()
-                INDEX_CACHE[path].name = path
-            INDEX_CACHE[path].columns = childColumns
-            continue
 
         if property.dynamic:
             continue
@@ -446,6 +446,7 @@ def fix_es_stats(s):
     """
     ES RETURNS BAD DEFAULT VALUES FOR STATS
     """
+    s = wrap(s)
     if s.count == 0:
         return stats.zero
     return s

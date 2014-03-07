@@ -7,19 +7,20 @@
 #
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
 from __future__ import unicode_literals
-from datetime import datetime, timedelta
 
+from datetime import datetime, timedelta
 import threading
 import thread
 import time
 import sys
 from ..struct import nvl, Struct
 
+# THIS THREADING MODULE IS PERMEATED BY THE please_stop SIGNAL.
+# THIS SIGNAL IS IMPORTANT FOR PROPER SIGNALLING WHICH ALLOWS
+# FOR FAST AND PREDICTABLE SHUTDOWN AND CLEANUP OF THREADS
 
 DEBUG = True
-
 
 class Lock(object):
     """
@@ -376,7 +377,7 @@ class ThreadedQueue(Queue):
     DISPATCH TO ANOTHER (SLOWER) queue IN BATCHES OF GIVEN size
     """
 
-    def __init__(self, queue, size, max=None):
+    def __init__(self, queue, size=None, max=None, period=None):
         if max == None:
             #REASONABLE DEFAULT
             max = size * 2
@@ -402,7 +403,7 @@ class ThreadedQueue(Queue):
                 except Exception, e:
                     from ..env.logs import Log
 
-                    Log.error("Problem with pushing {{num}} items to data sink", {"num": len(g)}, e)
+                    Log.warning("Problem with pushing {{num}} items to data sink", {"num": len(g)}, e)
 
         self.thread = Thread.run("threaded queue", size_pusher)
 

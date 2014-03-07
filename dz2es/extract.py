@@ -13,6 +13,7 @@ import requests
 from dz2es.util.collections import MAX
 from dz2es.util.env.files import File
 from dz2es.util.queries import Q
+from dz2es.util.queries.es_query import ESQuery
 from dz2es.util.struct import nvl, Null
 from dz2es.util.env.logs import Log
 from dz2es.util.env import startup
@@ -64,8 +65,15 @@ def get_existing_ids(es, settings):
     bad_ids = []
     int_ids = set()
 
-    interval_size = 400000
-    for mini, maxi in Q.intervals(settings.production.min, settings.production.max, interval_size):
+    esq = ESQuery(es)
+
+    max_id = esq.query({
+        "from": es.settings.alias,
+        "select": {"value": "datazilla.id", "aggregate": "max"}
+    })
+
+    interval_size = 200000
+    for mini, maxi in Q.intervals(settings.production.min, max_id+interval_size, interval_size):
         existing_ids = es.search({
             "query": {
                 "filtered": {
@@ -119,8 +127,9 @@ def extract_from_datazilla_using_id(settings, transformer):
             es = ElasticSearch(settings.elasticsearch)
 
     existing_ids = get_existing_ids(es, settings)
-    holes = set(range(settings.production.min, nvl(MAX(existing_ids), settings.production.min))) - existing_ids
-    missing_ids = set(range(settings.production.min, settings.production.max)) - existing_ids
+    max_existing_id = nvl(MAX(existing_ids), settings.production.min)
+    holes = set(range(settings.production.min, max_existing_id)) - existing_ids
+    missing_ids = set(range(settings.production.min, max_existing_id+200000)) - existing_ids
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON
@@ -137,7 +146,7 @@ def extract_from_datazilla_using_id(settings, transformer):
                             continue
                         col = line.split("\t")
                         id = int(col[0])
-                        if id < settings.production.min or settings.production.max <= id:
+                        if id < settings.production.min:
                             continue
                         if id in existing_ids:
                             continue
