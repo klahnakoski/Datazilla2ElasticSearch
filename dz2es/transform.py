@@ -12,6 +12,7 @@ from math import sqrt
 
 import dz2es
 from dz2es.util.collections import MIN, MAX
+from dz2es.util.maths import Math
 from dz2es.util.maths.stats import Z_moment, z_moment2stats
 from dz2es.util.struct import Struct
 from dz2es.util.times.timer import Timer
@@ -159,6 +160,7 @@ def stats(values):
     s.max = MAX(values)
     s.min = MIN(values)
     s.median = dz2es.util.stats.median(values, simple=False)
-    s.std = sqrt(s.variance)
+    if Math.is_number(s.variance) and not Math.is_nan(s.variance):
+        s.std = sqrt(s.variance)
 
     return s
