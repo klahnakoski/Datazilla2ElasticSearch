@@ -39,7 +39,7 @@
 						"error_msg":{"index":"not_analyzed", "type":"string"}
 					}
 				},
-				"results":{
+				"result":{
                     "type":"object",
                     "properties":{
                         "test_name":{"index":"not_analyzed", "type":"string"},
@@ -67,8 +67,8 @@
                     "type": "object"
                 },
                 "results_xperf": {
-                    "type":"nested",
-                    "dynamic":true
+					"enabled": false,
+                    "type": "object"
                 },
                 "testrun":{
                     "type":"object",

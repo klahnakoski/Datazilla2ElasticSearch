@@ -76,43 +76,36 @@ class DZ_to_ES():
             #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
             r.testrun.date *= 1000
 
-            def mainthread_transform(r):
-                if r == None:
-                    return None
-
-                output = Struct()
-
-                for i in r.mainthread_readbytes:
-                    output[i[1].replace(".", "\.")].name = i[1]
-                    output[i[1].replace(".", "\.")].readbytes = i[0]
-                r.mainthread_readbytes = None
-
-                for i in r.mainthread_writebytes:
-                    output[i[1].replace(".", "\.")].name = i[1]
-                    output[i[1].replace(".", "\.")].writebytes = i[0]
-                r.mainthread_writebytes = None
-
-                for i in r.mainthread_readcount:
-                    output[i[1].replace(".", "\.")].name = i[1]
-                    output[i[1].replace(".", "\.")].readcount = i[0]
-                r.mainthread_readcount = None
-
-                for i in r.mainthread_writecount:
-                    output[i[1].replace(".", "\.")].name = i[1]
-                    output[i[1].replace(".", "\.")].writecount = i[0]
-                r.mainthread_writecount = None
-
-                r.mainthread = output.values()
-
-            #COLAPSE THESE TO SIMPLE MOMENTS
-            # if r.results_aux:
-            #     r.results_aux.responsivness.stats = stats(r.results_aux.responsivness)
-            #     r.results_aux["Private bytes"].stats = stats(r.results_aux["Private bytes"])
-            #     r.results_aux.Main_RSS.stats = stats(r.results_aux.Main_RSS)
-            #     r.results_aux.shutdown.stats = stats(r.results_aux.shutdown)
-
-            mainthread_transform(r.results_aux)
-            mainthread_transform(r.results_xperf)
+            # def mainthread_transform(r):
+            #     if r == None:
+            #         return None
+            #
+            #     output = Struct()
+            #
+            #     for i in r.mainthread_readbytes:
+            #         output[i[1].replace(".", "\.")].name = i[1]
+            #         output[i[1].replace(".", "\.")].readbytes = i[0]
+            #     r.mainthread_readbytes = None
+            #
+            #     for i in r.mainthread_writebytes:
+            #         output[i[1].replace(".", "\.")].name = i[1]
+            #         output[i[1].replace(".", "\.")].writebytes = i[0]
+            #     r.mainthread_writebytes = None
+            #
+            #     for i in r.mainthread_readcount:
+            #         output[i[1].replace(".", "\.")].name = i[1]
+            #         output[i[1].replace(".", "\.")].readcount = i[0]
+            #     r.mainthread_readcount = None
+            #
+            #     for i in r.mainthread_writecount:
+            #         output[i[1].replace(".", "\.")].name = i[1]
+            #         output[i[1].replace(".", "\.")].writecount = i[0]
+            #     r.mainthread_writecount = None
+            #
+            #     r.mainthread = output.values()
+            #
+            # mainthread_transform(r.results_aux)
+            # mainthread_transform(r.results_xperf)
 
             #ADD PUSH LOG INFO
             try:
@@ -130,6 +123,8 @@ class DZ_to_ES():
             new_records = []
             for i, (k, v) in enumerate(r.results.items()):
                 new_record = r.copy()
+                new_record.results_aux = None
+                new_record.results_xperf = None
                 new_record.results = None
                 new_record.result = {
                     "test_name": k,
@@ -140,8 +135,12 @@ class DZ_to_ES():
                     new_record.result.stats = stats(v)
                 except Exception, e:
                     Log.warning("can not reduce series to moments", e)
-
                 new_records.append(new_record)
+
+            # ONE MORE RECORD WITH THE results_* VALUES
+            # new_record = r.copy()
+            # new_record.results = None
+            # new_records.append(new_record)
 
             return new_records
         except Exception, e:
