@@ -38,7 +38,7 @@ You will require a ```settings.json``` file that holds all your pointers
 		"elasticsearch":{
 			"host":"http://klahnakoski-es.corp.tor1.mozilla.com",
 			"port":9200,
-			"index":"datazilla",
+			"index":"talos",
 			"type":"test_results"
 		},
 		"production":{

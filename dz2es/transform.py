@@ -105,11 +105,11 @@ class DZ_to_ES():
                 r.mainthread = output.values()
 
             #COLAPSE THESE TO SIMPLE MOMENTS
-            if r.results_aux:
-                r.results_aux.responsivness.stats = stats(r.results_aux.responsivness)
-                r.results_aux["Private bytes"].stats = stats(r.results_aux["Private bytes"])
-                r.results_aux.Main_RSS.stats = stats(r.results_aux.Main_RSS)
-                r.results_aux.shutdown.stats = stats(r.results_aux.shutdown)
+            # if r.results_aux:
+            #     r.results_aux.responsivness.stats = stats(r.results_aux.responsivness)
+            #     r.results_aux["Private bytes"].stats = stats(r.results_aux["Private bytes"])
+            #     r.results_aux.Main_RSS.stats = stats(r.results_aux.Main_RSS)
+            #     r.results_aux.shutdown.stats = stats(r.results_aux.shutdown)
 
             mainthread_transform(r.results_aux)
             mainthread_transform(r.results_xperf)
@@ -151,6 +151,11 @@ def stats(values):
     """
     RETURN LOTS OF AGGREGATES
     """
+    if values == None:
+        return None
+
+    values = [float(v) for v in values if v != None]
+
     z = Z_moment.new_instance(values)
     s = Struct()
     for k, v in z.dict.items():

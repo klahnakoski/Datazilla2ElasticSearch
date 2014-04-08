@@ -103,7 +103,7 @@ def unique_index(data, keys=None):
 
 def map2set(data, relation):
     """
-    EXPECTING A dict THAT MAPS VALUES TO lists
+    EXPECTING A isinstance(relation, dict) THAT MAPS VALUES TO lists
     THE LISTS ARE EXPECTED TO POINT TO MEMBERS OF A SET
     A set() IS RETURNED
     """
@@ -293,6 +293,8 @@ def _select_deep(v, field, depth, record):
 
     for i, f in enumerate(field.value[depth:len(field.value) - 1:]):
         v = v.get(f, None)
+        if v is None:
+            return 0, None
         if isinstance(v, list):
             return depth + i + 1, v
 
@@ -324,13 +326,13 @@ def sort(data, fieldnames=None):
                 def comparer(left, right):
                     return cmp(nvl(left, Struct())[fieldnames], nvl(right, Struct())[fieldnames])
 
-                return wrap(sorted(data, cmp=comparer))
+                return StructList([unwrap(d) for d in sorted(data, cmp=comparer)])
             else:
                 #EXPECTING {"field":f, "sort":i} FORMAT
                 def comparer(left, right):
                     return fieldnames["sort"] * cmp(nvl(left, Struct())[fieldnames["field"]], nvl(right, Struct())[fieldnames["field"]])
 
-                return wrap(sorted(data, cmp=comparer))
+                return StructList([unwrap(d) for d in sorted(data, cmp=comparer)])
 
         formal = query._normalize_sort(fieldnames)
 
@@ -347,9 +349,9 @@ def sort(data, fieldnames=None):
             return 0
 
         if isinstance(data, list):
-            output = wrap(sorted(data, cmp=comparer))
+            output = StructList([unwrap(d) for d in sorted(data, cmp=comparer)])
         elif hasattr(data, "__iter__"):
-            output = wrap(sorted(list(data), cmp=comparer))
+            output = StructList([unwrap(d) for d in sorted(list(data), cmp=comparer)])
         else:
             Log.error("Do not know how to handle")
 
@@ -375,6 +377,9 @@ def filter(data, where):
     """
     where  - a function that accepts (record, rownum, rows) and returns boolean
     """
+    if where == TRUE_FILTER:
+        return data
+
     if isinstance(data, Cube):
         Log.error("Do not know how to handle")
 
@@ -636,16 +641,25 @@ def window(data, param):
     """
     name = param.name            # column to assign window function result
     edges = param.edges          # columns to gourp by
+    where = param.where          # DO NOT CONSIDER THESE VALUES
     sortColumns = param.sort            # columns to sort by
     calc_value = wrap_function(param.value) # function that takes a record and returns a value (for aggregation)
     aggregate = param.aggregate  # WindowFunction to apply
     _range = param.range          # of form {"min":-10, "max":0} to specify the size and relative position of window
+
+    data = filter(data, where)
+
+    if sortColumns:
+        data = sort(data, sortColumns)
 
     if not aggregate and not edges:
         #SIMPLE CALCULATED VALUE
         for rownum, r in enumerate(data):
             r[name] = calc_value(r, rownum, data)
         return
+
+
+
 
     for rownum, r in enumerate(data):
         r["__temp__"] = calc_value(r, rownum, data)
@@ -682,11 +696,13 @@ def intervals(_min, _max=None, size=1):
     """
     RETURN (min, max) PAIRS OF GIVEN SIZE, WHICH COVER THE _min, _max RANGE
     THE LAST PAIR MAY BE SMALLER
+    (Yes!  It's just like range(), only cooler!
     """
     if _max == None:
         _max = _min
         _min = 0
     _max = int(Math.ceiling(_max))
+    _min = int(Math.floor(_min))
 
     output = ((x, min(x + size, _max)) for x in __builtin__.range(_min, _max, size))
     return output

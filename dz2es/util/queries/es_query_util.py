@@ -41,7 +41,7 @@ def loadColumns(es, frum):
         )
     else:
         if not frum.name:
-            Log.error("Expecting name")
+            Log.error("Expecting from clause to have a name")
 
         if frum.name in INDEX_CACHE:
             return INDEX_CACHE[frum.name]
@@ -181,6 +181,12 @@ def parseColumns(index_name, parent_path, esProperties):
                     "type": property.type,
                     "useSource": property.index == "no"
                 })
+        elif property.enabled == False:
+            columns.append({
+                "name": struct.join_field(split_field(path)[1::]),
+                "type": property.type,
+                "useSource": "yes"
+            })
         else:
             Log.warning("unknown type {{type}} for property {{path}}", {"type": property.type, "path": path})
 
