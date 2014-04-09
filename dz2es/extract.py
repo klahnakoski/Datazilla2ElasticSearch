@@ -12,6 +12,7 @@ import functools
 import requests
 from dz2es.util.collections import MAX
 from dz2es.util.env.files import File
+from dz2es.util.env.profiles import Profiler
 from dz2es.util.queries import Q
 from dz2es.util.queries.es_query import ESQuery
 from dz2es.util.struct import nvl, Null
@@ -156,15 +157,17 @@ def extract_from_datazilla_using_id(settings, transformer):
                             return
                         num += 1
 
-                        data = CNV.JSON2object(col[-1])
-                        if data.test_run_id:
-                            data = transformer.transform(id, data)
-                            json_for_es.extend({"value": d} for d in data)
-                            Log.note("Added {{id}} from file", {"id": id})
+                        with Profiler("decode and transform"):
+                            data = CNV.JSON2object(col[-1])
+                            if data.test_run_id:
+                                with Profiler("transform"):
+                                    data = transformer.transform(id, data)
+                                json_for_es.extend({"value": d} for d in data)
+                                Log.note("Added {{id}} from file", {"id": id})
 
-                            existing_ids.add(id)
-                        else:
-                            Log.note("Skipped {{id}} from file", {"id": id})
+                                existing_ids.add(id)
+                            else:
+                                Log.note("Skipped {{id}} from file", {"id": id})
                     except Exception, e:
                         Log.warning("Bad line id={{id}} ({{length}}bytes):\n\t{{prefix}}", {
                             "id": id,

@@ -162,6 +162,36 @@ class JSONList(object):
             return wrap(self.list[-1])
         return Null
 
+
+    def map(self, oper):
+        json=self.json
+        i = self.start + 1
+        output = []
+        while True:
+            c = json[i]
+            if c in [" ", "\n", "\r", "\t", "\""]:
+                pass
+            elif c == "]":
+                return output
+            else:
+                j = i + 1
+                while True:
+                    c = json[j]
+                    if c in [" ", "\n", "\r", "\t", "\""]:
+                        output.append(oper(json[i:j]))
+                        i = j
+                        break
+                    j += 1
+            i += 1
+        return output
+
+    def __float__(self):
+        return self.map(float)
+
+    def __int__(self):
+        return self.map(int)
+
+
     def __json__(self):
         if self.json is not None:
             return self.json[self.start, self.end]

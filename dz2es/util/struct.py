@@ -562,6 +562,13 @@ class StructList(list):
             return wrap(_get(self, "list")[-1])
         return Null
 
+    def __float__(self):
+        return StructList([float(v) for v in _get(self, "list")])
+
+    def __int__(self):
+        return StructList([int(v) for v in _get(self, "list")])
+
+
     def __getattribute__(self, key):
         try:
             if key != "index":
