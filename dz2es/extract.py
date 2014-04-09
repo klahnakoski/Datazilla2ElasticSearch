@@ -140,6 +140,7 @@ def extract_from_datazilla_using_id(settings, transformer):
         #ASYNCH PUSH TO ES IN BLOCKS OF 1000
         with Timer("Scan file for missing ids"):
             with ThreadedQueue(es, size=1000) as json_for_es:
+                num = 0
                 for line in File(settings.param.output_file):
                     try:
                         if len(line.strip()) == 0:
@@ -150,6 +151,10 @@ def extract_from_datazilla_using_id(settings, transformer):
                             continue
                         if id in existing_ids:
                             continue
+
+                        if num > settings.production.step:
+                            return
+                        num += 1
 
                         data = CNV.JSON2object(col[-1])
                         if data.test_run_id:
@@ -177,7 +182,7 @@ def extract_from_datazilla_using_id(settings, transformer):
             with Multithread(functions) as many:
                 for result in many.execute([
                     {"id": id}
-                    for id in Q.sort(missing_ids)
+                    for id in Q.sort(missing_ids)[:nvl(settings.production.step, 200000):]
                 ]):
                     if not result:
                         num_not_found += 1

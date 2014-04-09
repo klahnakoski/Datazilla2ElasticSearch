@@ -15,7 +15,9 @@ import re
 import time
 from . import jsons
 from .collections.multiset import Multiset
-from .jsons import json_decoder, json_encoder, replace, ESCAPE
+from dz2es.util.env.profiles import Profiler
+from dz2es.util.json_decoder import json_decoder
+from .jsons import json_encoder, replace, ESCAPE
 from .env.logs import Log
 from . import struct
 from .strings import expand_template
@@ -30,7 +32,7 @@ class CNV:
     @staticmethod
     def object2JSON(obj, pretty=False):
         try:
-            json = json_encoder.encode(obj, pretty=pretty)
+            json = json_encoder(obj, pretty=pretty)
             if json == None:
                 Log.note(str(type(obj))+ " is not valid{{type}}JSON", {"type": " (pretty) " if pretty else " "})
                 Log.error("Not valid JSON: "+str(obj)+ " of type "+str(type(obj)))
@@ -40,25 +42,26 @@ class CNV:
 
     @staticmethod
     def JSON2object(json_string, params=None, flexible=False, paths=False):
-        try:
-            #REMOVE """COMMENTS""", #COMMENTS, //COMMENTS, AND \n \r
-            if flexible:
-                #DERIVED FROM https://github.com/jeads/datasource/blob/master/datasource/bases/BaseHub.py#L58
-                json_string = re.sub(r"\"\"\".*?\"\"\"|[ \t]+//.*\n|^//.*\n|#.*?\n", r"\n", json_string)
-                json_string = re.sub(r"\n//.*\n", r"\n\n", json_string)
-            if params:
-                params = dict([(k, CNV.value2quote(v)) for k, v in params.items()])
-                json_string = expand_template(json_string, params)
+        with Profiler("JSON2Object"):
+            try:
+                #REMOVE """COMMENTS""", #COMMENTS, //COMMENTS, AND \n \r
+                if flexible:
+                    #DERIVED FROM https://github.com/jeads/datasource/blob/master/datasource/bases/BaseHub.py#L58
+                    json_string = re.sub(r"\"\"\".*?\"\"\"|[ \t]+//.*\n|^//.*\n|#.*?\n", r"\n", json_string)
+                    json_string = re.sub(r"\n//.*\n", r"\n\n", json_string)
+                if params:
+                    params = dict([(k, CNV.value2quote(v)) for k, v in params.items()])
+                    json_string = expand_template(json_string, params)
 
-            value = wrap(json_decoder.decode(json_string))
+                value = wrap(json_decoder(json_string))
 
-            if paths:
-                value = jsons.expand_dot(value)
+                if paths:
+                    value = jsons.expand_dot(value)
 
-            return value
+                return value
 
-        except Exception, e:
-            Log.error("Can not decode JSON:\n\t" + str(json_string), e)
+            except Exception, e:
+                Log.error("Can not decode JSON:\n\t" + str(json_string), e)
 
 
     @staticmethod
