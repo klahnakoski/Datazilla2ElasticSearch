@@ -120,17 +120,21 @@ class DZ_to_ES():
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
 
+
+
             new_records = []
             for i, (k, v) in enumerate(r.results.items()):
-                new_record = r.copy()
-                new_record.results_aux = None
-                new_record.results_xperf = None
-                new_record.results = None
-                new_record.result = {
-                    "test_name": k,
-                    "ordering": i,
-                    "samples": v
-                }
+                new_record = Struct(
+                    test_machine=r.test_machine,
+                    datazilla=r.datazilla,
+                    testrun=r.testrun,
+                    test_build=r.test_build,
+                    result={
+                        "test_name": k,
+                        "ordering": i,
+                        "samples": v
+                    }
+                )
                 try:
                     new_record.result.stats = stats(v)
                 except Exception, e:
