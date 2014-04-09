@@ -51,6 +51,7 @@ def write(profile_settings):
     from .files import File
 
     stats = [{
+        "description": p.description,
         "num_calls": p.num,
         "total_time": p.total,
         "total_time_per_call": p.total / p.num
