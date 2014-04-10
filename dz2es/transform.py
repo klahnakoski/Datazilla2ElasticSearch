@@ -12,6 +12,7 @@ from math import sqrt
 
 import dz2es
 from dz2es.util.collections import MIN, MAX
+from dz2es.util.env.profiles import Profiler
 from dz2es.util.maths import Math
 from dz2es.util.maths.stats import Z_moment, z_moment2stats
 from dz2es.util.struct import Struct
@@ -136,7 +137,8 @@ class DZ_to_ES():
                     }
                 )
                 try:
-                    new_record.result.stats = stats(v)
+                    with Profiler("calc stats"):
+                        new_record.result.stats = stats(v)
                 except Exception, e:
                     Log.warning("can not reduce series to moments", e)
                 new_records.append(new_record)
@@ -157,7 +159,7 @@ def stats(values):
     if values == None:
         return None
 
-    values = [float(v) for v in values if v != None]
+    values = values.map(float, includeNone=False)
 
     z = Z_moment.new_instance(values)
     s = Struct()

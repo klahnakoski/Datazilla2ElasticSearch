@@ -34,7 +34,7 @@ def arrays_add(id, path, r):
                 arrays_add(id, new_path, v)
         elif isinstance(r, list):
             try:
-                values = [float(v) for v in r]
+                values = r.map(float)
                 arrays.append([id, path, len(values), 1])
             except Exception, e:
                 for i, v in enumerate(r):

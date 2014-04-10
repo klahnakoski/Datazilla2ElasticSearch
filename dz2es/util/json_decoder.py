@@ -8,21 +8,11 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-
-
-# THE INTENT IS TO NEVER ACTUALLY PARSE ARRAYS OF PRIMITIVE VALUES, RATHER FIND
-# THE START AND END OF THOSE ARRAYS AND SIMPLY STRING COPY THEM TO THE
-# INEVITABLE JSON OUTPUT
-import json
-from dz2es.util.jsons import json_encoder, use_pypy
+from dz2es.util.jsons import json_encoder, use_pypy, UnicodeBuilder
 from dz2es.util.struct import StructList, Null, wrap, unwrap, EmptyList
 
 
-ARRAY = 1
-VALUE = 3
-OBJECT = 4
-
-builtin_json_decoder = json._default_decoder.decode
+DEBUG = True
 
 
 class JSONList(object):
@@ -34,7 +24,7 @@ class JSONList(object):
 
     def _convert(self):
         if self.list is None:
-            self.list = builtin_json_decoder(self.json[self.start:self.end])
+            self.list = parse_array(self.start, self.json)
 
     def __getitem__(self, index):
         self._convert()
@@ -162,53 +152,30 @@ class JSONList(object):
             return wrap(self.list[-1])
         return Null
 
-
-    def map(self, oper):
-        json=self.json
-        i = self.start + 1
-        output = []
-        while True:
-            c = json[i]
-            if c in [" ", "\n", "\r", "\t", "\""]:
-                pass
-            elif c == "]":
-                return output
-            else:
-                j = i + 1
-                while True:
-                    c = json[j]
-                    if c in [" ", "\n", "\r", "\t", "\""]:
-                        output.append(oper(json[i:j]))
-                        i = j
-                        break
-                    j += 1
-            i += 1
-        return output
-
-    def __float__(self):
-        return self.map(float)
-
-    def __int__(self):
-        return self.map(int)
-
+    def map(self, oper, includeNone=True):
+        self._convert()
+        if includeNone:
+            return StructList([oper(v) for v in self.list])
+        else:
+            return StructList([oper(v) for v in self.list if v != None])
 
     def __json__(self):
         if self.json is not None:
-            return self.json[self.start, self.end]
+            return self.json[self.start:self.end]
         else:
-            return json_encoder.encode(self)
+            return json_encoder(self)
 
 
-def parse_string(i, json):
+def fast_parse_string(i, json):
     simple = True
     j = i + 1
     while j < len(json):
         c = json[j]
         if c == "\"":
             if simple:
-                return j, json[i + 1:j]
+                return j + 1, json[i + 1:j]
             else:
-                return j, builtin_json_decoder(json[i:j + 1])
+                return parse_string(i, json)
         elif c == "\\":
             simple = False
             j += 1
@@ -219,6 +186,71 @@ def parse_string(i, json):
                 j -= 1
         j += 1
     return i, None
+
+
+ESC = {
+    "\"": "\"",
+    "\\": "\\",
+    "/": "/",
+    "b": "\b",
+    "r": "\r",
+    "f": "\f",
+    "n": "\n",
+    "t": "\t"
+}
+
+
+def parse_string(i, json):
+    j = i + 1
+    output = UnicodeBuilder()
+    while j < len(json):
+        c = json[j]
+        if c == "\"":
+            return j + 1, output.build()
+        elif c == "\\":
+            j += 1
+            c = json[j]
+            if c == "u":
+                n = json[j:j + 4].decode('hex').decode('utf-8')
+                output.append(n)
+                j += 4
+            else:
+                try:
+                    output.append(ESC[c])
+                except Exception, e:
+                    output.append("\\")
+                    output.append(c)
+        else:
+            output.append(c)
+        j += 1
+    return i, None
+
+
+def parse_array(i, json):
+    """
+    ONLY PARSES NONE-EMPTY ARRAYS
+    ARRAY OF PRIMITIVES ARE SKIPPED, THIS IS WHERE WE PARSE THEM
+    """
+    i += 1
+    output = []
+    val = None
+    while True:
+        c = json[i]
+        if c in [" ", "\n", "\r", "\t"]:
+            pass
+        elif c == ",":
+            output.append(val)
+            val = None
+        elif c == "]":
+            output.append(val)
+            return output
+        elif c == "\"":
+            i, val = parse_string(i, json)
+            i -= 1
+        else:
+            i, val = parse_const(i, json)
+            i -= 1
+        i += 1
 
 
 def jump_string(i, json):
@@ -232,7 +264,9 @@ def jump_string(i, json):
             c = json[j]
             if c == "u":
                 j += 4
-            elif c not in ["\"", "\\", "/", "b", "n", "f", "n", "t"]:
+            elif c in ["\"", "\\", "/", "b", "n", "f", "n", "t"]:
+                pass
+            else:
                 j -= 1
         j += 1
     return j
@@ -262,6 +296,7 @@ def jump_array(i, json):
 def parse_const(i, json):
     try:
         j = i + 1
+        mode = int
         while j < len(json):
             c = json[j]
             if c in [" ", "\t", "\n", "\r", ",", "}", "]"]:
@@ -276,12 +311,11 @@ def parse_const(i, json):
                         "null": None
                     }[const]
                 except Exception:
-                    try:
-                        val = int(const)
-                    except Exception:
-                        val = float(const)
+                    val = mode(const)
 
-                return j - 1, val
+                return j, val
+            elif c in [".", "e", "E"]:
+                mode = float
             j += 1
         return i
     except Exception, e:
@@ -289,8 +323,18 @@ def parse_const(i, json):
 
         Log.error("Can not parse const", e)
 
+# PARSE MODES
+ARRAY = 1   # PARSING INSIDE AN ARRAY
+VALUE = 3   # PARSING PROPERTY VALUE
+OBJECT = 4  # PARSING PROPERTY NAME
+
 
 def decode(json):
+    """
+    THE INTENT IS TO NEVER ACTUALLY PARSE ARRAYS OF PRIMITIVE VALUES, RATHER FIND
+    THE START AND END OF THOSE ARRAYS AND SIMPLY STRING COPY THEM TO THE
+    INEVITABLE JSON OUTPUT
+    """
     var = ""
     curr = []
     mode = ARRAY
@@ -326,10 +370,12 @@ def decode(json):
                 curr = obj
                 mode = OBJECT
             elif c == "\"":
-                i, val = parse_string(i, json)
+                i, val = fast_parse_string(i, json)
+                i -= 1
                 curr.children.append(val)
             else:
                 i, val = parse_const(i, json)
+                i -= 1
                 curr.children.append(i)
                 j = i + 1
                 while j < len(json):
@@ -351,7 +397,8 @@ def decode(json):
                 else:
                     mode = ARRAY
             elif c == "\"":
-                i, var = parse_string(i, json)
+                i, var = fast_parse_string(i, json)
+                i -= 1
             i += 1
         elif mode == VALUE:
             if c in [" ", "\t", "\n", "\r"]:
@@ -380,11 +427,13 @@ def decode(json):
                 curr = obj
                 mode = OBJECT
             elif c == "\"":
-                i, val = parse_string(i, json)
+                i, val = fast_parse_string(i, json)
+                i -= 1
                 curr[var] = val
                 mode = OBJECT
             else:
                 i, val = parse_const(i, json)
+                i -= 1
                 curr[var] = val
                 mode = OBJECT
             i += 1
@@ -395,4 +444,10 @@ def decode(json):
 if use_pypy:
     json_decoder = decode
 else:
+    import json
+
+    builtin_json_decoder = json.JSONDecoder().decode
     json_decoder = builtin_json_decoder
+
+if DEBUG:
+    json_decoder = decode

@@ -52,6 +52,8 @@ class CNV:
                 if params:
                     params = dict([(k, CNV.value2quote(v)) for k, v in params.items()])
                     json_string = expand_template(json_string, params)
+                if isinstance(json_string, str):
+                    json_string = unicode(json_string)
 
                 value = wrap(json_decoder(json_string))
 

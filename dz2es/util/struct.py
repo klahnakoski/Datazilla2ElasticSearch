@@ -562,11 +562,11 @@ class StructList(list):
             return wrap(_get(self, "list")[-1])
         return Null
 
-    def __float__(self):
-        return StructList([float(v) for v in _get(self, "list")])
-
-    def __int__(self):
-        return StructList([int(v) for v in _get(self, "list")])
+    def map(self, oper, includeNone=True):
+        if includeNone:
+            return StructList([oper(v) for v in _get(self, "list")])
+        else:
+            return StructList([oper(v) for v in _get(self, "list") if v != None])
 
 
     def __getattribute__(self, key):
