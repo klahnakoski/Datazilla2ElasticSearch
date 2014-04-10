@@ -59,4 +59,8 @@ def write(profile_settings):
         for p in profiles.values() if p.num > 0
     ]
     stats_file = File(profile_settings.filename, suffix=CNV.datetime2string(datetime.now(), "_%Y%m%d_%H%M%S"))
-    stats_file.write(CNV.list2tab(stats))
+    if stats:
+        stats_file.write(CNV.list2tab(stats))
+    else:
+        stats_file.write("<no profiles>")
+

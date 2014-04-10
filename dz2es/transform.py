@@ -159,7 +159,8 @@ def stats(values):
     if values == None:
         return None
 
-    values = values.map(float, includeNone=False)
+    with Profiler("convert samples"):
+        values = values.map(float, includeNone=False)
 
     z = Z_moment.new_instance(values)
     s = Struct()
