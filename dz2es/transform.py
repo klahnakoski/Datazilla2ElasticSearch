@@ -137,6 +137,7 @@ class DZ_to_ES():
                     }
                 )
                 try:
+                    Log.note("start stats")
                     with Profiler("calc stats"):
                         new_record.result.stats = stats(v)
                 except Exception, e:
