@@ -170,7 +170,7 @@ def extract_from_datazilla_using_id(settings, transformer):
                                 Log.note("Skipped {{id}} from file (no test_run_id)", {"id": id})
                                 num -= 1
                             else:
-                                Log.note("Skipped {{id}} from file\n{{json}}", {"id": id, "json": col[-1]})
+                                Log.note("Skipped {{id}} from file (no results)\n{{json}}", {"id": id})
                                 num -= 1
                     except Exception, e:
                         Log.warning("Bad line id={{id}} ({{length}}bytes):\n\t{{prefix}}", {

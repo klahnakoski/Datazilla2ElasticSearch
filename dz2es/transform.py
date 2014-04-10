@@ -121,8 +121,6 @@ class DZ_to_ES():
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
 
-
-
             new_records = []
             for i, (k, v) in enumerate(r.results.items()):
                 new_record = Struct(
@@ -137,7 +135,6 @@ class DZ_to_ES():
                     }
                 )
                 try:
-                    Log.note("start stats")
                     with Profiler("calc stats"):
                         new_record.result.stats = stats(v)
                 except Exception, e:
