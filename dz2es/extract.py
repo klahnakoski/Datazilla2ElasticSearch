@@ -50,7 +50,8 @@ def etl(es, file_sink, settings, transformer, id):
             Log.println("Add {{id}} for revision {{revision}} ({{size}} bytes)",
                         {"id": id, "revision": data.json_blob.test_build.revision,
                          "size": len(content)})
-            data = transformer.transform(id, data)
+            with Profiler("transform"):
+                data = transformer.transform(id, data)
 
             es.extend({"value": d} for d in data)
             file_sink.add(str(id) + "\t" + content + "\n")
@@ -148,6 +149,8 @@ def extract_from_datazilla_using_id(settings, transformer):
                             continue
                         col = line.split("\t")
                         id = int(col[0])
+                        if id==3003529:
+                            Log.debug()
                         if id < settings.production.min:
                             continue
                         if id in existing_ids:

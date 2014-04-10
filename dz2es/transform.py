@@ -109,22 +109,28 @@ class DZ_to_ES():
             # mainthread_transform(r.results_xperf)
 
             #ADD PUSH LOG INFO
-            try:
-                branch = r.test_build.branch
-                if branch.endswith("-Non-PGO"):
-                    branch = branch[0:-8]
-                if branch in self.pushlog:
-                    possible_dates = self.pushlog[branch][r.test_build.revision]
-                    r.test_build.push_date = int(possible_dates[0].date) * 1000
-                else:
-                    self.unknown_branches.add(branch)
-            except Exception, e:
-                Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
+            with Profiler("get pushlog info"):
+                try:
+                    branch = r.test_build.branch
+                    if branch.endswith("-Non-PGO"):
+                        branch = branch[0:-8]
+                    if branch in self.pushlog:
+                        possible_dates = self.pushlog[branch][r.test_build.revision]
+                        r.test_build.push_date = int(possible_dates[0].date) * 1000
+                    else:
+                        self.unknown_branches.add(branch)
+                except Exception, e:
+                    Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
+
+
+            new_records = []
 
             # RECORD THE UNKNOWN PART OF THE TEST RESULTS
-            remainder = r.copy()
-            remainder.results = None
-            new_records = [remainder]
+            with Profiler("make copy"):
+                remainder = r.copy()
+                remainder.results = None
+                if len(remainder.keys())>4:
+                    new_records.append(remainder)
 
             for i, (k, v) in enumerate(r.results.items()):
                 new_record = Struct(
