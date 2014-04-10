@@ -121,7 +121,11 @@ class DZ_to_ES():
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
 
-            new_records = []
+            # RECORD THE UNKNOWN PART OF THE TEST RESULTS
+            remainder = r.copy()
+            remainder.results = None
+            new_records = [remainder]
+
             for i, (k, v) in enumerate(r.results.items()):
                 new_record = Struct(
                     test_machine=r.test_machine,

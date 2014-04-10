@@ -159,19 +159,17 @@ def extract_from_datazilla_using_id(settings, transformer):
 
                         with Profiler("decode and transform"):
                             data = CNV.JSON2object(col[-1])
-                            if data.test_run_id and data.results:
+                            if data.test_run_id:
                                 with Profiler("transform"):
                                     data = transformer.transform(id, data)
                                 json_for_es.extend({"value": d} for d in data)
                                 Log.note("Added {{id}} from file", {"id": id})
 
                                 existing_ids.add(id)
-                            elif not data.test_run_id:
+                            else:
                                 Log.note("Skipped {{id}} from file (no test_run_id)", {"id": id})
                                 num -= 1
-                            else:
-                                Log.note("Skipped {{id}} from file (no results)\n{{json}}", {"id": id})
-                                num -= 1
+
                     except Exception, e:
                         Log.warning("Bad line id={{id}} ({{length}}bytes):\n\t{{prefix}}", {
                             "id": id,
