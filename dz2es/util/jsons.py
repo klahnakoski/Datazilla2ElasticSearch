@@ -21,6 +21,8 @@ import sys
 from .collections import AND, MAX
 from .struct import Struct, StructList
 
+json_decoder = json.JSONDecoder().decode
+
 
 # THIS FILE EXISTS TO SERVE AS A FAST REPLACEMENT FOR JSON ENCODING
 # THE DEFAULT JSON ENCODERS CAN NOT HANDLE A DIVERSITY OF TYPES *AND* BE FAST

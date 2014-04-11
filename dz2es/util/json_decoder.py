@@ -9,166 +9,117 @@
 #
 from __future__ import unicode_literals
 
-# THE INTENT IS TO NEVER ACTUALLY PARSE ARRAYS OF PRIMITIVE VALUES, RATHER FIND
-# THE START AND END OF THOSE ARRAYS AND SIMPLY STRING COPY THEM TO THE
-# INEVITABLE JSON OUTPUT
 import json
 from .jsons import json_encoder, use_pypy, UnicodeBuilder
 from .struct import StructList, Null, wrap, unwrap, EmptyList
 
-
 DEBUG = True
 
+# PARSE MODES
+ARRAY = 1   # PARSING INSIDE AN ARRAY
+VALUE = 3   # PARSING PROPERTY VALUE
+OBJECT = 4  # PARSING PROPERTY NAME
 
-class JSONList(object):
-    def __init__(self, json, s, e):
-        self.json = json
-        self.start = s
-        self.end = e
-        self.list = None
 
-    def _convert(self):
-        if self.list is None:
-            i, self.list = parse_array(self.start+1, self.json)
+def decode(json):
+    """
+    THIS IS CURRENTLY 50% SLOWER THAN PyPy DEFAULT IMPLEMENTATION
 
-    def __getitem__(self, index):
-        self._convert()
-        if isinstance(index, slice):
-            # IMPLEMENT FLAT SLICES (for i not in range(0, len(self)): assert self[i]==None)
-            if index.step is not None:
-                from .env.logs import Log
+    THE INTENT IS TO NEVER ACTUALLY PARSE ARRAYS OF PRIMITIVE VALUES, RATHER FIND
+    THE START AND END OF THOSE ARRAYS AND SIMPLY STRING COPY THEM TO THE
+    INEVITABLE JSON OUTPUT
+    """
+    var = ""
+    curr = []
+    mode = ARRAY
+    stack = []
 
-                Log.error("slice step must be None, do not know how to deal with values")
-            length = len(self.list)
-
-            i = index.start
-            i = min(max(i, 0), length)
-            j = index.stop
-            if j is None:
-                j = length
+    # FIRST PASS SIMPLY GETS STRUCTURE
+    i = 0
+    while i < len(json):
+        c = json[i]
+        i += 1
+        if mode == ARRAY:
+            if c in [" ", "\t", "\n", "\r", ","]:
+                pass
+            elif c == "]":
+                curr = stack.pop()
+                if isinstance(curr, dict):
+                    mode = OBJECT
+                else:
+                    mode = ARRAY
+            elif c == "[":
+                i, arr = jump_array(i, json)
+                if arr is None:
+                    arr = []
+                    stack.append(curr)
+                    curr.append(arr)
+                    curr = arr
+                    mode = ARRAY
+                else:
+                    curr.append(arr)
+            elif c == "{":
+                obj = {}
+                stack.append(curr)
+                curr.append(obj)
+                curr = obj
+                mode = OBJECT
+            elif c == "\"":
+                i, val = fast_parse_string(i, json)
+                curr.children.append(val)
             else:
-                j = max(min(j, length), 0)
-            return StructList(self.list[i:j])
+                i, val = parse_const(i, json)
+        elif mode == OBJECT:
+            if c in [" ", "\t", "\n", "\r", ","]:
+                pass
+            elif c == ":":
+                mode = VALUE
+            elif c == "}":
+                curr = stack.pop()
+                if isinstance(curr, dict):
+                    mode = OBJECT
+                else:
+                    mode = ARRAY
+            elif c == "\"":
+                i, var = fast_parse_string(i, json)
+        elif mode == VALUE:
+            if c in [" ", "\t", "\n", "\r"]:
+                pass
+            elif c == "}":
+                curr = stack.pop()
+                if isinstance(curr, dict):
+                    mode = OBJECT
+                else:
+                    mode = ARRAY
+            elif c == "[":
+                i, arr = jump_array(i, json)
+                if arr is None:
+                    arr = []
+                    stack.append(curr)
+                    curr[var] = arr
+                    curr = arr
+                    mode = ARRAY
+                else:
+                    curr[var] = arr
+                    mode = OBJECT
+            elif c == "{":
+                obj = {}
+                stack.append(curr)
+                curr[var] = obj
+                curr = obj
+                mode = OBJECT
+            elif c == "\"":
+                i, val = fast_parse_string(i, json)
+                curr[var] = val
+                mode = OBJECT
+            else:
+                i, val = parse_const(i, json)
+                curr[var] = val
+                mode = OBJECT
 
-        if index < 0 or len(self.list) <= index:
-            return Null
-        return wrap(self.list[index])
+    return curr[0]
 
-    def __setitem__(self, i, y):
-        self._convert()
-        self.json = None
-        self.list[i] = unwrap(y)
 
-    def __iter__(self):
-        self._convert()
-        return (wrap(v) for v in self.list)
-
-    def __contains__(self, item):
-        self._convert()
-        return list.__contains__(self.list, item)
-
-    def append(self, val):
-        self._convert()
-        self.json = None
-        self.list.append(unwrap(val))
-        return self
-
-    def __str__(self):
-        return self.json[self.start:self.end]
-
-    def __len__(self):
-        self._convert()
-        return self.list.__len__()
-
-    def __getslice__(self, i, j):
-        from .env.logs import Log
-
-        Log.error("slicing is broken in Python 2.7: a[i:j] == a[i+len(a), j] sometimes.  Use [start:stop:step]")
-
-    def copy(self):
-        if self.list is not None:
-            return list(self.list)
-        return JSONList(self.json, self.start, self.end)
-
-    def remove(self, x):
-        self._convert()
-        self.json = None
-        self.list.remove(x)
-        return self
-
-    def extend(self, values):
-        self._convert()
-        self.json = None
-        for v in values:
-            self.list.append(unwrap(v))
-        return self
-
-    def pop(self):
-        self._convert()
-        self.json = None
-        return wrap(self.list.pop())
-
-    def __add__(self, value):
-        self._convert()
-        output = list(self.list)
-        output.extend(value)
-        return StructList(vals=output)
-
-    def __or__(self, value):
-        self._convert()
-        output = list(self.list)
-        output.append(value)
-        return StructList(vals=output)
-
-    def __radd__(self, other):
-        self._convert()
-        output = list(other)
-        output.extend(self.list)
-        return StructList(vals=output)
-
-    def right(self, num=None):
-        """
-        WITH SLICES BEING FLAT, WE NEED A SIMPLE WAY TO SLICE FROM THE RIGHT
-        """
-        self._convert()
-        if num == None:
-            return StructList([self.list[-1]])
-        if num <= 0:
-            return EmptyList
-        return StructList(self.list[-num])
-
-    def leftBut(self, num):
-        """
-        WITH SLICES BEING FLAT, WE NEED A SIMPLE WAY TO SLICE FROM THE LEFT [:-num:]
-        """
-        self._convert()
-        if num == None:
-            return StructList([self.list[:-1:]])
-        if num <= 0:
-            return EmptyList
-        return StructList(self.list[:-num:])
-
-    def last(self):
-        """
-        RETURN LAST ELEMENT IN StructList
-        """
-        self._convert()
-        if self.list:
-            return wrap(self.list[-1])
-        return Null
-
-    def map(self, oper, includeNone=True):
-        self._convert()
-        if includeNone:
-            return StructList([oper(v) for v in self.list])
-        else:
-            return StructList([oper(v) for v in self.list if v != None])
-
-    def __json__(self):
-        if self.json is not None:
-            return self.json[self.start:self.end]
-        else:
-            return json_encoder(self)
 
 
 def fast_parse_string(i, json):
@@ -327,107 +278,160 @@ def parse_const(i, json):
 
         Log.error("Can not parse const", e)
 
-# PARSE MODES
-ARRAY = 1   # PARSING INSIDE AN ARRAY
-VALUE = 3   # PARSING PROPERTY VALUE
-OBJECT = 4  # PARSING PROPERTY NAME
+class JSONList(object):
+    def __init__(self, json, s, e):
+        self.json = json
+        self.start = s
+        self.end = e
+        self.list = None
 
+    def _convert(self):
+        if self.list is None:
+            i, self.list = parse_array(self.start+1, self.json)
 
-def decode(json):
-    """
-    THE INTENT IS TO NEVER ACTUALLY PARSE ARRAYS OF PRIMITIVE VALUES, RATHER FIND
-    THE START AND END OF THOSE ARRAYS AND SIMPLY STRING COPY THEM TO THE
-    INEVITABLE JSON OUTPUT
-    """
-    var = ""
-    curr = []
-    mode = ARRAY
-    stack = []
+    def __getitem__(self, index):
+        self._convert()
+        if isinstance(index, slice):
+            # IMPLEMENT FLAT SLICES (for i not in range(0, len(self)): assert self[i]==None)
+            if index.step is not None:
+                from .env.logs import Log
 
-    # FIRST PASS SIMPLY GETS STRUCTURE
-    i = 0
-    while i < len(json):
-        c = json[i]
-        i += 1
-        if mode == ARRAY:
-            if c in [" ", "\t", "\n", "\r", ","]:
-                pass
-            elif c == "]":
-                curr = stack.pop()
-                if isinstance(curr, dict):
-                    mode = OBJECT
-                else:
-                    mode = ARRAY
-            elif c == "[":
-                i, arr = jump_array(i, json)
-                if arr is None:
-                    arr = []
-                    stack.append(curr)
-                    curr.append(arr)
-                    curr = arr
-                    mode = ARRAY
-                else:
-                    curr.append(arr)
-            elif c == "{":
-                obj = {}
-                stack.append(curr)
-                curr.append(obj)
-                curr = obj
-                mode = OBJECT
-            elif c == "\"":
-                i, val = fast_parse_string(i, json)
-                curr.children.append(val)
+                Log.error("slice step must be None, do not know how to deal with values")
+            length = len(self.list)
+
+            i = index.start
+            i = min(max(i, 0), length)
+            j = index.stop
+            if j is None:
+                j = length
             else:
-                i, val = parse_const(i, json)
-        elif mode == OBJECT:
-            if c in [" ", "\t", "\n", "\r", ","]:
-                pass
-            elif c == ":":
-                mode = VALUE
-            elif c == "}":
-                curr = stack.pop()
-                if isinstance(curr, dict):
-                    mode = OBJECT
-                else:
-                    mode = ARRAY
-            elif c == "\"":
-                i, var = fast_parse_string(i, json)
-        elif mode == VALUE:
-            if c in [" ", "\t", "\n", "\r"]:
-                pass
-            elif c == "}":
-                curr = stack.pop()
-                if isinstance(curr, dict):
-                    mode = OBJECT
-                else:
-                    mode = ARRAY
-            elif c == "[":
-                i, arr = jump_array(i, json)
-                if arr is None:
-                    arr = []
-                    stack.append(curr)
-                    curr[var] = arr
-                    curr = arr
-                    mode = ARRAY
-                else:
-                    curr[var] = arr
-                    mode = OBJECT
-            elif c == "{":
-                obj = {}
-                stack.append(curr)
-                curr[var] = obj
-                curr = obj
-                mode = OBJECT
-            elif c == "\"":
-                i, val = fast_parse_string(i, json)
-                curr[var] = val
-                mode = OBJECT
-            else:
-                i, val = parse_const(i, json)
-                curr[var] = val
-                mode = OBJECT
+                j = max(min(j, length), 0)
+            return StructList(self.list[i:j])
 
-    return curr[0]
+        if index < 0 or len(self.list) <= index:
+            return Null
+        return wrap(self.list[index])
+
+    def __setitem__(self, i, y):
+        self._convert()
+        self.json = None
+        self.list[i] = unwrap(y)
+
+    def __iter__(self):
+        self._convert()
+        return (wrap(v) for v in self.list)
+
+    def __contains__(self, item):
+        self._convert()
+        return list.__contains__(self.list, item)
+
+    def append(self, val):
+        self._convert()
+        self.json = None
+        self.list.append(unwrap(val))
+        return self
+
+    def __str__(self):
+        return self.json[self.start:self.end]
+
+    def __len__(self):
+        self._convert()
+        return self.list.__len__()
+
+    def __getslice__(self, i, j):
+        from .env.logs import Log
+
+        Log.error("slicing is broken in Python 2.7: a[i:j] == a[i+len(a), j] sometimes.  Use [start:stop:step]")
+
+    def copy(self):
+        if self.list is not None:
+            return list(self.list)
+        return JSONList(self.json, self.start, self.end)
+
+    def remove(self, x):
+        self._convert()
+        self.json = None
+        self.list.remove(x)
+        return self
+
+    def extend(self, values):
+        self._convert()
+        self.json = None
+        for v in values:
+            self.list.append(unwrap(v))
+        return self
+
+    def pop(self):
+        self._convert()
+        self.json = None
+        return wrap(self.list.pop())
+
+    def __add__(self, value):
+        self._convert()
+        output = list(self.list)
+        output.extend(value)
+        return StructList(vals=output)
+
+    def __or__(self, value):
+        self._convert()
+        output = list(self.list)
+        output.append(value)
+        return StructList(vals=output)
+
+    def __radd__(self, other):
+        self._convert()
+        output = list(other)
+        output.extend(self.list)
+        return StructList(vals=output)
+
+    def right(self, num=None):
+        """
+        WITH SLICES BEING FLAT, WE NEED A SIMPLE WAY TO SLICE FROM THE RIGHT
+        """
+        self._convert()
+        if num == None:
+            return StructList([self.list[-1]])
+        if num <= 0:
+            return EmptyList
+        return StructList(self.list[-num])
+
+    def leftBut(self, num):
+        """
+        WITH SLICES BEING FLAT, WE NEED A SIMPLE WAY TO SLICE FROM THE LEFT [:-num:]
+        """
+        self._convert()
+        if num == None:
+            return StructList([self.list[:-1:]])
+        if num <= 0:
+            return EmptyList
+        return StructList(self.list[:-num:])
+
+    def last(self):
+        """
+        RETURN LAST ELEMENT IN StructList
+        """
+        self._convert()
+        if self.list:
+            return wrap(self.list[-1])
+        return Null
+
+    def map(self, oper, includeNone=True):
+        self._convert()
+        if includeNone:
+            return StructList([oper(v) for v in self.list])
+        else:
+            return StructList([oper(v) for v in self.list if v != None])
+
+    def __json__(self):
+        if self.json is not None:
+            return self.json[self.start:self.end]
+        else:
+            return json_encoder(self)
+
+
+
+
+
 
 
 if use_pypy:
