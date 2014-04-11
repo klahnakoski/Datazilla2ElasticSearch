@@ -116,8 +116,9 @@ class DZ_to_ES():
                 if (branch, ) in self.pushlog:
                     possible_dates = self.pushlog[(branch, r.test_build.revision)]
                     if not possible_dates:
-                        Log.error("can't find date")
-                    r.test_build.push_date = Math.round(possible_dates[0].date * 1000)
+                        Log.note("{{branch}} @ {{revision}} has no pushlog", r.test_build)
+                    else:
+                        r.test_build.push_date = Math.round(possible_dates[0].date * 1000)
                 else:
                     self.unknown_branches.add(branch)
             except Exception, e:
