@@ -15,8 +15,8 @@ import re
 import time
 from . import jsons
 from .collections.multiset import Multiset
-from dz2es.util.env.profiles import Profiler
-from dz2es.util.json_decoder import json_decoder
+from .env.profiles import Profiler
+from .json_decoder import json_decoder
 from .jsons import json_encoder, replace, ESCAPE
 from .env.logs import Log
 from . import struct

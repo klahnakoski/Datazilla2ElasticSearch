@@ -14,7 +14,7 @@ from datetime import datetime
 import sys
 
 from .. import struct
-from dz2es.util.env import profiles
+from ..env import profiles
 from ..jsons import json_encoder
 from ..thread import threads
 from ..struct import listwrap, nvl, Struct, wrap

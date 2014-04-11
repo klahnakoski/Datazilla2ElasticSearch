@@ -8,8 +8,13 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-from dz2es.util.jsons import json_encoder, use_pypy, UnicodeBuilder
-from dz2es.util.struct import StructList, Null, wrap, unwrap, EmptyList
+
+# THE INTENT IS TO NEVER ACTUALLY PARSE ARRAYS OF PRIMITIVE VALUES, RATHER FIND
+# THE START AND END OF THOSE ARRAYS AND SIMPLY STRING COPY THEM TO THE
+# INEVITABLE JSON OUTPUT
+import json
+from .jsons import json_encoder, use_pypy, UnicodeBuilder
+from .struct import StructList, Null, wrap, unwrap, EmptyList
 
 
 DEBUG = True
