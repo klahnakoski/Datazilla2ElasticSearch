@@ -109,28 +109,25 @@ class DZ_to_ES():
             # mainthread_transform(r.results_xperf)
 
             #ADD PUSH LOG INFO
-            with Profiler("get pushlog info"):
-                try:
-                    branch = r.test_build.branch
-                    if branch.endswith("-Non-PGO"):
-                        branch = branch[0:-8]
-                    if branch in self.pushlog:
-                        possible_dates = self.pushlog[branch][r.test_build.revision]
-                        r.test_build.push_date = int(possible_dates[0].date) * 1000
-                    else:
-                        self.unknown_branches.add(branch)
-                except Exception, e:
-                    Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
-
+            try:
+                branch = r.test_build.branch
+                if branch.endswith("-Non-PGO"):
+                    branch = branch[0:-8]
+                if (branch, ) in self.pushlog:
+                    possible_dates = self.pushlog[(branch, r.test_build.revision)]
+                    r.test_build.push_date = int(possible_dates[0].date) * 1000
+                else:
+                    self.unknown_branches.add(branch)
+            except Exception, e:
+                Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
 
             new_records = []
 
             # RECORD THE UNKNOWN PART OF THE TEST RESULTS
-            with Profiler("make copy"):
-                remainder = r.copy()
-                remainder.results = None
-                if len(remainder.keys())>4:
-                    new_records.append(remainder)
+            remainder = r.copy()
+            remainder.results = None
+            if len(remainder.keys()) > 4:
+                new_records.append(remainder)
 
             for i, (k, v) in enumerate(r.results.items()):
                 new_record = Struct(
@@ -145,8 +142,7 @@ class DZ_to_ES():
                     }
                 )
                 try:
-                    with Profiler("calc stats"):
-                        new_record.result.stats = stats(v)
+                    new_record.result.stats = stats(v)
                 except Exception, e:
                     Log.warning("can not reduce series to moments", e)
                 new_records.append(new_record)
@@ -167,8 +163,7 @@ def stats(values):
     if values == None:
         return None
 
-    with Profiler("convert samples"):
-        values = values.map(float, includeNone=False)
+    values = values.map(float, includeNone=False)
 
     z = Z_moment.new_instance(values)
     s = Struct()

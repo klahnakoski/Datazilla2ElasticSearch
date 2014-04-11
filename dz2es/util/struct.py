@@ -686,8 +686,8 @@ def tuplewrap(value):
     INTENDED TO TURN lists INTO tuples FOR USE AS KEYS
     """
     if isinstance(value, (list, tuple, GeneratorType)):
-        return tuple(tuplewrap(v) for v in value)
-    return unwrap(value)
+        return tuple(tuplewrap(v) if isinstance(v, (list, tuple, GeneratorType)) else v for v in value)
+    return unwrap(value),
 
 
 
@@ -711,14 +711,29 @@ def pypy_split_field(field):
     """
     RETURN field AS ARRAY OF DOT-SEPARATED FIELDS
     """
+    from dz2es.util.jsons import UnicodeBuilder
+
+    if not field:
+        return []
+
     output = []
-    start = 0
-    for e, c in enumerate(field):
-        if c == ".":
-            if output[e - 1] != "\\":
-                output.append(field[start:e - 1].replace("\.", "."))
-                start = e + 1
-    output.append(field[start:])
+    curr = UnicodeBuilder()
+    i = 0
+    while i < len(field):
+        c = field[i]
+        i += 1
+        if c == "\\":
+            c = field[i]
+            i += 1
+            if c == ".":
+                curr.append(".")
+            else:
+                curr.append("\\")
+                curr.append(c)
+        elif c == ".":
+            output.append(curr.build())
+            curr = UnicodeBuilder()
+    output.append(curr.build())
     return output
 
 # try:

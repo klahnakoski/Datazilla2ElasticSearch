@@ -149,8 +149,8 @@ def extract_from_datazilla_using_id(settings, transformer):
                             continue
                         col = line.split("\t")
                         id = int(col[0])
-                        if id==3003529:
-                            Log.debug()
+                        # if id==3003529:
+                        #     Log.debug()
                         if id < settings.production.min:
                             continue
                         if id in existing_ids:
