@@ -195,6 +195,7 @@ def extract_from_datazilla_using_id(settings, transformer):
                     if not result:
                         num_not_found += 1
                         if num_not_found > 100:
+                            many.inbound.pop_all()  # CLEAR THE QUEUE OF OTHER WORK
                             many.stop()
                             break
                     else:
