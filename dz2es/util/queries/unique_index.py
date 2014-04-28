@@ -48,13 +48,15 @@ class UniqueIndex(object):
 
 
     def add(self, val):
+        val =  unwrap(val)
         key = value2key(self._keys, val)
         d = self._data.get(key, None)
-        if d != None:
+        if d is None:
+            self._data[key] = val
+            self.count += 1
+        elif d is not val:
             Log.error("key already filled")
 
-        self._data[key] = unwrap(val)
-        self.count += 1
 
     def __contains__(self, key):
         return self[key] != None
@@ -97,7 +99,10 @@ def value2key(keys, val):
     if len(keys)==1:
         if isinstance(val, dict):
             return val[keys[0]]
-        return val
+        elif isinstance(val, (list, tuple)):
+            return val[0]
+        else:
+            return val
     else:
         if isinstance(val, dict):
             return wrap({k: val[k] for k in keys})

@@ -41,6 +41,10 @@ class ElasticSearch(object):
 
     """
     def __init__(self, settings=None):
+        """
+        settings.explore_metadata == True - IF PROBING THE CLUSTER FOR METATDATA IS ALLOWED
+        """
+
         if settings is None:
             self.debug = DEBUG
             return
@@ -49,6 +53,7 @@ class ElasticSearch(object):
         assert settings.host
         assert settings.index
         assert settings.type
+        settings.setdefault("explore_metadata", True)
 
         if settings.index == settings.alias:
             Log.error("must have a unique index name")
@@ -57,10 +62,14 @@ class ElasticSearch(object):
             settings.port = 9200
         self.debug = nvl(settings.debug, DEBUG)
         self.settings = settings
-        index = self.get_index(settings.index)
-        if index:
-            settings.alias = settings.index
-            settings.index = index
+        try:
+            index = self.get_index(settings.index)
+            if index:
+                settings.alias = settings.index
+                settings.index = index
+        except Exception, e:
+            # EXPLORING (get_metadata()) IS NOT ALLOWED ON THE PUBLIC CLUSTER
+            pass
 
         self.path = settings.host + ":" + unicode(settings.port) + "/" + settings.index + "/" + settings.type
 
@@ -124,18 +133,29 @@ class ElasticSearch(object):
         return wrap(output)
 
     def get_metadata(self):
-        if not self.cluster_metadata:
-            response = self.get(self.settings.host + ":" + unicode(self.settings.port) + "/_cluster/state")
-            self.cluster_metadata = response.metadata
-            self.node_metatdata = self.get(self.settings.host + ":" + unicode(self.settings.port) + "/")
+        if self.settings.explore_metadata:
+            if not self.cluster_metadata:
+                response = self.get(self.settings.host + ":" + unicode(self.settings.port) + "/_cluster/state")
+                self.cluster_metadata = response.metadata
+                self.node_metatdata = self.get(self.settings.host + ":" + unicode(self.settings.port) + "/")
+        else:
+            Log.error("Metadata exploration has been disabled")
         return self.cluster_metadata
 
+
     def get_schema(self):
-        indices = self.get_metadata().indices
-        index = indices[self.settings.index]
-        if not index.mappings[self.settings.type]:
-            Log.error("{{index}} does not have type {{type}}", self.settings)
-        return index.mappings[self.settings.type]
+        if self.settings.explore_metadata:
+            indices = self.get_metadata().indices
+            index = indices[self.settings.index]
+            if not index.mappings[self.settings.type]:
+                Log.error("ElasticSearch index ({{index}}) does not have type ({{type}})", self.settings)
+            return index.mappings[self.settings.type]
+        else:
+            mapping = self.get(self.settings.host + ":" + unicode(self.settings.port) + "/" + self.settings.index +"/" + self.settings.type + "/_mapping")
+            if not mapping[self.settings.type]:
+                Log.error("{{index}} does not have type {{type}}", self.settings)
+            return wrap({"mappings":mapping[self.settings.type]})
+
 
     #DELETE ALL INDEXES WITH GIVEN PREFIX, EXCEPT name
     def delete_all_but(self, prefix, name):
@@ -245,9 +265,15 @@ class ElasticSearch(object):
 
             if not lines:
                 return
+
+            try:
+                data_bytes = ("\n".join(lines) + "\n").encode("utf8")
+            except Exception, e:
+                Log.error("can not make request body", e)
+
             response = self.post(
                 self.path + "/_bulk",
-                data=("\n".join(lines) + "\n").encode("utf8"),
+                data=data_bytes,
                 headers={"Content-Type": "text"},
                 timeout=self.settings.timeout
             )
@@ -288,10 +314,10 @@ class ElasticSearch(object):
             data="{\"index.refresh_interval\":\"" + interval + "\"}"
         )
 
-        result = CNV.JSON2object(response.content)
+        result = CNV.JSON2object(response.content.decode("utf-8"))
         if not result.ok:
             Log.error("Can not set refresh interval ({{error}})", {
-                "error": response.content
+                "error": response.content.decode("utf-8")
             })
 
     def search(self, query):
@@ -329,8 +355,8 @@ class ElasticSearch(object):
             kwargs = unwrap(kwargs)
             response = requests.post(*args, **kwargs)
             if self.debug:
-                Log.note(response.content[:130])
-            details = CNV.JSON2object(response.content)
+                Log.note(response.content.decode("utf-8")[:130])
+            details = CNV.JSON2object(response.content.decode("utf-8"))
             if details.error:
                 Log.error(CNV.quote2string(details.error))
             if details._shards.failed > 0:
@@ -353,8 +379,8 @@ class ElasticSearch(object):
             kwargs.setdefault("timeout", 600)
             response = requests.get(*args, **kwargs)
             if self.debug:
-                Log.note(response.content[:130])
-            details = wrap(CNV.JSON2object(response.content))
+                Log.note(response.content.decode("utf-8")[:130])
+            details = wrap(CNV.JSON2object(response.content.decode("utf-8")))
             if details.error:
                 Log.error(details.error)
             return details
@@ -367,7 +393,7 @@ class ElasticSearch(object):
             kwargs.setdefault("timeout", 30)
             response = requests.put(*args, **kwargs)
             if self.debug:
-                Log.note(response.content)
+                Log.note(response.content.decode("utf-8"))
             return response
         except Exception, e:
             Log.error("Problem with call to {{url}}", {"url": args[0]}, e)
@@ -377,7 +403,7 @@ class ElasticSearch(object):
             kwargs.setdefault("timeout", 30)
             response = requests.delete(*args, **kwargs)
             if self.debug:
-                Log.note(response.content)
+                Log.note(response.content.decode("utf-8"))
             return response
         except Exception, e:
             Log.error("Problem with call to {{url}}", {"url": args[0]}, e)

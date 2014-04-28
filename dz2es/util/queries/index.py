@@ -9,7 +9,7 @@
 #
 
 from __future__ import unicode_literals
-from dz2es.util.queries.unique_index import UniqueIndex
+from ..queries.unique_index import UniqueIndex
 from ..env.logs import Log
 from ..struct import unwrap, wrap, tuplewrap
 
@@ -80,10 +80,12 @@ class Index(object):
         def iter(data, depth):
             if depth == 0:
                 for v in data:
-                    yield v
+                    yield wrap(v)
+                return
+
             for v in data.values():
                 for v1 in iter(v, depth - 1):
-                    yield v1
+                    yield wrap(v1)
 
         return iter(self._data, len(self._keys))
 
@@ -125,8 +127,8 @@ class Index(object):
 def value2key(keys, val):
     if len(keys) == 1:
         if isinstance(val, dict):
-            return val[keys[0]]
-        return val
+            return val[keys[0]],
+        return val,
     else:
         if isinstance(val, dict):
             return tuple(val[k] for k in keys)

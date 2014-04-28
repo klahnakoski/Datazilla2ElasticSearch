@@ -36,6 +36,7 @@ class Log(object):
     main_log = None
     logging_multi = None
     profiler = None
+    cprofiler = None  # screws up with pypy, but better than nothing
     error_mode = False  # prevent error loops
 
     @classmethod
@@ -220,16 +221,27 @@ class Log(object):
         for log in listwrap(settings.log):
             Log.add_log(Log.new_instance(log))
 
+        if settings.cprofile:
+            if isinstance(settings.cprofile, bool):
+                settings.cprofile = {"enabled": True, "filename": "cprofile.tab"}
+
+            import cProfile
+            cls.cprofiler = cProfile.Profile()
+            cls.cprofiler.enable()
+
         if settings.profile:
             if isinstance(settings.profile, bool):
-                settings.profile = {"enabled":True, "filename":"profile.tab"}
+                settings.profile = {"enabled": True, "filename": "profile.tab"}
 
             if settings.profile.enabled:
-                profiles.ON=True
+                profiles.ON = True
 
 
     @classmethod
     def stop(cls):
+        if cls.cprofiler and hasattr(cls, "settings"):
+            write_profile(cls.settings.cprofile, cls.cprofiler)
+
         if profiles.ON and hasattr(cls, "settings"):
             profiles.write(cls.settings.profile)
         cls.main_log.stop()
@@ -304,8 +316,9 @@ def extract_tb(start):
 
 def format_trace(tbs, start=0):
     trace = []
-    for d in tbs[start:]:
-        item = expand_template('at File {{file}}, line {{line}}, in {{method}}\n', d)
+    for d in tbs[start::]:
+        d["file"] = d["file"].replace("/", "\\")
+        item = expand_template('File "{{file}}", line {{line}}, in {{method}}\n', d)
         trace.append(item)
     return "".join(trace)
 
@@ -438,7 +451,6 @@ class Log_usingThread(BaseLog):
 class Log_usingMulti(BaseLog):
     def __init__(self):
         self.many = []
-
     def write(self, template, params):
         for m in self.many:
             try:
@@ -457,7 +469,6 @@ class Log_usingMulti(BaseLog):
 
     def clear_log(self):
         self.many = []
-
     def stop(self):
         for m in self.many:
             try:
@@ -466,12 +477,12 @@ class Log_usingMulti(BaseLog):
                 pass
 
 
-def write_profile(profile_settings, profiler):
+def write_profile(profile_settings, cprofiler):
     from ..cnv import CNV
     from .files import File
     import pstats
 
-    p = pstats.Stats(profiler)
+    p = pstats.Stats(cprofiler)
     stats = [{
             "num_calls": d[1],
             "self_time": d[2],

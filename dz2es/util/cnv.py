@@ -56,7 +56,7 @@ class CNV:
                     params = dict([(k, CNV.value2quote(v)) for k, v in params.items()])
                     json_string = expand_template(json_string, params)
                 if isinstance(json_string, str):
-                    json_string = unicode(json_string)
+                    Log.error("only unicode json accepted")
 
                 value = wrap(json_decoder(json_string))
 
@@ -312,7 +312,7 @@ class CNV:
             return CNV.value2number(value[1::])
 
         if type != 's' and type != 'a':
-            Log.error("unknown pipe type")
+            Log.error("unknown pipe type ({{type}}) in {{value}}", {"type": type, "value": value})
 
         # EXPECTING MOST STRINGS TO NOT HAVE ESCAPED CHARS
         output = unPipe(value)

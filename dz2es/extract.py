@@ -43,7 +43,7 @@ def etl(es, file_sink, settings, transformer, id):
             Log.note("{{id}} not found", {"id": id})
             return False
 
-        data = CNV.JSON2object(content)
+        data = CNV.JSON2object(content.decode('utf-8'))
         content = CNV.object2JSON(data)  #ENSURE content HAS NO crlf
 
         if data.test_run_id:
