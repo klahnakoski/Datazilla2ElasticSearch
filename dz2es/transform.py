@@ -112,7 +112,12 @@ class DZ_to_ES():
             try:
                 branch = r.test_build.branch
                 if branch.endswith("-Non-PGO"):
+                    r.test_build.branch = branch
+                    r.test_build.pgo = False
                     branch = branch[0:-8]
+                else:
+                    r.test_build.pgo = True
+
                 if (branch, ) in self.pushlog:
                     possible_dates = self.pushlog[(branch, r.test_build.revision)]
                     if not possible_dates:

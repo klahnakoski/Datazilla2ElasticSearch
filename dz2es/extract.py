@@ -183,23 +183,24 @@ def extract_from_datazilla_using_id(settings, transformer):
 
     #COPY MISSING DATA TO ES
     try:
-        with ThreadedQueue(File(settings.param.output_file), size=50) as file_sink:
-            functions = [functools.partial(etl, *[es, file_sink, settings, transformer]) for i in range(settings.production.threads)]
+        with ThreadedQueue(es, size=1000) as es_sink:
+            with ThreadedQueue(File(settings.param.output_file), size=50) as file_sink:
+                functions = [functools.partial(etl, *[es_sink, file_sink, settings, transformer]) for i in range(settings.production.threads)]
 
-            num_not_found = 0
-            with Multithread(functions) as many:
-                for result in many.execute([
-                    {"id": id}
-                    for id in Q.sort(missing_ids)[:nvl(settings.production.step, 200000):]
-                ]):
-                    if not result:
-                        num_not_found += 1
-                        if num_not_found > 100:
-                            many.inbound.pop_all()  # CLEAR THE QUEUE OF OTHER WORK
-                            many.stop()
-                            break
-                    else:
-                        num_not_found = 0
+                num_not_found = 0
+                with Multithread(functions) as many:
+                    for result in many.execute([
+                        {"id": id}
+                        for id in Q.sort(missing_ids)[:nvl(settings.production.step, 200000):]
+                    ]):
+                        if not result:
+                            num_not_found += 1
+                            if num_not_found > 100:
+                                many.inbound.pop_all()  # CLEAR THE QUEUE OF OTHER WORK
+                                many.stop()
+                                break
+                        else:
+                            num_not_found = 0
     except (KeyboardInterrupt, SystemExit):
         Log.println("Shutdown Started, please be patient")
     except Exception, e:
