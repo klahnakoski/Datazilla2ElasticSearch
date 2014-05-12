@@ -26,7 +26,7 @@ from dz2es.util.times.timer import Timer
 from dz2es.util.thread.multithread import Multithread
 
 
-def etl(es, file_sink, settings, transformer, id):
+def etl(es_sink, file_sink, settings, transformer, id):
     """
     PULL FROM DZ AND PUSH TO es AND file_sink
     """
@@ -53,7 +53,7 @@ def etl(es, file_sink, settings, transformer, id):
             with Profiler("transform"):
                 data = transformer.transform(id, data)
 
-            es.extend({"value": d} for d in data)
+            es_sink.extend({"value": d} for d in data)
             file_sink.add(str(id) + "\t" + content + "\n")
 
         return True
@@ -183,7 +183,7 @@ def extract_from_datazilla_using_id(settings, transformer):
 
     #COPY MISSING DATA TO ES
     try:
-        with ThreadedQueue(es, size=100) as es_sink:
+        with ThreadedQueue(es, size=10) as es_sink:
             with ThreadedQueue(File(settings.param.output_file), size=50) as file_sink:
                 functions = [functools.partial(etl, *[es_sink, file_sink, settings, transformer]) for i in range(settings.production.threads)]
 
