@@ -1,5 +1,3 @@
 requests
 pymysql
-numpy
-python-dateutil
-pandas
+

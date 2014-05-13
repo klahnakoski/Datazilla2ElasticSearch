@@ -47,14 +47,24 @@ def etl(es_sink, file_sink, settings, transformer, id):
         content = CNV.object2JSON(data)  #ENSURE content HAS NO crlf
 
         if data.test_run_id:
-            Log.println("Add {{id}} for revision {{revision}} ({{size}} bytes)",
-                        {"id": id, "revision": data.json_blob.test_build.revision,
-                         "size": len(content)})
+            Log.println("Add {{id}} for revision {{revision}} ({{size}} bytes)", {
+                "id": id,
+                "revision": data.json_blob.test_build.revision,
+                "size": len(content)
+            })
             with Profiler("transform"):
                 data = transformer.transform(id, data)
 
             es_sink.extend({"value": d} for d in data)
             file_sink.add(str(id) + "\t" + content + "\n")
+        elif data.error_flag == 'Y':
+            error = data.json_blob
+            error.datazilla = data
+            error.results = None
+            data.json_blob = None
+            es_sink.add({"value": error})
+        else:
+            Log.println("No test run id for {{id}}", {"id": id})
 
         return True
     except Exception, e:
@@ -183,7 +193,7 @@ def extract_from_datazilla_using_id(settings, transformer):
 
     #COPY MISSING DATA TO ES
     try:
-        with ThreadedQueue(es, size=10) as es_sink:
+        with ThreadedQueue(es, size=100) as es_sink:
             with ThreadedQueue(File(settings.param.output_file), size=50) as file_sink:
                 functions = [functools.partial(etl, *[es_sink, file_sink, settings, transformer]) for i in range(settings.production.threads)]
 
