@@ -44,8 +44,7 @@ class Lock(object):
             timeout = (datetime.utcnow() - till).total_seconds()
             if timeout < 0:
                 return
-        self.monitor.notify()
-        self.monitor.wait(timeout=timeout)
+        self.monitor.wait(timeout=float(timeout) if timeout else None)
 
     def notify_all(self):
         self.monitor.notify_all()
@@ -83,27 +82,38 @@ class Queue(object):
         with self.lock:
             if self.keep_running:
                 self.queue.append(value)
+            wait_time = 5
             while self.keep_running and len(self.queue) > self.max:
                 if self.silent:
                     self.lock.wait()
                 else:
-                    self.lock.wait(5)
+                    self.lock.wait(wait_time)
                     if len(self.queue) > self.max:
                         from ..env.logs import Log
-                        Log.warning("Queue is full ({{num}}} items), been waiting 5 sec", {"num": len(self.queue)})
+                        Log.warning("Queue is full ({{num}}} items), been waiting {{wait_time}} sec", {
+                            "num": len(self.queue),
+                            "wait_time": wait_time
+                        })
+                        wait_time *= 2
+
         return self
 
     def extend(self, values):
         with self.lock:
             # ONCE THE queue IS BELOW LIMIT, ALLOW ADDING MORE
+            wait_time = 5
             while self.keep_running and len(self.queue) > self.max:
                 if self.silent:
                     self.lock.wait()
                 else:
-                    self.lock.wait(5)
+                    self.lock.wait(wait_time)
                     if len(self.queue) > self.max:
                         from ..env.logs import Log
-                        Log.warning("Queue is full ({{num}}} items), been waiting 5 sec", {"num": len(self.queue)})
+                        Log.warning("Queue is full ({{num}}} items), been waiting {{wait_time}} sec", {
+                            "num": len(self.queue),
+                            "wait_time": wait_time
+                        })
+                        wait_time *= 2
             if self.keep_running:
                 self.queue.extend(values)
 
@@ -289,7 +299,7 @@ class Thread(object):
                 if DEBUG:
                     from ..env.logs import Log
 
-                    Log.note("Waiting on thread {{thread|quote}}", {"thread": self.name})
+                    Log.note("Waiting on thread {{thread|json}}", {"thread": self.name})
         else:
             self.stopped.wait_for_go(till=till)
             if self.stopped:
