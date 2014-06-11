@@ -137,28 +137,46 @@ class DZ_to_ES():
             if len(remainder.keys()) > 4:
                 new_records.append(remainder)
 
-            for i, (k, v) in enumerate(r.results.items()):
-                new_record = Struct(
-                    test_machine=r.test_machine,
-                    datazilla=r.datazilla,
-                    testrun=r.testrun,
-                    test_build=r.test_build,
-                    result={
-                        "test_name": k,
-                        "ordering": i,
-                        "samples": v
-                    }
-                )
-                try:
-                    new_record.result.stats = stats(v)
-                except Exception, e:
-                    Log.warning("can not reduce series to moments", e)
-                new_records.append(new_record)
-
-            # ONE MORE RECORD WITH THE results_* VALUES
-            # new_record = r.copy()
-            # new_record.results = None
-            # new_records.append(new_record)
+            #RECORD TEST RESULTS
+            if r.testrun.suite in ["dromaeo_css", "dromaeo_dom"]:
+                #dromaeo IS SPECIAL, REPLICATES ARE IN SETS OF FIVE
+                #RECORD ALL RESULTS
+                for i, (test_name, replicates) in enumerate(r.results.items()):
+                    for g, sub_results in Q.groupby(replicates, size=5):
+                        new_record = Struct(
+                            test_machine=r.test_machine,
+                            datazilla=r.datazilla,
+                            testrun=r.testrun,
+                            test_build=r.test_build,
+                            result={
+                                "test_name": unicode(test_name) + "." + unicode(g),
+                                "ordering": i,
+                                "samples": sub_results
+                            }
+                        )
+                        try:
+                            new_record.result.stats = stats(sub_results)
+                        except Exception, e:
+                            Log.warning("can not reduce series to moments", e)
+                        new_records.append(new_record)
+            else:
+                for i, (test_name, replicates) in enumerate(r.results.items()):
+                    new_record = Struct(
+                        test_machine=r.test_machine,
+                        datazilla=r.datazilla,
+                        testrun=r.testrun,
+                        test_build=r.test_build,
+                        result={
+                            "test_name": test_name,
+                            "ordering": i,
+                            "samples": replicates
+                        }
+                    )
+                    try:
+                        new_record.result.stats = stats(replicates)
+                    except Exception, e:
+                        Log.warning("can not reduce series to moments", e)
+                    new_records.append(new_record)
 
             return new_records
         except Exception, e:
