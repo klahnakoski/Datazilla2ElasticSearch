@@ -200,6 +200,8 @@ def stats(values):
     s.max = MAX(values)
     s.min = MIN(values)
     s.median = dz2es.util.stats.median(values, simple=False)
+    s.last = values.last()
+    s.first = values[0]
     if Math.is_number(s.variance) and not Math.is_nan(s.variance):
         s.std = sqrt(s.variance)
 
