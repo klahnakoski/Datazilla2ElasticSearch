@@ -11,13 +11,15 @@ from __future__ import unicode_literals
 from ..collections import PRODUCT, reverse, MAX, MIN
 from ..cnv import CNV
 from ..env.logs import Log
-from ..struct import Null, Struct, wrap
+from ..struct import Null, Struct
+from ..structs.wraps import wrap
 
 
 class Matrix(object):
     """
     SIMPLE n-DIMENSIONAL ARRAY OF OBJECTS
     """
+    ZERO = None
 
     def __init__(self, *dims, **kwargs):
         kwargs = wrap(kwargs)
@@ -149,12 +151,9 @@ class Matrix(object):
             # RETURN AN ITERATOR OF PAIRS (c, v), WHERE
             # c - COORDINATES INTO THE CUBE
             # v - VALUE AT GIVEN COORDINATES
-            def output():
-                for c in self._all_combos():
-                    yield c, self[c]
-            return output()
+            return ((c, self[c]) for c in self._all_combos())
         else:
-            output = [[None, Matrix(new_dim)] for i in range(acc)]
+            output = [[None, Matrix(*new_dim)] for i in range(acc)]
             _groupby(self.cube, 0, offsets, 0, output, tuple(), [])
 
         return output
@@ -209,6 +208,8 @@ class Matrix(object):
         return CNV.object2JSON(self.cube)
 
 
+Matrix.ZERO = Matrix(value=None)
+
 def _max(depth, cube):
     if depth == 0:
         return cube
@@ -252,9 +253,9 @@ def _null(*dims):
     if d0 == 0:
         Log.error("Zero dimensions not allowed")
     if len(dims) == 1:
-        return [Null for i in range(dims[0])]
+        return [Null for i in range(d0)]
     else:
-        return [_null(*dims[1::]) for i in range(dims[0])]
+        return [_null(*dims[1::]) for i in range(d0)]
 
 
 def _groupby(cube, depth, intervals, offset, output, group, new_coord):
