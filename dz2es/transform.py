@@ -77,36 +77,36 @@ class DZ_to_ES():
             #CONVERT UNIX TIMESTAMP TO MILLISECOND TIMESTAMP
             r.testrun.date *= 1000
 
-            # def mainthread_transform(r):
-            #     if r == None:
-            #         return None
-            #
-            #     output = Struct()
-            #
-            #     for i in r.mainthread_readbytes:
-            #         output[i[1].replace(".", "\.")].name = i[1]
-            #         output[i[1].replace(".", "\.")].readbytes = i[0]
-            #     r.mainthread_readbytes = None
-            #
-            #     for i in r.mainthread_writebytes:
-            #         output[i[1].replace(".", "\.")].name = i[1]
-            #         output[i[1].replace(".", "\.")].writebytes = i[0]
-            #     r.mainthread_writebytes = None
-            #
-            #     for i in r.mainthread_readcount:
-            #         output[i[1].replace(".", "\.")].name = i[1]
-            #         output[i[1].replace(".", "\.")].readcount = i[0]
-            #     r.mainthread_readcount = None
-            #
-            #     for i in r.mainthread_writecount:
-            #         output[i[1].replace(".", "\.")].name = i[1]
-            #         output[i[1].replace(".", "\.")].writecount = i[0]
-            #     r.mainthread_writecount = None
-            #
-            #     r.mainthread = output.values()
-            #
-            # mainthread_transform(r.results_aux)
-            # mainthread_transform(r.results_xperf)
+            def mainthread_transform(r):
+                if r == None:
+                    return None
+
+                output = Struct()
+
+                for i in r.mainthread_readbytes:
+                    output[i[1].replace(".", "\.")].name = i[1]
+                    output[i[1].replace(".", "\.")].readbytes = i[0]
+                r.mainthread_readbytes = None
+
+                for i in r.mainthread_writebytes:
+                    output[i[1].replace(".", "\.")].name = i[1]
+                    output[i[1].replace(".", "\.")].writebytes = i[0]
+                r.mainthread_writebytes = None
+
+                for i in r.mainthread_readcount:
+                    output[i[1].replace(".", "\.")].name = i[1]
+                    output[i[1].replace(".", "\.")].readcount = i[0]
+                r.mainthread_readcount = None
+
+                for i in r.mainthread_writecount:
+                    output[i[1].replace(".", "\.")].name = i[1]
+                    output[i[1].replace(".", "\.")].writecount = i[0]
+                r.mainthread_writecount = None
+
+                r.mainthread = output.values()
+
+            mainthread_transform(r.results_aux)
+            mainthread_transform(r.results_xperf)
 
             #ADD PUSH LOG INFO
             try:
