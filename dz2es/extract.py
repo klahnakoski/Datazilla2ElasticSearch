@@ -77,45 +77,43 @@ def get_existing_ids(es, settings):
     bad_ids = []
     int_ids = set()
 
-    esq = ESQuery(es)
+    with ESQuery(es) as esq:
 
-    max_id = esq.query({
-        "from": es.settings.alias,
-        "select": {"value": "datazilla.id", "aggregate": "max"}
-    })
-
-    interval_size = 200000
-    for mini, maxi in Q.intervals(settings.production.min, max_id+interval_size, interval_size):
-        existing_ids = es.search({
-            "query": {
-                "filtered": {
-                    "query": {"match_all": {}},
-                    "filter": {
-                        "range": {"datazilla.id": {
-                            "gte": mini,
-                            "lt": maxi
-                        }}
-                    }
-                }
-            },
-            "from": 0,
-            "size": 0,
-            "sort": [],
-            "facets": {
-                "ids": {"terms": {"field": "datazilla.id", "size": interval_size}}
-            }
+        max_id = esq.query({
+            "from": es.settings.alias,
+            "select": {"value": "datazilla.id", "aggregate": "max"}
         })
 
-        for t in existing_ids.facets.ids.terms:
-            try:
-                int_ids.add(int(t.term))
-            except Exception, e:
-                bad_ids.append(t.term)
+        interval_size = 200000
+        for mini, maxi in Q.intervals(settings.production.min, max_id+interval_size, interval_size):
+            existing_ids = es.search({
+                "query": {
+                    "filtered": {
+                        "query": {"match_all": {}},
+                        "filter": {"and": [
+                            {"range": {"datazilla.id": {"gte": mini, "lt": maxi}}},
+                            {"not": {"missing": {"field": "test_build.push_date"}}}
+                        ]}
+                    }
+                },
+                "from": 0,
+                "size": 0,
+                "sort": [],
+                "facets": {
+                    "ids": {"terms": {"field": "datazilla.id", "size": interval_size}}
+                }
+            }, timeout=5*60)
 
-    existing_ids = int_ids
-    Log.println("Number of ids in ES: " + str(len(existing_ids)))
-    Log.println("BAD ids in ES: " + str(bad_ids))
-    return existing_ids
+            for t in existing_ids.facets.ids.terms:
+                try:
+                    int_ids.add(int(t.term))
+                except Exception, e:
+                    bad_ids.append(t.term)
+
+        existing_ids = int_ids
+        Log.println("Number of ids in ES: " + str(len(existing_ids)))
+        Log.println("BAD ids in ES: " + str(bad_ids))
+        return existing_ids
 
 
 def extract_from_datazilla_using_id(settings, transformer):
@@ -195,14 +193,15 @@ def extract_from_datazilla_using_id(settings, transformer):
     try:
         with ThreadedQueue(es, size=100) as es_sink:
             with ThreadedQueue(File(settings.param.output_file), size=50) as file_sink:
-                functions = [functools.partial(etl, *[es_sink, file_sink, settings, transformer]) for i in range(settings.production.threads)]
+                simple_etl = functools.partial(etl, *[es_sink, file_sink, settings, transformer])
 
                 num_not_found = 0
-                with Multithread(functions) as many:
-                    for result in many.execute([
+                with Multithread(simple_etl, threads=settings.production.threads) as many:
+                    results = many.execute([
                         {"id": id}
                         for id in Q.sort(missing_ids)[:nvl(settings.production.step, 200000):]
-                    ]):
+                    ])
+                    for result in results:
                         if not result:
                             num_not_found += 1
                             if num_not_found > 100:
