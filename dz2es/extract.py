@@ -26,7 +26,7 @@ from dz2es.util.times.timer import Timer
 from dz2es.util.thread.multithread import Multithread
 
 
-NUM_PER_BATCH=1000
+NUM_PER_BATCH = 1000
 
 def etl(es_sink, file_sink, settings, transformer, id):
     """
@@ -94,9 +94,9 @@ def get_existing_ids(es, settings, branches):
                         "query": {"match_all": {}},
                         "filter": {"and": [
                             {"range": {"datazilla.id": {"gte": mini, "lt": maxi}}},
-                            {"or":[
+                            {"or": [
                                 {"not": {"missing": {"field": "test_build.push_date"}}},
-                                {"not": {"terms": {"test_build.branch": branches}}}
+                                {"not": {"missing": {"field": "test_build.no_pushlog"}}}
                             ]}
                         ]}
                     }

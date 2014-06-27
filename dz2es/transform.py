@@ -9,8 +9,10 @@
 #
 from __future__ import unicode_literals
 from math import sqrt
+import datetime
 
 import dz2es
+from dz2es.util.cnv import CNV
 from dz2es.util.collections import MIN, MAX
 from dz2es.util.env.profiles import Profiler
 from dz2es.util.maths import Math
@@ -25,7 +27,7 @@ from dz2es.util.queries import Q
 
 DEBUG = False
 ARRAY_TOO_BIG = 1000
-
+TOO_OLD = datetime.datetime.utcnow() + datetime.timedelta(days=-30)
 
 class DZ_to_ES():
     def __init__(self, pushlog_settings):
@@ -49,7 +51,7 @@ class DZ_to_ES():
                             branch_map bm ON br.id = bm.id
                     """)
             Log.note("Got pushlog, now indexing...")
-            self.pushlog = Q.index(all_pushlogs, ["branch", "revision"])._data
+            self.pushlog = wrap(Q.index(all_pushlogs, ["branch", "revision"])._data)
             self.unknown_branches = set()
 
     def __del__(self):
@@ -121,16 +123,19 @@ class DZ_to_ES():
                     r.test_build.pgo = True
 
                 with Profiler("get from pushlog"):
-                    if self.pushlog.get(branch, None):
-                        possible_dates = wrap(self.pushlog[branch].get(r.test_build.revision, None))
-                        if not possible_dates:
-                            Log.note("{{branch}} @ {{revision}} has no pushlog", r.test_build)
-                            r.test_build.push_date = r.datazilla.date_loaded,
-                        else:
+                    if self.pushlog[branch]:
+                        possible_dates = self.pushlog[branch][r.test_build.revision]
+                        if possible_dates:
                             r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
+                        else:
+                            Log.note("{{branch}} @ {{revision}} has no pushlog", r.test_build)
+                            if CNV.milli2datetime(r.datazilla.date_loaded) < TOO_OLD:
+                                r.test_build.no_pushlog = True
                     else:
-                        self.unknown_branches.add(branch)
                         Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
+                        self.unknown_branches.add(branch)
+                        if CNV.milli2datetime(r.datazilla.date_loaded) < TOO_OLD:
+                            r.test_build.no_pushlog = True
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
 
