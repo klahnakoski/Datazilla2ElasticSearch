@@ -26,6 +26,8 @@ from dz2es.util.times.timer import Timer
 from dz2es.util.thread.multithread import Multithread
 
 
+NUM_PER_BATCH=1000
+
 def etl(es_sink, file_sink, settings, transformer, id):
     """
     PULL FROM DZ AND PUSH TO es AND file_sink
@@ -92,7 +94,11 @@ def get_existing_ids(es, settings):
                         "query": {"match_all": {}},
                         "filter": {"and": [
                             {"range": {"datazilla.id": {"gte": mini, "lt": maxi}}},
-                            {"not": {"missing": {"field": "test_build.push_date"}}}
+                            {"or":[
+                                {"not": {"missing": {"field": "test_build.push_date"}}},
+                                {"terms": {"test_build.branch": ["Try", "Try-Non-PGO"]}}
+                            ]}
+
                         ]}
                     }
                 },
@@ -139,7 +145,7 @@ def extract_from_datazilla_using_id(settings, transformer):
     existing_ids = get_existing_ids(es, settings)
     max_existing_id = nvl(MAX(existing_ids), settings.production.min)
     holes = set(range(settings.production.min, max_existing_id)) - existing_ids
-    missing_ids = set(range(settings.production.min, max_existing_id+nvl(settings.production.step, 200000))) - existing_ids
+    missing_ids = set(range(settings.production.min, max_existing_id+nvl(settings.production.step, NUM_PER_BATCH))) - existing_ids
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON
@@ -199,7 +205,7 @@ def extract_from_datazilla_using_id(settings, transformer):
                 with Multithread(simple_etl, threads=settings.production.threads) as many:
                     results = many.execute([
                         {"id": id}
-                        for id in Q.sort(missing_ids)[:nvl(settings.production.step, 200000):]
+                        for id in Q.sort(missing_ids)[:nvl(settings.production.step, NUM_PER_BATCH):]
                     ])
                     for result in results:
                         if not result:

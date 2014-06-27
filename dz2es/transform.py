@@ -16,6 +16,7 @@ from dz2es.util.env.profiles import Profiler
 from dz2es.util.maths import Math
 from dz2es.util.maths.stats import Z_moment, z_moment2stats
 from dz2es.util.struct import Struct
+from dz2es.util.structs.wraps import wrap
 from dz2es.util.times.timer import Timer
 from dz2es.util.sql.db import DB
 from dz2es.util.env.logs import Log
@@ -47,7 +48,8 @@ class DZ_to_ES():
                         LEFT JOIN
                             branch_map bm ON br.id = bm.id
                     """)
-            self.pushlog = Q.index(all_pushlogs, ["branch", "revision"])
+            Log.note("Got pushlog, now indexing...")
+            self.pushlog = Q.index(all_pushlogs, ["branch", "revision"])._data
             self.unknown_branches = set()
 
     def __del__(self):
@@ -118,14 +120,15 @@ class DZ_to_ES():
                 else:
                     r.test_build.pgo = True
 
-                if (branch, ) in self.pushlog:
-                    possible_dates = self.pushlog[(branch, r.test_build.revision)]
-                    if not possible_dates:
-                        Log.note("{{branch}} @ {{revision}} has no pushlog", r.test_build)
+                with Profiler("get from pushlog"):
+                    if self.pushlog.get(branch, None):
+                        possible_dates = wrap(self.pushlog[branch].get(r.test_build.revision, None))
+                        if not possible_dates:
+                            Log.note("{{branch}} @ {{revision}} has no pushlog", r.test_build)
+                        else:
+                            r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
                     else:
-                        r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
-                else:
-                    self.unknown_branches.add(branch)
+                        self.unknown_branches.add(branch)
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
 
