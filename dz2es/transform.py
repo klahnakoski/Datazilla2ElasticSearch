@@ -129,6 +129,7 @@ class DZ_to_ES():
                             r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
                     else:
                         self.unknown_branches.add(branch)
+                        Log.note("Whole branch {{branch}} has no pushlog", branch)
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
 

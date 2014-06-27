@@ -94,9 +94,9 @@ def get_existing_ids(es, settings):
                         "query": {"match_all": {}},
                         "filter": {"and": [
                             {"range": {"datazilla.id": {"gte": mini, "lt": maxi}}},
-                            {"or":[
-                                {"not": {"missing": {"field": "test_build.push_date"}}},
-                                {"terms": {"test_build.branch": ["Try", "Try-Non-PGO"]}}
+                            {"or": [
+                                {"not": {"missing": {"field": "test_build.push_date"}}}
+                                # {"terms": {"test_build.branch": ["Try", "Try-Non-PGO"]}}
                             ]}
 
                         ]}
@@ -108,7 +108,7 @@ def get_existing_ids(es, settings):
                 "facets": {
                     "ids": {"terms": {"field": "datazilla.id", "size": interval_size}}
                 }
-            }, timeout=5*60)
+            })
 
             for t in existing_ids.facets.ids.terms:
                 try:
