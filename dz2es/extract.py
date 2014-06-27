@@ -74,7 +74,7 @@ def etl(es_sink, file_sink, settings, transformer, id):
         return False
 
 
-def get_existing_ids(es, settings):
+def get_existing_ids(es, settings, branches):
     #FIND WHAT'S IN ES
     bad_ids = []
     int_ids = set()
@@ -94,11 +94,10 @@ def get_existing_ids(es, settings):
                         "query": {"match_all": {}},
                         "filter": {"and": [
                             {"range": {"datazilla.id": {"gte": mini, "lt": maxi}}},
-                            {"or": [
-                                {"not": {"missing": {"field": "test_build.push_date"}}}
-                                # {"terms": {"test_build.branch": ["Try", "Try-Non-PGO"]}}
+                            {"or":[
+                                {"not": {"missing": {"field": "test_build.push_date"}}},
+                                {"not": {"terms": {"test_build.branch": branches}}}
                             ]}
-
                         ]}
                     }
                 },
@@ -142,7 +141,7 @@ def extract_from_datazilla_using_id(settings, transformer):
             settings.elasticsearch.index = candidates.last()
             es = ElasticSearch(settings.elasticsearch)
 
-    existing_ids = get_existing_ids(es, settings)
+    existing_ids = get_existing_ids(es, settings, transformer.pushlog.keys())
     max_existing_id = nvl(MAX(existing_ids), settings.production.min)
     holes = set(range(settings.production.min, max_existing_id)) - existing_ids
     missing_ids = set(range(settings.production.min, max_existing_id+nvl(settings.production.step, NUM_PER_BATCH))) - existing_ids
