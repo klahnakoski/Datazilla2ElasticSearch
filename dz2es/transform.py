@@ -125,6 +125,7 @@ class DZ_to_ES():
                         possible_dates = wrap(self.pushlog[branch].get(r.test_build.revision, None))
                         if not possible_dates:
                             Log.note("{{branch}} @ {{revision}} has no pushlog", r.test_build)
+                            r.test_build.push_date = r.datazilla.date_loaded,
                         else:
                             r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
                     else:
