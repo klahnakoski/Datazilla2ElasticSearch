@@ -123,7 +123,10 @@ class DZ_to_ES():
                     r.test_build.pgo = True
 
                 with Profiler("get from pushlog"):
-                    if self.pushlog[branch]:
+                    if not self.pushlog:
+                        #NO PUCHLOG MENAS WE DO NOTHING TO MARKUP TEST RESULTS
+                        pass
+                    elif self.pushlog[branch]:
                         possible_dates = self.pushlog[branch][r.test_build.revision]
                         if possible_dates:
                             r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
@@ -132,8 +135,9 @@ class DZ_to_ES():
                             if CNV.milli2datetime(r.datazilla.date_loaded) < TOO_OLD:
                                 r.test_build.no_pushlog = True
                     else:
-                        Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
-                        self.unknown_branches.add(branch)
+                        if branch not in self.unknown_branches:
+                            Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
+                            self.unknown_branches.add(branch)
                         if CNV.milli2datetime(r.datazilla.date_loaded) < TOO_OLD:
                             r.test_build.no_pushlog = True
             except Exception, e:

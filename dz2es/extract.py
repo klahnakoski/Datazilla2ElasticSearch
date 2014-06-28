@@ -79,6 +79,14 @@ def get_existing_ids(es, settings, branches):
     bad_ids = []
     int_ids = set()
 
+    demand_pushlog = {"match_all":{}}
+    if branches:
+        demand_pushlog = {"or": [
+            {"not": {"missing": {"field": "test_build.push_date"}}},
+            {"not": {"missing": {"field": "test_build.no_pushlog"}}}
+        ]}
+
+
     with ESQuery(es) as esq:
 
         max_id = esq.query({
@@ -94,10 +102,7 @@ def get_existing_ids(es, settings, branches):
                         "query": {"match_all": {}},
                         "filter": {"and": [
                             {"range": {"datazilla.id": {"gte": mini, "lt": maxi}}},
-                            {"or": [
-                                {"not": {"missing": {"field": "test_build.push_date"}}},
-                                {"not": {"missing": {"field": "test_build.no_pushlog"}}}
-                            ]}
+                            demand_pushlog
                         ]}
                     }
                 },
