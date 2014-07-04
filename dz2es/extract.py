@@ -150,6 +150,7 @@ def extract_from_datazilla_using_id(settings, transformer):
     max_existing_id = nvl(MAX(existing_ids), settings.production.min)
     holes = set(range(settings.production.min, max_existing_id)) - existing_ids
     missing_ids = set(range(settings.production.min, max_existing_id+nvl(settings.production.step, NUM_PER_BATCH))) - existing_ids
+
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON

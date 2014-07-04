@@ -27,7 +27,10 @@ from dz2es.util.queries import Q
 
 DEBUG = False
 ARRAY_TOO_BIG = 1000
-TOO_OLD = datetime.datetime.utcnow() + datetime.timedelta(days=-30)
+NOW = datetime.datetime.utcnow()
+TOO_OLD = NOW - datetime.timedelta(days=30)
+PUSHLOG_TOO_OLD = NOW - datetime.timedelta(days=7)
+
 
 class DZ_to_ES():
     def __init__(self, pushlog_settings):
@@ -49,7 +52,9 @@ class DZ_to_ES():
                             branches br ON br.id = pl.branch_id
                         LEFT JOIN
                             branch_map bm ON br.id = bm.id
-                    """)
+                        WHERE
+                            pl.date > {{oldest_date}}
+                    """, {"oldest_date": TOO_OLD})
             Log.note("Got pushlog, now indexing...")
             self.pushlog = wrap(Q.index(all_pushlogs, ["branch", "revision"])._data)
             self.unknown_branches = set()
@@ -138,7 +143,7 @@ class DZ_to_ES():
                         if branch not in self.unknown_branches:
                             Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
                             self.unknown_branches.add(branch)
-                        if CNV.milli2datetime(r.datazilla.date_loaded) < TOO_OLD:
+                        if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
                             r.test_build.no_pushlog = True
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
