@@ -9,6 +9,7 @@
 #
 
 from __future__ import unicode_literals
+from __future__ import division
 import sys
 from ..vendor import strangman
 
@@ -35,10 +36,13 @@ if DEBUG_STRANGMAN:
 
 
 def chisquare(f_obs, f_exp):
-    py_result = strangman.stats.chisquare(
-        f_obs,
-        f_exp
-    )
+    try:
+        py_result = strangman.stats.chisquare(
+            f_obs,
+            f_exp
+        )
+    except Exception, e:
+        Log.error("problem with call", e)
 
     if DEBUG_STRANGMAN:
         sp_result = scipy.stats.chisquare(
@@ -229,19 +233,48 @@ class Z_moment(object):
         self.S = tuple(args)
 
     def __add__(self, other):
-        return Z_moment(*map(add, self.S, other.S))
+        if isinstance(other, Z_moment):
+            return Z_moment(*map(add, self.S, other.S))
+        elif hasattr(other, "__iter__"):
+            return Z_moment(*map(add, self.S, Z_moment.new_instance(other)))
+        elif other == None:
+            return self
+        else:
+            return Z_moment(*map(add, self.S, (
+                1,
+                other,
+                pow(other, 2),
+                pow(other, 3),
+                pow(other, 4),
+                pow(other, 2)
+            )))
+
 
     def __sub__(self, other):
-        return Z_moment(*map(sub, self.S, other.S))
+        if isinstance(other, Z_moment):
+            return Z_moment(*map(sub, self.S, other.S))
+        elif hasattr(other, "__iter__"):
+            return Z_moment(*map(sub, self.S, Z_moment.new_instance(other)))
+        elif other == None:
+            return self
+        else:
+            return Z_moment(*map(sub, self.S, (
+                1,
+                other,
+                pow(other, 2),
+                pow(other, 3),
+                pow(other, 4)
+            )))
+
 
     @property
     def tuple(self):
-    #RETURN AS ORDERED TUPLE
+    # RETURN AS ORDERED TUPLE
         return self.S
 
     @property
     def dict(self):
-    #RETURN HASH OF SUMS
+    # RETURN HASH OF SUMS
         return {u"s" + unicode(i): m for i, m in enumerate(self.S)}
 
 
@@ -252,11 +285,15 @@ class Z_moment(object):
 
         return Z_moment(
             len(values),
-            sum([n for n in values]),
+            sum(values),
             sum([pow(n, 2) for n in values]),
             sum([pow(n, 3) for n in values]),
             sum([pow(n, 4) for n in values])
         )
+
+    @property
+    def stats(self, *args, **kwargs):
+        return z_moment2stats(self, *args, **kwargs)
 
 
 def add(a, b):
@@ -268,7 +305,7 @@ def sub(a, b):
 
 
 def z_moment2dict(z):
-    #RETURN HASH OF SUMS
+    # RETURN HASH OF SUMS
     return {u"s" + unicode(i): m for i, m in enumerate(z.S)}
 
 
@@ -308,7 +345,7 @@ def median(values, simple=True, mean_weight=0.0):
                 return float(_sorted[middle - 1] + _median) / 2
             return _median
 
-        #FIND RANGE OF THE median
+        # FIND RANGE OF THE median
         start_index = middle - 1
         while start_index > 0 and _sorted[start_index] == _median:
             start_index -= 1

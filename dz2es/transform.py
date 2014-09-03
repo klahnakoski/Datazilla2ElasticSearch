@@ -8,7 +8,7 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-from math import sqrt
+from math import sqrt, log
 import datetime
 
 import dz2es
@@ -17,7 +17,7 @@ from dz2es.util.collections import MIN, MAX
 from dz2es.util.env.profiles import Profiler
 from dz2es.util.maths import Math
 from dz2es.util.maths.stats import Z_moment, z_moment2stats
-from dz2es.util.struct import Struct
+from dz2es.util.struct import Struct, literal_field, nvl
 from dz2es.util.structs.wraps import wrap
 from dz2es.util.times.timer import Timer
 from dz2es.util.sql.db import DB
@@ -93,23 +93,23 @@ class DZ_to_ES():
                 output = Struct()
 
                 for i in r.mainthread_readbytes:
-                    output[i[1].replace(".", "\.")].name = i[1]
-                    output[i[1].replace(".", "\.")].readbytes = i[0]
+                    output[literal_field(i[1])].name = i[1]
+                    output[literal_field(i[1])].readbytes = i[0]
                 r.mainthread_readbytes = None
 
                 for i in r.mainthread_writebytes:
-                    output[i[1].replace(".", "\.")].name = i[1]
-                    output[i[1].replace(".", "\.")].writebytes = i[0]
+                    output[literal_field(i[1])].name = i[1]
+                    output[literal_field(i[1])].writebytes = i[0]
                 r.mainthread_writebytes = None
 
                 for i in r.mainthread_readcount:
-                    output[i[1].replace(".", "\.")].name = i[1]
-                    output[i[1].replace(".", "\.")].readcount = i[0]
+                    output[literal_field(i[1])].name = i[1]
+                    output[literal_field(i[1])].readcount = i[0]
                 r.mainthread_readcount = None
 
                 for i in r.mainthread_writecount:
-                    output[i[1].replace(".", "\.")].name = i[1]
-                    output[i[1].replace(".", "\.")].writecount = i[0]
+                    output[literal_field(i[1])].name = i[1]
+                    output[literal_field(i[1])].writecount = i[0]
                 r.mainthread_writecount = None
 
                 r.mainthread = output.values()
@@ -184,6 +184,7 @@ class DZ_to_ES():
                             Log.warning("can not reduce series to moments", e)
                         new_records.append(new_record)
             else:
+                total = []
                 for i, (test_name, replicates) in enumerate(r.results.items()):
                     new_record = Struct(
                         test_machine=r.test_machine,
@@ -197,14 +198,31 @@ class DZ_to_ES():
                         }
                     )
                     try:
-                        new_record.result.stats = stats(replicates)
+                        s = stats(replicates)
+                        new_record.result.stats = s
+                        total.append(s)
                     except Exception, e:
                         Log.warning("can not reduce series to moments", e)
                     new_records.append(new_record)
 
+                new_record = Struct(
+                    test_machine=r.test_machine,
+                    datazilla=r.datazilla,
+                    testrun=r.testrun,
+                    test_build=r.test_build,
+                    result={
+                        "test_name": "SUMMARY",
+                        "ordering": -1,
+                        "stats": geo_mean(total)
+                    }
+                )
+                new_records.append(new_record)
+
+
             return new_records
         except Exception, e:
             Log.error("Transformation failure", e)
+
 
 def stats(values):
     """
@@ -230,3 +248,16 @@ def stats(values):
         s.std = sqrt(s.variance)
 
     return s
+
+
+def geo_mean(values):
+    """
+    GIVEN AN ARRAY OF dicts, CALC THE GEO-MEAN ON EACH ATTRIBUTE
+    """
+    agg = Struct()
+    for d in values:
+        for k, v in d.items():
+            agg[k] = nvl(agg[k], Z_moment.new_instance()) + Math.log(Math.abs(v))
+    return {k: Math.exp(v.stats.mean) for k, v in agg.items()}
+
+
