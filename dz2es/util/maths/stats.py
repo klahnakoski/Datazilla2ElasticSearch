@@ -9,15 +9,15 @@
 #
 
 from __future__ import unicode_literals
-from __future__ import division
-import sys
-from ..vendor import strangman
 
+import sys
 from math import sqrt
+
 from ..cnv import CNV
 from ..collections import OR
-from ..struct import nvl, Struct, Null
 from ..env.logs import Log
+from ..struct import nvl, Struct, Null
+from ..vendor import strangman
 
 
 DEBUG = True
