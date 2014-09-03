@@ -8,7 +8,10 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-from ..collections import PRODUCT, reverse, MAX, MIN
+from __future__ import division
+
+
+from ..collections import PRODUCT, reverse, MAX, MIN, OR
 from ..cnv import CNV
 from ..env.logs import Log
 from ..struct import Null, Struct
@@ -39,7 +42,7 @@ class Matrix(object):
 
         self.num = len(dims)
         self.dims = tuple(dims)
-        if self.num == 0:
+        if self.num == 0 or OR(d == 0 for d in dims):  #NO DIMS, OR HAS A ZERO DIM, THEN IT IS A NULL CUBE
             self.cube = Null
         else:
             self.cube = _null(*dims)
@@ -136,7 +139,7 @@ class Matrix(object):
         SLICE THIS MATRIX INTO ONES WITH LESS DIMENSIONALITY
         """
 
-        #offsets WILL SERVE TO MASK DIMS WE ARE NOT GROUPING BY, AND SERVE AS RELATIVE INDEX FOR EACH COORDINATE
+        # offsets WILL SERVE TO MASK DIMS WE ARE NOT GROUPING BY, AND SERVE AS RELATIVE INDEX FOR EACH COORDINATE
         offsets = []
         new_dim = []
         acc = 1

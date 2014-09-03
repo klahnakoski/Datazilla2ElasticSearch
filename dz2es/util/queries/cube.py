@@ -8,6 +8,7 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
+from __future__ import division
 from .. import struct
 from ..collections.matrix import Matrix
 from ..collections import MAX, OR
@@ -32,7 +33,7 @@ class Cube(object):
         self.is_value = False if isinstance(select, list) else True
         self.select = select
 
-        #ENSURE frum IS PROPER FORM
+        # ENSURE frum IS PROPER FORM
         if isinstance(select, list):
             if OR(not isinstance(v, Matrix) for v in data.values()):
                 Log.error("Expecting data to be a dict with Matrix values")
@@ -179,10 +180,10 @@ class Cube(object):
 
         if len(stacked) + len(remainder) != len(self.edges):
             Log.error("can not find some edges to group by")
-        #CACHE SOME RESULTS
+        # CACHE SOME RESULTS
         keys = [e.name for e in self.edges]
         getKey = [e.domain.getKey for e in self.edges]
-        lookup = [[getKey[i](p) for p in e.domain.partitions] for i, e in enumerate(self.edges)]
+        lookup = [[getKey[i](p) for p in e.domain.partitions+([None] if e.allowNulls else [])] for i, e in enumerate(self.edges)]
 
         def coord2term(coord):
             output = wrap_dot({keys[i]: lookup[i][c] for i, c in enumerate(coord)})
