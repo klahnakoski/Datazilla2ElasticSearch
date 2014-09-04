@@ -13,6 +13,7 @@ from __future__ import division
 from datetime import datetime
 from time import clock
 from ..collections import MAX
+from dz2es.util.structs.wraps import wrap
 from ..struct import Struct
 
 ON = False
@@ -87,7 +88,7 @@ def write(profile_settings):
         r = range(MAX([len(p.samples) for p in profs]))
         profs.insert(0, Struct(description="index", samples=r))
         stats = [
-            {p.description: p.samples[i] for p in profs if p.samples}
+            {p.description: wrap(p.samples)[i] for p in profs if p.samples}
             for i in r
         ]
         if stats:
