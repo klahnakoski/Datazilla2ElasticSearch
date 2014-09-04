@@ -260,7 +260,8 @@ def geo_mean(values):
     agg = Struct()
     for d in values:
         for k, v in d.items():
-            agg[k] = nvl(agg[k], Z_moment.new_instance()) + Math.log(Math.abs(v))
+            if v != 0:
+                agg[k] = nvl(agg[k], Z_moment.new_instance()) + Math.log(Math.abs(v))
     return {k: Math.exp(v.stats.mean) for k, v in agg.items()}
 
 
