@@ -9,6 +9,7 @@
 #
 
 from __future__ import unicode_literals
+from __future__ import division
 
 import sys
 from math import sqrt
@@ -334,7 +335,7 @@ def median(values, simple=True, mean_weight=0.0):
         l = len(values)
         _sorted = sorted(values)
 
-        middle = l / 2
+        middle = int(l / 2)
         _median = float(_sorted[middle])
 
         if len(_sorted) == 1:
@@ -342,7 +343,7 @@ def median(values, simple=True, mean_weight=0.0):
 
         if simple:
             if l % 2 == 0:
-                return float(_sorted[middle - 1] + _median) / 2
+                return (_sorted[middle - 1] + _median) / 2
             return _median
 
         # FIND RANGE OF THE median
@@ -358,14 +359,14 @@ def median(values, simple=True, mean_weight=0.0):
 
         if l % 2 == 0:
             if num_middle == 1:
-                return float(_sorted[middle - 1] + _median) / 2
+                return (_sorted[middle - 1] + _median) / 2
             else:
-                return (_median - 0.5) + float(middle - start_index) / float(num_middle)
+                return (_median - 0.5) + (middle - start_index) / num_middle
         else:
             if num_middle == 1:
                 return (1 - mean_weight) * _median + mean_weight * (_sorted[middle - 1] + _sorted[middle + 1]) / 2
             else:
-                return (_median - 0.5) + float(middle + 0.5 - start_index) / float(num_middle)
+                return (_median - 0.5) + (middle + 0.5 - start_index) / num_middle
     except Exception, e:
         Log.error("problem with median of {{values}}", {"values": values}, e)
 

@@ -162,6 +162,7 @@ class DZ_to_ES():
                 new_records.append(remainder)
 
             #RECORD TEST RESULTS
+            total = []
             if r.testrun.suite in ["dromaeo_css", "dromaeo_dom"]:
                 #dromaeo IS SPECIAL, REPLICATES ARE IN SETS OF FIVE
                 #RECORD ALL RESULTS
@@ -179,12 +180,13 @@ class DZ_to_ES():
                             }
                         )
                         try:
-                            new_record.result.stats = stats(sub_results)
+                            s = stats(sub_results)
+                            new_record.result.stats = s
+                            total.append(s)
                         except Exception, e:
                             Log.warning("can not reduce series to moments", e)
                         new_records.append(new_record)
             else:
-                total = []
                 for i, (test_name, replicates) in enumerate(r.results.items()):
                     new_record = Struct(
                         test_machine=r.test_machine,
@@ -205,6 +207,8 @@ class DZ_to_ES():
                         Log.warning("can not reduce series to moments", e)
                     new_records.append(new_record)
 
+            # ADD RECORD FOR GEOMETRIC MEAN SUMMARY
+            if len(total) > 1:
                 new_record = Struct(
                     test_machine=r.test_machine,
                     datazilla=r.datazilla,
@@ -217,7 +221,6 @@ class DZ_to_ES():
                     }
                 )
                 new_records.append(new_record)
-
 
             return new_records
         except Exception, e:
