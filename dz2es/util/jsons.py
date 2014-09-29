@@ -154,7 +154,7 @@ def _value2json(value, _buffer):
         else:
             raise Exception(repr(value) + " is not JSON serializable")
     except Exception, e:
-        raise Exception(repr(value) + " is not JSON serializable")
+        raise Exception(repr(value) + " is not JSON serializable (becasue "+e.message+")")
 
 def _list2json(value, _buffer):
     if not value:
