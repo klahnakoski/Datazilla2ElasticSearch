@@ -16,8 +16,8 @@ from dz2es.util.cnv import CNV
 from dz2es.util.collections import MIN, MAX
 from dz2es.util.env.profiles import Profiler
 from dz2es.util.maths import Math
-from dz2es.util.maths.stats import Z_moment, z_moment2stats
-from dz2es.util.struct import Struct, literal_field, nvl
+from dz2es.util.maths.stats import Z_moment, z_moment2stats, Stats
+from dz2es.util.struct import Struct, literal_field, nvl, StructList
 from dz2es.util.structs.wraps import wrap
 from dz2es.util.times.timer import Timer
 from dz2es.util.sql.db import DB
@@ -162,7 +162,7 @@ class DZ_to_ES():
                 new_records.append(remainder)
 
             #RECORD TEST RESULTS
-            total = []
+            total = StructList()
             if r.testrun.suite in ["dromaeo_css", "dromaeo_dom"]:
                 #dromaeo IS SPECIAL, REPLICATES ARE IN SETS OF FIVE
                 #RECORD ALL RESULTS
@@ -207,8 +207,10 @@ class DZ_to_ES():
                         Log.warning("can not reduce series to moments", e)
                     new_records.append(new_record)
 
-            # ADD RECORD FOR GEOMETRIC MEAN SUMMARY
+
             if len(total) > 1:
+                # ADD RECORD FOR GEOMETRIC MEAN SUMMARY
+
                 new_record = Struct(
                     test_machine=r.test_machine,
                     datazilla=r.datazilla,
@@ -218,6 +220,20 @@ class DZ_to_ES():
                         "test_name": "SUMMARY",
                         "ordering": -1,
                         "stats": geo_mean(total)
+                    }
+                )
+                new_records.append(new_record)
+
+                # ADD RECORD FOR GRAPH SERVER SUMMARY
+                new_record = Struct(
+                    test_machine=r.test_machine,
+                    datazilla=r.datazilla,
+                    testrun=r.testrun,
+                    test_build=r.test_build,
+                    result={
+                        "test_name": "summary_old",
+                        "ordering": -1,
+                        "stats": Stats(samples=Q.sort(total.mean)[:-1])
                     }
                 )
                 new_records.append(new_record)
