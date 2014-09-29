@@ -233,7 +233,7 @@ class DZ_to_ES():
                     result={
                         "test_name": "summary_old",
                         "ordering": -1,
-                        "stats": Stats(samples=Q.sort(total.mean)[:-1])
+                        "stats": Stats(samples=Q.sort(total.mean)[:len(total)-1:])
                     }
                 )
                 new_records.append(new_record)
