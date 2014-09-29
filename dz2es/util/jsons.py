@@ -104,55 +104,57 @@ class cPythonJSONEncoder(object):
 
 
 def _value2json(value, _buffer):
-    if value == None:
-        append(_buffer, u"null")
-        return
-    elif value is True:
-        append(_buffer, u"true")
-        return
-    elif value is False:
-        append(_buffer, u"false")
-        return
+    try:
+        if value == None:
+            append(_buffer, u"null")
+            return
+        elif value is True:
+            append(_buffer, u"true")
+            return
+        elif value is False:
+            append(_buffer, u"false")
+            return
 
-    type = value.__class__
-    if type in (dict, Struct):
-        if value:
-            _dict2json(value, _buffer)
+        type = value.__class__
+        if type in (dict, Struct):
+            if value:
+                _dict2json(value, _buffer)
+            else:
+                append(_buffer, u"{}")
+        elif type is str:
+            append(_buffer, u"\"")
+            v = value.decode("utf8")
+            for c in v:
+                append(_buffer, ESCAPE_DCT.get(c, c))
+            append(_buffer, u"\"")
+        elif type is unicode:
+            append(_buffer, u"\"")
+            for c in value:
+                append(_buffer, ESCAPE_DCT.get(c, c))
+            append(_buffer, u"\"")
+        elif type in (int, long, Decimal):
+            append(_buffer, unicode(value))
+        elif type is float:
+            append(_buffer, unicode(repr(value)))
+        elif type in (set, list, tuple, StructList):
+            _list2json(value, _buffer)
+        elif type is date:
+            append(_buffer, unicode(long(time.mktime(value.timetuple()) * 1000)))
+        elif type is datetime:
+            append(_buffer, unicode(long(time.mktime(value.timetuple()) * 1000)))
+        elif type is timedelta:
+            append(_buffer, "\"")
+            append(_buffer, unicode(value.total_seconds()))
+            append(_buffer, "second\"")
+        elif hasattr(value, '__json__'):
+            j = value.__json__()
+            append(_buffer, j)
+        elif hasattr(value, '__iter__'):
+            _iter2json(value, _buffer)
         else:
-            append(_buffer, u"{}")
-    elif type is str:
-        append(_buffer, u"\"")
-        v = value.decode("utf8")
-        for c in v:
-            append(_buffer, ESCAPE_DCT.get(c, c))
-        append(_buffer, u"\"")
-    elif type is unicode:
-        append(_buffer, u"\"")
-        for c in value:
-            append(_buffer, ESCAPE_DCT.get(c, c))
-        append(_buffer, u"\"")
-    elif type in (int, long, Decimal):
-        append(_buffer, unicode(value))
-    elif type is float:
-        append(_buffer, unicode(repr(value)))
-    elif type in (set, list, tuple, StructList):
-        _list2json(value, _buffer)
-    elif type is date:
-        append(_buffer, unicode(long(time.mktime(value.timetuple()) * 1000)))
-    elif type is datetime:
-        append(_buffer, unicode(long(time.mktime(value.timetuple()) * 1000)))
-    elif type is timedelta:
-        append(_buffer, "\"")
-        append(_buffer, unicode(value.total_seconds()))
-        append(_buffer, "second\"")
-    elif hasattr(value, '__json__'):
-        j = value.__json__()
-        append(_buffer, j)
-    elif hasattr(value, '__iter__'):
-        _iter2json(value, _buffer)
-    else:
+            raise Exception(repr(value) + " is not JSON serializable")
+    except Exception, e:
         raise Exception(repr(value) + " is not JSON serializable")
-
 
 def _list2json(value, _buffer):
     if not value:
