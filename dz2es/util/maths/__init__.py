@@ -129,8 +129,10 @@ class Math(object):
         """
         if value == None:
             return None
+        else:
+            value = float(value)
 
-        if digits != None:
+        if digits is None:
             m = pow(10, math.ceil(math.log10(value)))
             return __builtin__.round(value / m, digits) * m
 
@@ -165,8 +167,8 @@ class Math(object):
         return value
 
     @staticmethod
-    def ceiling(value):
-        return int(math.ceil(value))
+    def ceiling(value, mod=1):
+        return int(math.ceil(value/mod))*mod
 
 
     @staticmethod

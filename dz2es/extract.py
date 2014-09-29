@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import functools
 import requests
 from dz2es.util.collections import MAX
+from dz2es.util.env.elasticsearch import Cluster, Index
 from dz2es.util.env.files import File
 from dz2es.util.env.profiles import Profiler
 from dz2es.util.queries import Q
@@ -21,7 +22,6 @@ from dz2es.util.env import startup
 from dz2es.util.cnv import CNV
 from dz2es.util.thread.threads import ThreadedQueue
 from transform import DZ_to_ES
-from dz2es.util.env.elasticsearch import ElasticSearch
 from dz2es.util.times.timer import Timer
 from dz2es.util.thread.multithread import Multithread
 
@@ -126,25 +126,7 @@ def get_existing_ids(es, settings, branches):
         return existing_ids
 
 
-def extract_from_datazilla_using_id(settings, transformer):
-    es = ElasticSearch(settings.elasticsearch)
-
-    #FIND SPECIFIC INDEX
-    if settings.elasticsearch.alias == Null:
-        settings.elasticsearch.alias = settings.elasticsearch.index
-    if settings.elasticsearch.alias == settings.elasticsearch.index:
-        candidates = es.get_proto(settings.elasticsearch.alias)
-        current = es.get_index(settings.elasticsearch.alias)
-        if not candidates:
-            if not current or settings.args.restart:
-                settings.args.restart = True
-                es = reset(settings)
-            else:
-                settings.elasticsearch.index = current
-                es = ElasticSearch(settings.elasticsearch)
-        else:
-            settings.elasticsearch.index = candidates.last()
-            es = ElasticSearch(settings.elasticsearch)
+def extract_from_datazilla_using_id(es, settings, transformer):
 
     existing_ids = get_existing_ids(es, settings, transformer.pushlog.keys())
     max_existing_id = nvl(MAX(existing_ids), settings.production.min)
@@ -238,12 +220,7 @@ def reset(settings):
     schema_json = File(settings.param.schema_file).read()
     schema = CNV.JSON2object(schema_json, {"type": settings.elasticsearch.type}, flexible=True)
 
-    # USE UNIQUE NAME EACH TIME RUN
-    if settings.elasticsearch.alias == Null:
-        settings.elasticsearch.alias = settings.elasticsearch.index
-    settings.elasticsearch.index = ElasticSearch.proto_name(settings.elasticsearch.alias)
-
-    es = ElasticSearch.create_index(settings.elasticsearch, schema, limit_replicas=True)
+    es = Cluster(settings.elasticsearch).create_index(settings.elasticsearch)
     return es
 
 
@@ -280,8 +257,13 @@ def main():
 
             #RESET ONLY IF NEW Transform IS USED
             if settings.args.restart:
-                reset(settings)
-            extract_from_datazilla_using_id(settings, transformer)
+                es = Cluster(settings.elasticsearch).create_index(settings.elasticsearch)
+                es.add_alias()
+                es.delete_all_but_self()
+                extract_from_datazilla_using_id(es, settings, transformer)
+            else:
+                es = Cluster(settings.elasticsearch).get_or_create_index(settings.elasticsearch)
+                extract_from_datazilla_using_id(es, settings, transformer)
     finally:
         Log.stop()
 

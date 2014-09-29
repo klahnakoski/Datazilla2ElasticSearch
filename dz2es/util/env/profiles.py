@@ -13,7 +13,7 @@ from __future__ import division
 from datetime import datetime
 from time import clock
 from ..collections import MAX
-from dz2es.util.structs.wraps import wrap
+from ..structs.wraps import wrap
 from ..struct import Struct
 
 ON = False
