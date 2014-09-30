@@ -210,7 +210,7 @@ def extract_from_datazilla_using_id(es, settings, transformer):
 
     #FINISH ES SETUP SO IT CAN BE QUERIED
     es.set_refresh_interval(1)
-    es.delete_all_but(settings.elasticsearch.alias, settings.elasticsearch.index)
+    es.delete_all_but_self()
     es.add_alias(settings.elasticsearch.alias)
 
 
