@@ -33,7 +33,7 @@ json_decoder = json.JSONDecoder().decode
 #    ITS JOB.  ALONG WITH THE UnicodeBuilder WE GET NEAR C SPEEDS
 
 
-use_pypy = False
+use_pypy = True
 try:
     # UnicodeBuilder IS ABOUT 2x FASTER THAN list()
     # use_pypy = True
@@ -42,7 +42,12 @@ try:
     use_pypy = True
 except Exception, e:
     if use_pypy:
-        sys.stdout.write("The PyPy JSON serializer is in use!  Currently running CPython, not a good mix.")
+        sys.stdout.write(
+            "*********************************************************\n"
+            "** The PyLibrary JSON serializer for PyPy is in use!\n"
+            "** Currently running CPython: This will run sloooow!\n"
+            "*********************************************************\n"
+        )
 
     class UnicodeBuilder(list):
         def __init__(self, length=None):
@@ -152,9 +157,14 @@ def _value2json(value, _buffer):
         elif hasattr(value, '__iter__'):
             _iter2json(value, _buffer)
         else:
-            raise Exception(repr(value) + " is not JSON serializable")
+            from .env.logs import Log
+
+            Log.error(repr(value) + " is not JSON serializable")
     except Exception, e:
-        raise Exception(repr(value) + " is not JSON serializable (becasue "+e.message+")")
+        from .env.logs import Log
+
+        Log.error(repr(value) + " is not JSON serializable", e)
+
 
 def _list2json(value, _buffer):
     if not value:

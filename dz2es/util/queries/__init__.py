@@ -12,8 +12,6 @@ from ..struct import Struct, nvl
 
 INDEX_CACHE = {}  # MATCH NAMES TO FULL CONNECTION INFO
 
-
-
 def _normalize_select(select, schema=None):
     if isinstance(select, basestring):
         if schema:

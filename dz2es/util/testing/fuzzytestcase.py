@@ -7,8 +7,11 @@
 #
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from math import log10
+from string import Template
 
 import unittest
+from ..struct import nvl
 from ..maths import Math
 from ..structs.wraps import wrap
 
@@ -35,13 +38,15 @@ def assertAlmostEqual(first, second, places=None, msg=None, delta=None):
         assertAlmostEqualValue(first, second, places=places, msg=msg, delta=delta)
 
 
-def assertAlmostEqualValue(first, second, places=None, msg=None, delta=None):
+def assertAlmostEqualValue(first, second, digits=None, places=None, msg=None, delta=None):
     """
     Snagged from unittest/case.py, then modified (Aug2014)
     """
     if first == second:
         # shortcut
         return
+
+    places = places if places is not None else digits
     if delta is not None and places is not None:
         raise TypeError("specify delta or places not both")
 
@@ -49,24 +54,26 @@ def assertAlmostEqualValue(first, second, places=None, msg=None, delta=None):
         if abs(first - second) <= delta:
             return
 
-        standardMsg = '%s != %s within %s delta' % (
-            repr(first),
-            repr(second),
-            repr(delta)
-        )
+        standardMsg = Template("{{first}} != {{second}} within {{delta}} delta").substitute({
+            "first": first,
+            "second": second,
+            "delta": delta
+        })
     else:
         if places is None:
             places = 18
 
-        if Math.round(first, digits=places) == Math.round(second, digits=places):
+        diff = log10(abs(first-second))
+        if diff < Math.ceiling(log10(abs(first)))-places:
             return
 
-        standardMsg = '%s != %s within %r places' % (
-            repr(first),
-            repr(second),
-            places
-        )
-    raise AssertionError(msg + ": (" + standardMsg + ")")
+        standardMsg = Template("{{first}} != {{second}} within {{places}} places").substitute({
+            "first": first,
+            "second": second,
+            "": places
+        })
+
+    raise AssertionError(nvl(msg, "") + ": (" + standardMsg + ")")
 
 
 

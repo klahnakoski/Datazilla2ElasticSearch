@@ -18,7 +18,7 @@ from dz2es.util.env.profiles import Profiler
 from dz2es.util.maths import Math
 from dz2es.util.maths.stats import Z_moment, z_moment2stats, Stats
 from dz2es.util.struct import Struct, literal_field, nvl, StructList
-from dz2es.util.structs.wraps import wrap
+from dz2es.util.structs.wraps import wrap, unwrap
 from dz2es.util.times.timer import Timer
 from dz2es.util.sql.db import DB
 from dz2es.util.env.logs import Log
@@ -238,7 +238,7 @@ class DZ_to_ES():
                 )
                 new_records.append(new_record)
 
-            return new_records
+            return unwrap(new_records)
         except Exception, e:
             Log.error("Transformation failure", e)
 
