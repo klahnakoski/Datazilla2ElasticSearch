@@ -58,7 +58,7 @@ def etl(es_sink, file_sink, settings, transformer, id):
                 result = transformer.transform(id, data)
 
             Log.println("{{num}} records to add", {
-                "num": len(data)
+                "num": len(result)
             })
             es_sink.extend({"value": d} for d in result)
             file_sink.add(str(id) + "\t" + content + "\n")
