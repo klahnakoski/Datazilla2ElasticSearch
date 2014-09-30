@@ -49,14 +49,17 @@ def etl(es_sink, file_sink, settings, transformer, id):
         content = CNV.object2JSON(data)  #ENSURE content HAS NO crlf
 
         if data.test_run_id:
-            Log.println("Add {{id}} for revision {{revision}} ({{size}} bytes)", {
+            Log.println("Add {{id}} for revision {{revision}} ({{bytes}} bytes)", {
                 "id": id,
                 "revision": data.json_blob.test_build.revision,
-                "size": len(content)
+                "bytes": len(content)
             })
             with Profiler("transform"):
                 data = transformer.transform(id, data)
 
+            Log.println("{{num}} records to add", {
+                "num": len(data)
+            })
             es_sink.extend({"value": d} for d in data)
             file_sink.add(str(id) + "\t" + content + "\n")
         elif data.error_flag == 'Y':
