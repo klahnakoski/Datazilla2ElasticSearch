@@ -9,6 +9,7 @@
 #
 from __future__ import unicode_literals
 import functools
+import gc
 import requests
 from dz2es.util.collections import MAX
 from dz2es.util.env.elasticsearch import Cluster, Index
@@ -62,6 +63,7 @@ def etl(es_sink, file_sink, settings, transformer, id):
             })
             es_sink.extend({"value": d} for d in result)
             file_sink.add(str(id) + "\t" + content + "\n")
+            gc.collect()
         elif data.error_flag == 'Y':
             error = data.json_blob
             error.datazilla = data
