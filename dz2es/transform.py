@@ -140,7 +140,7 @@ class DZ_to_ES():
                             if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
                                 r.test_build.no_pushlog = True
                             else:
-                                return []  # DO NOT ADD RECORD YET
+                                return []  # TRY AGAIN LATER
                     else:
                         if branch not in self.unknown_branches:
                             Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
@@ -148,7 +148,8 @@ class DZ_to_ES():
                         if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
                             r.test_build.no_pushlog = True
                         else:
-                            return []  # DO NOT ADD RECORD YET
+                            r.datzilla.import_status = "no pushlog for branch"
+                            return [r]  # ADD RAW RECORD AS PLACEHOLDER
 
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
