@@ -90,9 +90,11 @@ def get_existing_ids(es, settings, branches):
             {"not": {"missing": {"field": "test_build.no_pushlog"}}}
         ]}
 
+    if settings.elasticsearch.debug and settings.production.step < 10:
+        # SIMPLY RELOAD THIS SMALL NUMBER
+        return set([])
 
     with ESQuery(es) as esq:
-
         max_id = esq.query({
             "from": es.settings.alias,
             "select": {"value": "datazilla.id", "aggregate": "max"}
