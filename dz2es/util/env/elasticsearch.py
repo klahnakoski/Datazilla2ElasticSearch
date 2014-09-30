@@ -60,6 +60,9 @@ class Index(object):
 
         self.debug = nvl(settings.debug, DEBUG)
         globals()["DEBUG"] = OR(self.debug, DEBUG)
+        if self.debug:
+            Log.note("elasticsearch debugging is on")
+
         self.settings = settings
         self.cluster = Cluster(settings)
 
@@ -193,13 +196,14 @@ class Index(object):
 
                 lines.append('{"index":{"_id": ' + CNV.object2JSON(id) + '}}')
                 lines.append(json)
+            del records
 
             if not lines:
                 return
-
             try:
                 data_bytes = "\n".join(lines) + "\n"
                 data_bytes = data_bytes.encode("utf8")
+                del lines
             except Exception, e:
                 Log.error("can not make request body from\n{{lines|indent}}", {"lines": lines}, e)
 

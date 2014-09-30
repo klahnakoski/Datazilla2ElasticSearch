@@ -207,7 +207,6 @@ class DZ_to_ES():
                         Log.warning("can not reduce series to moments", e)
                     new_records.append(new_record)
 
-
             if len(total) > 1:
                 # ADD RECORD FOR GEOMETRIC MEAN SUMMARY
 
@@ -238,7 +237,7 @@ class DZ_to_ES():
                 )
                 new_records.append(new_record)
 
-            return unwrap(new_records)
+            return new_records
         except Exception, e:
             Log.error("Transformation failure", e)
 
