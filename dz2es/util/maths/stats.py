@@ -16,6 +16,7 @@ from math import sqrt
 
 from ..cnv import CNV
 from ..collections import OR
+from __init__ import Math, almost_equal
 from ..env.logs import Log
 from ..struct import nvl, Struct, Null
 from ..vendor import strangman
@@ -24,12 +25,11 @@ from ..vendor import strangman
 DEBUG = True
 DEBUG_STRANGMAN = True
 EPSILON = 0.000000001
-ABS_EPSILON = sys.float_info.min*2  # *2 FOR SAFETY
-
+ABS_EPSILON = sys.float_info.min * 2  # *2 FOR SAFETY
 
 if DEBUG_STRANGMAN:
     try:
-        import numpy
+        import numpy as np
         from scipy import stats
         import scipy
     except Exception, e:
@@ -46,15 +46,16 @@ def chisquare(f_obs, f_exp):
         Log.error("problem with call", e)
 
     if DEBUG_STRANGMAN:
+        from ..testing.fuzzytestcase import assertAlmostEqualValue
+
         sp_result = scipy.stats.chisquare(
-            numpy.array(f_obs),
-            f_exp=numpy.array(f_exp)
+            np.array(f_obs),
+            f_exp=np.array(f_exp)
         )
-        if not closeEnough(sp_result[0], py_result[0]) and closeEnough(sp_result[1], py_result[1]):
+        if not assertAlmostEqualValue(sp_result[0], py_result[0], digits=9) and assertAlmostEqualValue(sp_result[1], py_result[1], delta=1e-8):
             Log.error("problem with stats lib")
 
     return py_result
-
 
 
 def stats2z_moment(stats):
@@ -72,38 +73,21 @@ def stats2z_moment(stats):
 
     m = Z_moment(mz0, mz1, mz2, mz3, mz4)
     if DEBUG:
+        from ..testing.fuzzytestcase import assertAlmostEqualValue
+
         globals()["DEBUG"] = False
         try:
             v = z_moment2stats(m, unbiased=False)
-            assert closeEnough(v.count, stats.count)
-            assert closeEnough(v.mean, stats.mean)
-            assert closeEnough(v.variance, stats.variance)
-            assert closeEnough(v.skew, stats.skew)
-            assert closeEnough(v.kurtosis, stats.vkurtosis)
+            assertAlmostEqualValue(v.count, stats.count)
+            assertAlmostEqualValue(v.mean, stats.mean)
+            assertAlmostEqualValue(v.variance, stats.variance)
+            assertAlmostEqualValue(v.skew, stats.skew)
+            assertAlmostEqualValue(v.kurtosis, stats.vkurtosis)
         except Exception, e:
             v = z_moment2stats(m, unbiased=False)
             Log.error("programmer error")
         globals()["DEBUG"] = True
     return m
-
-
-def closeEnough(a, b):
-    if a == None and b == None:
-        return True
-    if a == None or b == None:
-        return False
-
-    if abs(a - b) < ABS_EPSILON:
-        return True
-
-    if abs(b) > abs(a):
-        err = abs((a - b) / b)
-    else:
-        err = abs((a - b) / a)
-
-    if err < EPSILON:
-        return True
-    return False
 
 
 def z_moment2stats(z_moment, unbiased=True):
@@ -122,16 +106,12 @@ def z_moment2stats(z_moment, unbiased=True):
         skew = None
         kurtosis = None
     else:
-        variance = (Z2 - mean * mean)
-        error = -EPSILON * (abs(Z2) + 1)  # EXPECTED FLOAT ERROR
-
-        if error < variance <= 0:  # TODO: MAKE THIS A TEST ON SIGNIFICANT DIGITS
+        if almost_equal(Z2, mean * mean, digits=9):
             variance = 0
             skew = None
             kurtosis = None
-        elif variance < error:
-            Log.error("variance can not be negative ({{var}})", {"var": variance})
         else:
+            variance = (Z2 - mean * mean)
             mc3 = (Z3 - (3 * mean * variance + mean ** 3))  # 3rd central moment
             mc4 = (Z4 - (4 * mean * mc3 + 6 * mean * mean * variance + mean ** 4))
             skew = mc3 / (variance ** 1.5)
@@ -147,14 +127,16 @@ def z_moment2stats(z_moment, unbiased=True):
     )
 
     if DEBUG:
+        from ..testing.fuzzytestcase import assertAlmostEqualValue
+
         globals()["DEBUG"] = False
-        v=Null
+        v = Null
         try:
             v = stats2z_moment(stats)
             for i in range(5):
-                assert closeEnough(v.S[i], Z[i])
+                assertAlmostEqualValue(v.S[i], Z[i], digits=6)
         except Exception, e:
-            Log.error("Convertion failed.  Programmer error:\nfrom={{from|indent}},\nresult stats={{stats|indent}},\nexpected parem={{expected|indent}}", {
+            Log.error("Convertion failed.  Programmer error:\nfrom={{from|indent}},\nresult stats={{stats|indent}},\nexpected param={{expected|indent}}", {
                 "from": Z,
                 "stats": stats,
                 "expected": v.S
@@ -165,8 +147,15 @@ def z_moment2stats(z_moment, unbiased=True):
 
 
 class Stats(Struct):
+
     def __init__(self, **kwargs):
         Struct.__init__(self)
+
+        self.count = 0
+        self.mean = None
+        self.variance = None
+        self.skew = None
+        self.kurtosis = None
 
         if "samples" in kwargs:
             s = z_moment2stats(Z_moment.new_instance(kwargs["samples"]))
@@ -223,6 +212,15 @@ class Stats(Struct):
     @property
     def std(self):
         return sqrt(self.variance)
+
+    @property
+    def __class__(self):
+        """
+        TRICK JSON SERIALIZATION (AND OTHERS) THAT THIS IS JUST ANOTHER Struct
+        """
+        return Struct
+
+
 
 
 class Z_moment(object):

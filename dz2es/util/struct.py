@@ -39,7 +39,7 @@ class Struct(dict):
        > True
     2b) missing keys is important when dealing with JSON, which is often almost
         anything
-    2c) you loose the ability to perform <code>a is None</code> checks, must
+    2c) you loose the ability to perform <code>a is None</code> checks, you must
         always use <code>a == None</code> instead
     3) you can access paths as a variable:   a["b.c"]==a.b.c
     4) you can set paths to values, missing dicts along the path are created:
@@ -49,10 +49,9 @@ class Struct(dict):
        > a == {"b": {"c": 42}}
     5) attribute names (keys) are corrected to unicode - it appears Python
        object.getattribute() is called with str() even when using
-       <code>from __future__ import unicode_literals
-from __future__ import division</code>
+       <code>from __future__ import unicode_literals</code>
 
-    More on missing values: http://www.numpy.org/NA-overview.html
+    More on missing values: http://www.np.org/NA-overview.html
     it only considers the legitimate-field-with-missing-value (Statistical Null)
     and does not look at field-does-not-exist-in-this-context (Database Null)
 
@@ -280,6 +279,7 @@ from __future__ import division</code>
     def setdefault(self, k, d=None):
         if self[k] == None:
             self[k] = d
+        return self
 
 # KEEP TRACK OF WHAT ATTRIBUTES ARE REQUESTED, MAYBE SOME (BUILTIN) ARE STILL USEFUL
 requested = set()
@@ -358,10 +358,25 @@ def _getdefault(obj, key):
     try:
         return obj.__getattribute__(key)
     except Exception, e:
-        try:
-            return obj[key]
-        except Exception, f:
-            return NullType(obj, key)
+        pass
+
+    try:
+        return obj[key]
+    except Exception, f:
+        pass
+
+    try:
+        if float(key) == round(float(key), 0):
+            return eval("obj["+key+"]")
+    except Exception, f:
+        pass
+
+    try:
+        return eval("obj."+unicode(key))
+    except Exception, f:
+        pass
+
+    return NullType(obj, key)
 
 
 def _assign(obj, path, value, force=True):
@@ -440,6 +455,12 @@ class NullType(object):
         return Null
 
     def __rdiv__(self, other):
+        return Null
+
+    def __truediv__(self, other):
+        return Null
+
+    def __rtruediv__(self, other):
         return Null
 
     def __gt__(self, other):
