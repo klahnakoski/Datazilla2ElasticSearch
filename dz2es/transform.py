@@ -148,8 +148,8 @@ class DZ_to_ES():
                         if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
                             r.test_build.no_pushlog = True
                         else:
-                            r.datzilla.import_status = "no pushlog for branch"
-                            return [r]  # ADD RAW RECORD AS PLACEHOLDER
+                            r.test_build.no_pushlog = True
+                            #return [r]  #TODO: DO THIS IF WE FIGURE OUT HOW TO HANDLE THE VERY LARGE NUMBER OF RESULTS WITH NO PUSHLOG
 
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
