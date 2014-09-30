@@ -55,12 +55,12 @@ def etl(es_sink, file_sink, settings, transformer, id):
                 "bytes": len(content)
             })
             with Profiler("transform"):
-                data = transformer.transform(id, data)
+                result = transformer.transform(id, data)
 
             Log.println("{{num}} records to add", {
                 "num": len(data)
             })
-            es_sink.extend({"value": d} for d in data)
+            es_sink.extend({"value": d} for d in result)
             file_sink.add(str(id) + "\t" + content + "\n")
         elif data.error_flag == 'Y':
             error = data.json_blob
@@ -71,6 +71,7 @@ def etl(es_sink, file_sink, settings, transformer, id):
         else:
             Log.println("No test run id for {{id}}", {"id": id})
 
+        del data
         return True
     except Exception, e:
         Log.warning("Failure to etl (content length={{length}})", {"length": len(content)}, e)
