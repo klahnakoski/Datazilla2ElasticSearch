@@ -11,12 +11,14 @@ from __future__ import unicode_literals
 from __future__ import division
 
 import json
-from math import floor
 import re
+import sys
 import time
+
+from math import floor
 from datetime import datetime, date, timedelta
 from decimal import Decimal
-import sys
+
 from .collections import AND, MAX
 from .struct import Struct, StructList
 
@@ -33,7 +35,7 @@ json_decoder = json.JSONDecoder().decode
 #    ITS JOB.  ALONG WITH THE UnicodeBuilder WE GET NEAR C SPEEDS
 
 
-use_pypy = True
+use_pypy = False
 try:
     # UnicodeBuilder IS ABOUT 2x FASTER THAN list()
     # use_pypy = True

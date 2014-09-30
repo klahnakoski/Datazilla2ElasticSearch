@@ -8,12 +8,12 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from math import log10
-from string import Template
 
 import unittest
 from ..struct import nvl
 from ..maths import Math
 from ..structs.wraps import wrap
+from ..strings import expand_template
 
 
 class FuzzyTestCase(unittest.TestCase):
@@ -54,7 +54,7 @@ def assertAlmostEqualValue(first, second, digits=None, places=None, msg=None, de
         if abs(first - second) <= delta:
             return
 
-        standardMsg = Template("{{first}} != {{second}} within {{delta}} delta").substitute({
+        standardMsg = expand_template("{{first}} != {{second}} within {{delta}} delta", {
             "first": first,
             "second": second,
             "delta": delta
@@ -67,7 +67,7 @@ def assertAlmostEqualValue(first, second, digits=None, places=None, msg=None, de
         if diff < Math.ceiling(log10(abs(first)))-places:
             return
 
-        standardMsg = Template("{{first}} != {{second}} within {{places}} places").substitute({
+        standardMsg = expand_template("{{first}} != {{second}} within {{places}} places", {
             "first": first,
             "second": second,
             "": places
