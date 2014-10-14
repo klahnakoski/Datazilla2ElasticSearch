@@ -203,7 +203,7 @@ def extract_from_datazilla_using_id(es, settings, transformer):
                     for result in results:
                         if not result:
                             num_not_found += 1
-                            if num_not_found > 100:
+                            if num_not_found > nvl(settings.production.max_tries, 10):
                                 many.inbound.pop_all()  # CLEAR THE QUEUE OF OTHER WORK
                                 many.stop()
                                 break
