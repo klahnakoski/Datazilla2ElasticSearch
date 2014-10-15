@@ -137,7 +137,9 @@ class DZ_to_ES():
                             r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
                         else:
                             Log.note("{{branch}} @ {{revision}} has no pushlog", r.test_build)
-                            if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
+                            if r.test_build.revision == 'NULL':
+                                r.test_build.no_pushlog = True  # OOPS! SOMETHING BROKE
+                            elif CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
                                 r.test_build.no_pushlog = True
                             else:
                                 return []  # TRY AGAIN LATER
