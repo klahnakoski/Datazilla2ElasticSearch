@@ -35,11 +35,11 @@ def etl(es_sink, file_sink, settings, transformer, id):
     """
 
     # DEBUG GROWTH
-    try:
-        deltas, stats = objgraph.get_growth()
-        Log.note("Deltas:\n{{deltas|indent}}", {"deltas": deltas})
-    except Exception:
-        Log.note("objgraph problem")
+    # try:
+    #     deltas, stats = objgraph.get_growth()
+    #     Log.note("Deltas:\n{{deltas|indent}}", {"deltas": deltas})
+    # except Exception, e:
+    #     Log.warning("objgraph problem", e)
 
 
     try:
