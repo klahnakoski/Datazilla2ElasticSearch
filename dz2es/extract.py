@@ -11,16 +11,17 @@ from __future__ import unicode_literals
 import functools
 import requests
 from dz2es.util.collections import MAX
-from dz2es.util.env.elasticsearch import Cluster, Index
+from dz2es.util.env.elasticsearch import Cluster
 from dz2es.util.env.files import File
 from dz2es.util.env.profiles import Profiler
 from dz2es.util.queries import Q
 from dz2es.util.queries.es_query import ESQuery
-from dz2es.util.struct import nvl, Null
+from dz2es.util.struct import nvl
 from dz2es.util.env.logs import Log
 from dz2es.util.env import startup
 from dz2es.util.cnv import CNV
 from dz2es.util.thread.threads import ThreadedQueue
+from dz2es.util.vendor import objgraph
 from transform import DZ_to_ES
 from dz2es.util.times.timer import Timer
 from dz2es.util.thread.multithread import Multithread
@@ -32,6 +33,15 @@ def etl(es_sink, file_sink, settings, transformer, id):
     """
     PULL FROM DZ AND PUSH TO es AND file_sink
     """
+
+    # DEBUG GROWTH
+    try:
+        deltas, stats = objgraph.get_growth()
+        Log.note("Deltas:\n{{deltas|indent}}", {"deltas": deltas})
+    except Exception:
+        Log.note("objgraph problem")
+
+
     try:
         url = settings.production.blob_url + "/" + str(id)
         with Timer("read {{id}} from DZ", {"id": id}):
@@ -76,7 +86,6 @@ def etl(es_sink, file_sink, settings, transformer, id):
     except Exception, e:
         Log.warning("Failure to etl (content length={{length}})", {"length": len(content)}, e)
         return False
-
 
 def get_existing_ids(es, settings, branches):
     #FIND WHAT'S IN ES

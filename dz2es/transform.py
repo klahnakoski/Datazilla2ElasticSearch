@@ -8,7 +8,7 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-from math import sqrt, log
+from math import sqrt
 import datetime
 
 import dz2es
@@ -18,7 +18,7 @@ from dz2es.util.env.profiles import Profiler
 from dz2es.util.maths import Math
 from dz2es.util.maths.stats import Z_moment, z_moment2stats, Stats
 from dz2es.util.struct import Struct, literal_field, nvl, StructList
-from dz2es.util.structs.wraps import wrap, unwrap
+from dz2es.util.structs.wraps import wrap
 from dz2es.util.times.timer import Timer
 from dz2es.util.sql.db import DB
 from dz2es.util.env.logs import Log
