@@ -384,4 +384,12 @@ def utf82unicode(value):
             latin1 = unicode(value.decode("latin1"))
             Log.error("Can not explain conversion failure, but seems to be latin1", e)
         except Exception, f:
-            Log.error("Can not explain conversion failure!", [e, Except.wrap(f)])
+            pass
+
+        try:
+            a = unicode(value.decode("iso-8859-1"))
+            Log.error("Can not explain conversion failure, but seems to be iso-8859-1", e)
+        except Exception, f:
+            pass
+
+        Log.error("Can not explain conversion failure of "+type(value).__name__+"!", e)

@@ -18,7 +18,7 @@ from pymysql import connect, InterfaceError
 from .. import struct
 from ..jsons import json_scrub
 from ..maths import Math
-from ..strings import expand_template
+from ..strings import expand_template, utf82unicode
 from ..struct import nvl
 from ..structs.wraps import wrap, listwrap
 from ..cnv import CNV

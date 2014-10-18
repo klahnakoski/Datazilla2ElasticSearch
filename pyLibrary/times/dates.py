@@ -14,9 +14,8 @@
 from __future__ import unicode_literals
 from __future__ import division
 
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 import math
-from pyLibrary.strings import deformat
 
 
 class Date(object):

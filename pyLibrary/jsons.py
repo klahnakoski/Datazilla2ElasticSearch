@@ -131,8 +131,7 @@ def _value2json(value, _buffer):
             try:
                 v = utf82unicode(value)
             except Exception, e:
-                from .env.logs import Log
-                raise Log.error("Serialization of value="+repr(value), e)
+                problem_serializing(value, e)
 
             for c in v:
                 append(_buffer, ESCAPE_DCT.get(c, c))
@@ -232,7 +231,7 @@ def _scrub(value):
     type = value.__class__
 
     if type in (date, datetime):
-        return datetime2milli(value)
+        return datetime2milli(value, type)
     elif type is timedelta:
         return unicode(value.total_seconds()) + "second"
     elif type is str:
@@ -392,11 +391,34 @@ def pretty_json(value):
             return encode(value)
 
     except Exception, e:
-        from .env.logs import Log
-
-        Log.error("Problem turning value ({{value}}) to json", {"value": repr(value)}, e)
+        problem_serializing(value, e)
 
 
+def problem_serializing(value, e=None):
+    """
+    THROW ERROR ABOUT SERIALIZING
+    """
+    from .env.logs import Log
+
+    try:
+        typename = type(value).__name__
+    except Exception:
+        typename = "<error getting name>"
+
+    try:
+        rep = repr(value)
+    except Exception:
+        rep = None
+
+    if rep == None:
+        Log.error("Problem turning value of type {{type}} to json", {
+            "type": typename
+        }, e)
+    else:
+        Log.error("Problem turning value ({{value}}) of type {{type}} to json", {
+            "value": rep,
+            "type": typename
+        }, e)
 
 
 
@@ -433,21 +455,16 @@ def value_compare(a, b):
         return 0
 
 
-def datetime2milli(d):
+def datetime2milli(d, type):
     try:
-        if d == None:
-            return None
-        elif isinstance(d, datetime):
-            epoch = datetime(1970, 1, 1)
-        elif isinstance(d, date):
-            epoch = date(1970, 1, 1)
+        if type == datetime:
+            diff = d - datetime(1970, 1, 1)
         else:
-            raise Exception("Can not convert "+repr(d)+" to json")
+            diff = d - date(1970, 1, 1)
 
-        diff = d - epoch
         return long(diff.total_seconds()) * 1000L + long(diff.microseconds / 1000)
     except Exception, e:
-        raise Exception("Can not convert "+repr(d)+" to json", e)
+        problem_serializing(d, e)
 
 
 

@@ -11,13 +11,12 @@ from __future__ import unicode_literals
 from math import sqrt
 import datetime
 
-import dz2es
 import pyLibrary
 from pyLibrary.cnv import CNV
 from pyLibrary.collections import MIN, MAX
 from pyLibrary.env.profiles import Profiler
 from pyLibrary.maths import Math
-from pyLibrary.maths.stats import Z_moment, z_moment2stats, Stats
+from pyLibrary.maths.stats import Stats, ZeroMoment2Stats, ZeroMoment
 from pyLibrary.struct import Struct, literal_field, nvl, StructList
 from pyLibrary.structs.wraps import wrap
 from pyLibrary.thread.threads import Lock
@@ -259,11 +258,11 @@ def stats(values):
 
     values = values.map(float, includeNone=False)
 
-    z = Z_moment.new_instance(values)
+    z = ZeroMoment.new_instance(values)
     s = Struct()
     for k, v in z.dict.items():
         s[k] = v
-    for k, v in z_moment2stats(z).items():
+    for k, v in ZeroMoment2Stats(z).items():
         s[k] = v
     s.max = MAX(values)
     s.min = MIN(values)
@@ -284,7 +283,7 @@ def geo_mean(values):
     for d in values:
         for k, v in d.items():
             if v != 0:
-                agg[k] = nvl(agg[k], Z_moment.new_instance()) + Math.log(Math.abs(v))
+                agg[k] = nvl(agg[k], ZeroMoment.new_instance()) + Math.log(Math.abs(v))
     return {k: Math.exp(v.stats.mean) for k, v in agg.items()}
 
 
