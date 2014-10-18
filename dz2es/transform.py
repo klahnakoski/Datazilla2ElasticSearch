@@ -12,18 +12,19 @@ from math import sqrt
 import datetime
 
 import dz2es
-from dz2es.util.cnv import CNV
-from dz2es.util.collections import MIN, MAX
-from dz2es.util.env.profiles import Profiler
-from dz2es.util.maths import Math
-from dz2es.util.maths.stats import Z_moment, z_moment2stats, Stats
-from dz2es.util.struct import Struct, literal_field, nvl, StructList
-from dz2es.util.structs.wraps import wrap
-from dz2es.util.thread.threads import Lock
-from dz2es.util.times.timer import Timer
-from dz2es.util.sql.db import DB
-from dz2es.util.env.logs import Log
-from dz2es.util.queries import Q
+import pyLibrary
+from pyLibrary.cnv import CNV
+from pyLibrary.collections import MIN, MAX
+from pyLibrary.env.profiles import Profiler
+from pyLibrary.maths import Math
+from pyLibrary.maths.stats import Z_moment, z_moment2stats, Stats
+from pyLibrary.struct import Struct, literal_field, nvl, StructList
+from pyLibrary.structs.wraps import wrap
+from pyLibrary.thread.threads import Lock
+from pyLibrary.times.timer import Timer
+from pyLibrary.sql.db import DB
+from pyLibrary.env.logs import Log
+from pyLibrary.queries import Q
 
 
 DEBUG = False
@@ -266,7 +267,7 @@ def stats(values):
         s[k] = v
     s.max = MAX(values)
     s.min = MIN(values)
-    s.median = dz2es.util.stats.median(values, simple=False)
+    s.median = pyLibrary.stats.median(values, simple=False)
     s.last = values.last()
     s.first = values[0]
     if Math.is_number(s.variance) and not Math.is_nan(s.variance):

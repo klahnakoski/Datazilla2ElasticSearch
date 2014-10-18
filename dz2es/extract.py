@@ -9,23 +9,21 @@
 #
 from __future__ import unicode_literals
 import functools
-import gc
 import requests
-from dz2es.util.collections import MAX
-from dz2es.util.env.elasticsearch import Cluster
-from dz2es.util.env.files import File
-from dz2es.util.env.profiles import Profiler
-from dz2es.util.queries import Q
-from dz2es.util.queries.es_query import ESQuery
-from dz2es.util.struct import nvl, Struct
-from dz2es.util.env.logs import Log
-from dz2es.util.env import startup
-from dz2es.util.cnv import CNV
-from dz2es.util.thread.threads import ThreadedQueue, Lock
-from dz2es.util.vendor import objgraph
+from pyLibrary.collections import MAX
+from pyLibrary.env.elasticsearch import Cluster
+from pyLibrary.env.files import File
+from pyLibrary.env.profiles import Profiler
+from pyLibrary.queries import Q
+from pyLibrary.queries.es_query import ESQuery
+from pyLibrary.struct import nvl, Struct
+from pyLibrary.env.logs import Log
+from pyLibrary.env import startup
+from pyLibrary.cnv import CNV
+from pyLibrary.thread.threads import ThreadedQueue
 from transform import DZ_to_ES
-from dz2es.util.times.timer import Timer
-from dz2es.util.thread.multithread import Multithread
+from pyLibrary.times.timer import Timer
+from pyLibrary.thread.multithread import Multithread
 
 
 NUM_PER_BATCH = 1000

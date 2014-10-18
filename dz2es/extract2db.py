@@ -8,13 +8,13 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-from dz2es.util.cnv import CNV
-from dz2es.util.sql.db import DB
-from dz2es.util.env.files import File
-from dz2es.util.env.logs import Log
-from dz2es.util.env import startup
-from dz2es.util.struct import nvl, Struct
-from dz2es.util.thread.threads import ThreadedQueue
+from pyLibrary.cnv import CNV
+from pyLibrary.sql.db import DB
+from pyLibrary.env.files import File
+from pyLibrary.env.logs import Log
+from pyLibrary.env import startup
+from pyLibrary.struct import nvl, Struct
+from pyLibrary.thread.threads import ThreadedQueue
 
 
 def file2db(db, table_name, filename):

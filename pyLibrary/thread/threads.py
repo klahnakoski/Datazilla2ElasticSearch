@@ -68,8 +68,8 @@ class Queue(object):
         self.keep_running = True
         self.lock = Lock("lock for queue")
         self.queue = deque()
-        self.next_warning=datetime.utcnow()  # FOR DEBUGGING
-        self.gc_count=0
+        self.next_warning = datetime.utcnow()  # FOR DEBUGGING
+        self.gc_count = 0
 
     def __iter__(self):
         while self.keep_running:

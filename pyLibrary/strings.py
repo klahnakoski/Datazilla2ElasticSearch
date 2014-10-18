@@ -362,10 +362,16 @@ def apply_diff(text, diff, reverse=False):
 
 
 def utf82unicode(value):
+    """
+    WITH EXPLANATION FOR FAILURE
+    """
     try:
         return value.decode("utf8")
     except Exception, e:
         from .env.logs import Log, Except
+
+        if not isinstance(value, basestring):
+            Log.error("Can not convert {{type}} to unicode because it's not a string", {"type": type(value).__name__})
 
         e = Except.wrap(e)
         for i, c in enumerate(value):
