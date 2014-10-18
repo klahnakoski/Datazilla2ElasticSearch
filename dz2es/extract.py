@@ -9,6 +9,7 @@
 #
 from __future__ import unicode_literals
 import functools
+import gc
 import requests
 from dz2es.util.collections import MAX
 from dz2es.util.env.elasticsearch import Cluster
@@ -16,11 +17,11 @@ from dz2es.util.env.files import File
 from dz2es.util.env.profiles import Profiler
 from dz2es.util.queries import Q
 from dz2es.util.queries.es_query import ESQuery
-from dz2es.util.struct import nvl
+from dz2es.util.struct import nvl, Struct
 from dz2es.util.env.logs import Log
 from dz2es.util.env import startup
 from dz2es.util.cnv import CNV
-from dz2es.util.thread.threads import ThreadedQueue
+from dz2es.util.thread.threads import ThreadedQueue, Lock
 from dz2es.util.vendor import objgraph
 from transform import DZ_to_ES
 from dz2es.util.times.timer import Timer
@@ -28,6 +29,8 @@ from dz2es.util.thread.multithread import Multithread
 
 
 NUM_PER_BATCH = 1000
+COUNTER = Struct(count=0)
+GC_LOCKER = Lock()
 
 def etl(es_sink, file_sink, settings, transformer, id):
     """
@@ -35,12 +38,16 @@ def etl(es_sink, file_sink, settings, transformer, id):
     """
 
     # DEBUG GROWTH
-    # try:
-    #     deltas, stats = objgraph.get_growth()
-    #     Log.note("Deltas:\n{{deltas|indent}}", {"deltas": deltas})
-    # except Exception, e:
-    #     Log.warning("objgraph problem", e)
+    with GC_LOCKER:
+        try:
+            if COUNTER.count % 100 == 0:
+                # gc.collect()
+                deltas, stats = objgraph.get_growth()
+                Log.note("Deltas:\n{{deltas|indent}}", {"deltas": deltas})
+        except Exception, e:
+            Log.warning("objgraph problem", e)
 
+        COUNTER.count += 1
 
     try:
         url = settings.production.blob_url + "/" + str(id)
@@ -67,10 +74,12 @@ def etl(es_sink, file_sink, settings, transformer, id):
             with Profiler("transform"):
                 result = transformer.transform(id, data)
 
-            Log.println("{{num}} records to add", {
-                "num": len(result)
-            })
-            es_sink.extend({"value": d} for d in result)
+            if result:
+                Log.println("{{num}} records to add", {
+                    "num": len(result)
+                })
+                es_sink.extend({"value": d} for d in result)
+
             file_sink.add(str(id) + "\t" + content + "\n")
         elif data.error_flag == 'Y':
             error = data.json_blob

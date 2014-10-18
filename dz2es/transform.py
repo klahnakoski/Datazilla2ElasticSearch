@@ -19,6 +19,7 @@ from dz2es.util.maths import Math
 from dz2es.util.maths.stats import Z_moment, z_moment2stats, Stats
 from dz2es.util.struct import Struct, literal_field, nvl, StructList
 from dz2es.util.structs.wraps import wrap
+from dz2es.util.thread.threads import Lock
 from dz2es.util.times.timer import Timer
 from dz2es.util.sql.db import DB
 from dz2es.util.env.logs import Log
@@ -57,6 +58,7 @@ class DZ_to_ES():
                     """, {"oldest_date": TOO_OLD})
             Log.note("Got pushlog, now indexing...")
             self.pushlog = wrap(Q.index(all_pushlogs, ["branch", "revision"])._data)
+            self.locker = Lock()
             self.unknown_branches = set()
 
     def __del__(self):
@@ -136,22 +138,24 @@ class DZ_to_ES():
                         if possible_dates:
                             r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
                         else:
-                            Log.note("{{branch}} @ {{revision}} has no pushlog", r.test_build)
                             if r.test_build.revision == 'NULL':
                                 r.test_build.no_pushlog = True  # OOPS! SOMETHING BROKE
                             elif CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
+                                Log.note("{{branch}} @ {{revision}} has no pushlog, transforming anyway", r.test_build)
                                 r.test_build.no_pushlog = True
                             else:
+                                Log.note("{{branch}} @ {{revision}} has no pushlog, try again later", r.test_build)
                                 return []  # TRY AGAIN LATER
                     else:
-                        if branch not in self.unknown_branches:
-                            Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
-                            self.unknown_branches.add(branch)
-                        if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
-                            r.test_build.no_pushlog = True
-                        else:
-                            r.test_build.no_pushlog = True
-                            #return [r]  #TODO: DO THIS IF WE FIGURE OUT HOW TO HANDLE THE VERY LARGE NUMBER OF RESULTS WITH NO PUSHLOG
+                        with self.locker:
+                            if branch not in self.unknown_branches:
+                                Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
+                                self.unknown_branches.add(branch)
+                            if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
+                                r.test_build.no_pushlog = True
+                            else:
+                                r.test_build.no_pushlog = True
+                                #return [r]  #TODO: DO THIS IF WE FIGURE OUT HOW TO HANDLE THE VERY LARGE NUMBER OF RESULTS WITH NO PUSHLOG
 
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
