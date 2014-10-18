@@ -41,18 +41,12 @@ class Multithread(object):
 
         # MAKE THREADS
         if isinstance(functions, Iterable):
-            if threads:
-                Log.error("do not know how to handle an array of functions AND a thread multiplier")
-            self.threads = []
-            for t, f in enumerate(functions):
-                thread = worker_thread("worker " + unicode(t), self.inbound, self.outbound, f)
-                self.threads.append(thread)
-        else:
-            # ASSUME functions IS A SINGLE FUNCTION
-            self.threads = []
-            for t in range(nvl(threads, 1)):
-                thread = worker_thread("worker " + unicode(t), self.inbound, self.outbound, functions)
-                self.threads.append(thread)
+            Log.error("Not supported anymore")
+
+        self.threads = []
+        for t in range(nvl(threads, 1)):
+            thread = worker_thread("worker " + unicode(t), self.inbound, self.outbound, functions)
+            self.threads.append(thread)
 
     def __enter__(self):
         return self
@@ -180,7 +174,7 @@ class worker_thread(Thread):
                     "name": self.name,
                     "num": self.num_runs
                 })
-                
+
         if got_stop_message and self.in_queue.queue:
             Log.warning("multithread programmer error, queue not empty. {{num}} requests lost", {"num": len(self.in_queue.queue)})
         if DEBUG:
