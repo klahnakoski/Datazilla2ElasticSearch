@@ -30,7 +30,7 @@ from dz2es.util.thread.multithread import Multithread
 
 NUM_PER_BATCH = 1000
 COUNTER = Struct(count=0)
-GC_LOCKER = Lock()
+# GC_LOCKER = Lock()
 
 def etl(es_sink, file_sink, settings, transformer, id):
     """
@@ -38,16 +38,16 @@ def etl(es_sink, file_sink, settings, transformer, id):
     """
 
     # DEBUG GROWTH
-    with GC_LOCKER:
-        try:
-            if COUNTER.count % 100 == 0:
-                # gc.collect()
-                deltas, stats = objgraph.get_growth()
-                Log.note("Deltas:\n{{deltas|indent}}", {"deltas": deltas})
-        except Exception, e:
-            Log.warning("objgraph problem", e)
-
-        COUNTER.count += 1
+    # with GC_LOCKER:
+    #     try:
+    #         if COUNTER.count % 100 == 0:
+    #             # gc.collect()
+    #             deltas, stats = objgraph.get_growth()
+    #             Log.note("Deltas:\n{{deltas|indent}}", {"deltas": deltas})
+    #     except Exception, e:
+    #         Log.warning("objgraph problem", e)
+    #
+    #     COUNTER.count += 1
 
     try:
         url = settings.production.blob_url + "/" + str(id)
