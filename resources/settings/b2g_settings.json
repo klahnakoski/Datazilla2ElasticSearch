@@ -1,0 +1,45 @@
+{
+	"pushlog":{
+		"host":"s4n4.qa.phx1.mozilla.com",
+		"port":3306,
+		"username":"username",
+		"password":"password",
+		"schema":"pushlog_hgmozilla_1",
+        "disable": true
+	},
+	"elasticsearch":{
+        //"host":"http://klahnakoski-es.corp.tor1.mozilla.com",
+		"host":"http://elasticsearch4.bugs.scl3.mozilla.com",
+//		"host":"http://localhost",
+		"port":9200,
+		"index":"b2g_tests",
+		"type":"results",
+        "debug": true
+	},
+	"production":{
+		"blob_url":"https://datazilla.mozilla.org/b2g/refdata/objectstore/json_blob",
+        "timeout":30,
+		"threads":5,
+		"min": 0,
+		"max_tries":10
+	},
+    "param":{
+	    "output_file":"./results/raw_b2g_blobs.tab",
+        "schema_file":"./resources/schema/test_schema.json"
+    },
+    "debug":{
+        "trace": false,
+        "log":[{
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "./results/logs/b2g_2_es.log",
+            "maxBytes": 10000000,
+            "backupCount": 200,
+            "encoding": "utf8"
+        },{
+            "log_type":"stream",
+            "stream":"sys.stdout"
+        }]
+
+
+    }
+}
