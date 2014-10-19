@@ -340,6 +340,8 @@ class Cluster(object):
             from .files import File
 
             schema = CNV.JSON2object(File(settings.schema_file).read(), flexible=True, paths=True)
+        elif not schema:
+            Log.warning("Creating index {{name}} with no schema!", {"name": settings.alias})
         elif isinstance(schema, basestring):
             schema = CNV.JSON2object(schema, paths=True)
         else:

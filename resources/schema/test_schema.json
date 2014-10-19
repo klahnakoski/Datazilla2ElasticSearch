@@ -10,7 +10,7 @@
 		}
 	},
 	"mappings":{
-		{{type}}:{
+		"test_results":{
 			"dynamic_templates":[
 				{"xperf":{
 					"mapping":{"index":"not_analyzed", "type":"string"},
