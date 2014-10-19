@@ -19,8 +19,8 @@
 	"production" : {
 		"blob_url" : "https://datazilla.mozilla.org/talos/refdata/objectstore/json_blob",
 		"threads" : 20,
-		"min" : 5500000,
-		"step" : 1000,
+		"min" : 5000000,
+		"step" : 100000,
 		"max_tries":10
 	},
 	"param" : {
@@ -28,7 +28,7 @@
 		"output_file" : "./results/recent.tab"
 	},
 	"debug" : {
-		"profile" : true,
+		"profile" : false,
 		"log" : [
 			{
 				"class" : "logging.handlers.RotatingFileHandler",
