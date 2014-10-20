@@ -47,8 +47,8 @@ def etl(es_sink, file_sink, settings, transformer, id):
     #
     #     COUNTER.count += 1
 
+    url = settings.production.blob_url + "/" + str(id)
     try:
-        url = settings.production.blob_url + "/" + str(id)
         with Timer("read {{id}} from DZ", {"id": id}):
             content = requests.get(url, timeout=nvl(settings.production.timeout, 30)).content
     except Exception, e:
@@ -57,7 +57,7 @@ def etl(es_sink, file_sink, settings, transformer, id):
 
     try:
         if content.startswith("Id not found"):
-            Log.note("{{id}} not found", {"id": id})
+            Log.note("{{id}} not found {{url}}", {"id": id, "url": url})
             return False
 
         data = CNV.JSON2object(content.decode('utf-8'))
