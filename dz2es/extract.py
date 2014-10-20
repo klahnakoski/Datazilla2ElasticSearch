@@ -57,10 +57,10 @@ def etl(es_sink, file_sink, settings, transformer, max_id, id):
 
     try:
         if content.startswith("Id not found"):
-            Log.note("{{id}} not found {{url}}", {"id": id, "url": url})
             if id < max_id:
                 return True
             else:
+                Log.note("{{id}} not found {{url}}", {"id": id, "url": url})
                 return False
 
         data = CNV.JSON2object(content.decode('utf-8'))
@@ -159,6 +159,7 @@ def extract_from_datazilla_using_id(es, settings, transformer):
     holes = set(range(settings.production.min, max_existing_id)) - existing_ids
     missing_ids = set(range(settings.production.min, max_existing_id+nvl(settings.production.step, NUM_PER_BATCH))) - existing_ids
 
+    Log.note("Max Existing ID: {{max}}", {"max": max_existing_id})
     Log.note("Number missing: {{num}}", {"num": len(missing_ids)})
     Log.note("Number in holes: {{num}}", {"num": len(holes)})
     #FASTER IF NO INDEXING IS ON
