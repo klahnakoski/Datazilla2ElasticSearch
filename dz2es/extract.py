@@ -30,7 +30,7 @@ NUM_PER_BATCH = 1000
 COUNTER = Struct(count=0)
 # GC_LOCKER = Lock()
 
-def etl(es_sink, file_sink, settings, transformer, id):
+def etl(es_sink, file_sink, settings, transformer, max_id, id):
     """
     PULL FROM DZ AND PUSH TO es AND file_sink
     """
@@ -58,7 +58,10 @@ def etl(es_sink, file_sink, settings, transformer, id):
     try:
         if content.startswith("Id not found"):
             Log.note("{{id}} not found {{url}}", {"id": id, "url": url})
-            return False
+            if id < max_id:
+                return True
+            else:
+                return False
 
         data = CNV.JSON2object(content.decode('utf-8'))
         content = CNV.object2JSON(data)  #ENSURE content HAS NO crlf
@@ -93,6 +96,7 @@ def etl(es_sink, file_sink, settings, transformer, id):
     except Exception, e:
         Log.warning("Failure to etl (content length={{length}})", {"length": len(content)}, e)
         return False
+
 
 def get_existing_ids(es, settings, branches):
     #FIND WHAT'S IN ES
@@ -164,7 +168,7 @@ def extract_from_datazilla_using_id(es, settings, transformer):
     if (len(holes) > 10000 or settings.args.scan_file or settings.args.restart) and File(settings.param.output_file).exists:
         #ASYNCH PUSH TO ES IN BLOCKS OF 1000
         with Timer("Scan file for missing ids"):
-            with ThreadedQueue(es, size=1000) as json_for_es:
+            with ThreadedQueue(es, size=nvl(es.settings.batch_size, 100)) as json_for_es:
                 num = 0
                 for line in File(settings.param.output_file):
                     try:
@@ -206,9 +210,9 @@ def extract_from_datazilla_using_id(es, settings, transformer):
 
     #COPY MISSING DATA TO ES
     try:
-        with ThreadedQueue(es, size=100) as es_sink:
+        with ThreadedQueue(es, size=nvl(es.settings.batch_size, 100)) as es_sink:
             with ThreadedQueue(File(settings.param.output_file), size=50) as file_sink:
-                simple_etl = functools.partial(etl, *[es_sink, file_sink, settings, transformer])
+                simple_etl = functools.partial(etl, *[es_sink, file_sink, settings, transformer, max_existing_id])
 
                 num_not_found = 0
                 with Multithread(simple_etl, threads=settings.production.threads) as many:
@@ -234,16 +238,6 @@ def extract_from_datazilla_using_id(es, settings, transformer):
     es.set_refresh_interval(1)
     es.delete_all_but_self()
     es.add_alias()
-
-
-def reset(settings):
-    if settings.args.no_restart:
-        Log.error("reset not allowed")
-    schema_json = File(settings.param.schema_file).read()
-    schema = CNV.JSON2object(schema_json, {"type": settings.elasticsearch.type}, flexible=True)
-
-    es = Cluster(settings.elasticsearch).create_index(settings.elasticsearch)
-    return es
 
 
 def main():
@@ -286,6 +280,8 @@ def main():
             else:
                 es = Cluster(settings.elasticsearch).get_or_create_index(settings.elasticsearch)
                 extract_from_datazilla_using_id(es, settings, transformer)
+    except Exception, e:
+        Log.error("Problem with etl", e)
     finally:
         Log.stop()
 

@@ -14,7 +14,8 @@
 		"type" : "test_results",
 		"timeout" : 300,
 		"schema_file" : "./resources/schema/test_schema.json",
-		"debug": true
+		"debug": true,
+		"batch_size": 100
 	},
 	"production" : {
 		"blob_url" : "https://datazilla.mozilla.org/talos/refdata/objectstore/json_blob",
