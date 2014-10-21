@@ -246,7 +246,7 @@ class DZ_to_ES():
 
             return new_records
         except Exception, e:
-            Log.error("Transformation failure on id={{id}}", {"id":id}, e)
+            Log.error("Transformation failure on id={{id}}", {"id": id}, e)
 
 
 def stats(values):

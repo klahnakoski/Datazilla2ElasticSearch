@@ -279,12 +279,13 @@ class ZeroMoment(object):
         if values == None:
             return ZeroMoment()
 
+        vals = [v for v in values if v != None]
         return ZeroMoment(
-            len(values),
-            sum(values),
-            sum([pow(n, 2) for n in values]),
-            sum([pow(n, 3) for n in values]),
-            sum([pow(n, 4) for n in values])
+            len(vals),
+            sum(vals),
+            sum([pow(n, 2) for n in vals]),
+            sum([pow(n, 3) for n in vals]),
+            sum([pow(n, 4) for n in vals])
         )
 
     @property

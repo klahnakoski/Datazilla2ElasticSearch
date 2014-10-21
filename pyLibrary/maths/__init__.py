@@ -187,6 +187,28 @@ class Math(object):
     def ceiling(value, mod=1):
         return int(math.ceil(value/mod))*mod
 
+    @staticmethod
+    def count(values):
+        count = 0
+        for v in values:
+            if v != None:
+                count += 1
+        return count
+
+    @staticmethod
+    def pow(n, p):
+        if n == None or p == None:
+            return None
+        return math.pow(n, p)
+
+
+    @staticmethod
+    def sum(values):
+        sum = 0
+        for v in values:
+            if v != None:
+                sum += v
+        return sum
 
     @staticmethod
     def max(*values):
