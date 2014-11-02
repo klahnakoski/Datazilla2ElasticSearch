@@ -215,8 +215,7 @@ class DZ_to_ES():
                     new_records.append(new_record)
 
             if len(total) > 1:
-                # ADD RECORD FOR GEOMETRIC MEAN SUMMARY
-
+                #TODO: REMOVE ME, JUST FOR BACKWARDS COMPATIBILITY
                 new_record = Struct(
                     test_machine=r.test_machine,
                     datazilla=r.datazilla,
@@ -230,6 +229,20 @@ class DZ_to_ES():
                 )
                 new_records.append(new_record)
 
+                # ADD RECORD FOR GEOMETRIC MEAN SUMMARY
+                new_record = Struct(
+                    test_machine=r.test_machine,
+                    datazilla=r.datazilla,
+                    testrun=r.testrun,
+                    test_build=r.test_build,
+                    result={
+                        "test_name": "_"+r.testrun.suite+"_summary",
+                        "ordering": -1,
+                        "stats": geo_mean(total)
+                    }
+                )
+                new_records.append(new_record)
+
                 # ADD RECORD FOR GRAPH SERVER SUMMARY
                 new_record = Struct(
                     test_machine=r.test_machine,
@@ -237,7 +250,7 @@ class DZ_to_ES():
                     testrun=r.testrun,
                     test_build=r.test_build,
                     result={
-                        "test_name": "summary_old",
+                        "test_name": "_"+r.testrun.suite+"_old_summary",
                         "ordering": -1,
                         "stats": Stats(samples=Q.sort(total.mean)[:len(total)-1:])
                     }
