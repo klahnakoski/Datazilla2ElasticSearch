@@ -12,7 +12,7 @@ from math import sqrt
 import datetime
 
 import pyLibrary
-from pyLibrary.cnv import CNV
+from pyLibrary import convert
 from pyLibrary.collections import MIN, MAX
 from pyLibrary.env.profiles import Profiler
 from pyLibrary.maths import Math
@@ -140,7 +140,7 @@ class DZ_to_ES():
                         else:
                             if r.test_build.revision == 'NULL':
                                 r.test_build.no_pushlog = True  # OOPS! SOMETHING BROKE
-                            elif CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
+                            elif convert.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
                                 Log.note("{{branch}} @ {{revision}} has no pushlog, transforming anyway", r.test_build)
                                 r.test_build.no_pushlog = True
                             else:
@@ -151,7 +151,7 @@ class DZ_to_ES():
                             if branch not in self.unknown_branches:
                                 Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
                                 self.unknown_branches.add(branch)
-                            if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
+                            if convert.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
                                 r.test_build.no_pushlog = True
                             else:
                                 r.test_build.no_pushlog = True
@@ -215,20 +215,6 @@ class DZ_to_ES():
                     new_records.append(new_record)
 
             if len(total) > 1:
-                #TODO: REMOVE ME, JUST FOR BACKWARDS COMPATIBILITY
-                new_record = Struct(
-                    test_machine=r.test_machine,
-                    datazilla=r.datazilla,
-                    testrun=r.testrun,
-                    test_build=r.test_build,
-                    result={
-                        "test_name": "SUMMARY",
-                        "ordering": -1,
-                        "stats": geo_mean(total)
-                    }
-                )
-                new_records.append(new_record)
-
                 # ADD RECORD FOR GEOMETRIC MEAN SUMMARY
                 new_record = Struct(
                     test_machine=r.test_machine,
@@ -236,7 +222,7 @@ class DZ_to_ES():
                     testrun=r.testrun,
                     test_build=r.test_build,
                     result={
-                        "test_name": "_"+r.testrun.suite+"_summary",
+                        "test_name": "SUMMARY",
                         "ordering": -1,
                         "stats": geo_mean(total)
                     }
@@ -252,7 +238,7 @@ class DZ_to_ES():
                     result={
                         "test_name": "_"+r.testrun.suite+"_old_summary",
                         "ordering": -1,
-                        "stats": Stats(samples=Q.sort(total.mean)[:len(total)-1:])
+                        "stats": Stats(samples=Q.sort(total.mean).leftBut(1))
                     }
                 )
                 new_records.append(new_record)

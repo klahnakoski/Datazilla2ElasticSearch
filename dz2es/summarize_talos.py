@@ -10,7 +10,7 @@
 from __future__ import unicode_literals
 from pyLibrary.maths import Math
 from pyLibrary.env import startup
-from pyLibrary.cnv import CNV
+from pyLibrary import convert
 from pyLibrary.env.logs import Log
 from pyLibrary.times.timer import Timer
 
@@ -19,7 +19,7 @@ with Timer("load pandas"):
     import pandas
     from pandas.core.frame import DataFrame
 
-MINIMUM_DATE = CNV.string2datetime("20130720", "%Y%m%d")
+MINIMUM_DATE = convert.string2datetime("20130720", "%Y%m%d")
 MINIMUM_ID = 0
 parts = [0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000]
 
@@ -41,7 +41,7 @@ def arrays_add(id, path, r):
                     r[i] = arrays_add(id, path + "[" + str(i) + "]", v)
                 #        return r
     except Exception, e:
-        Log.warning("Can not summarize: {{json}}", {"json": CNV.object2JSON(r)})
+        Log.warning("Can not summarize: {{json}}", {"json": convert.object2JSON(r)})
 
 
 settings = startup.read_settings()
@@ -63,11 +63,11 @@ with open(settings.output_file, "r") as input_file:
                 json = col[1]
                 if Math.is_number(json):
                     json = col[2]
-                data = CNV.JSON2object(json).json_blob
-                date = CNV.unix2datetime(data.testrun.date)
+                data = convert.JSON2object(json).json_blob
+                date = convert.unix2datetime(data.testrun.date)
 
                 if id % 1000 == 0:
-                    Log.println("loading id " + str(id) + " date: " + CNV.datetime2string(date, "%Y-%m-%d %H:%M:%S"))
+                    Log.println("loading id " + str(id) + " date: " + convert.datetime2string(date, "%Y-%m-%d %H:%M:%S"))
 
                 if date < MINIMUM_DATE:
                     continue
@@ -92,20 +92,20 @@ length_dim = pandas.cut(df.length, parts, labels=colNames, right=False)
 summary = df.groupby(["path", length_dim], sort=False).size()
 #summary=summary.reindex(length_dim, level="length")
 table = summary.unstack("length")
-s = CNV.DataFrame2string(table)#, columns=colNames)
+s = convert.DataFrame2string(table)#, columns=colNames)
 Log.println("\n" + s)
 with open("talos_big_array_summary.tab", "w") as output_file:
     output_file.write(s)
 
 sum2 = df.groupby(["path", "length"]).size()
 tab2 = sum2.unstack("length")
-s = CNV.DataFrame2string(tab2)#, columns=colNames)
+s = convert.DataFrame2string(tab2)#, columns=colNames)
 Log.println("\n" + s)
 with open("talos_every_population.tab", "w") as output_file:
     output_file.write(s)
 
 biggest = df[df.length == 63000]
-s = CNV.DataFrame2string(biggest)
+s = convert.DataFrame2string(biggest)
 Log.println("\n" + s)
 with open("talos_biggest.tab", "w") as output_file:
     output_file.write(s)

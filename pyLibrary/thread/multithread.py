@@ -13,10 +13,11 @@ from __future__ import division
 
 from collections import Iterable
 from types import GeneratorType
+from pyLibrary.struct import nvl
+from pyLibrary.env.logs import Log
+from pyLibrary.thread.threads import Queue, Thread
+from pyLibrary.collections import OR
 from pyLibrary.times.timer import Timer
-from ..struct import nvl
-from ..env.logs import Log
-from ..thread.threads import Queue, Thread
 
 DEBUG = True
 
@@ -94,7 +95,7 @@ class Multithread(object):
         EXPECTING requests TO BE A list OF dicts, EACH dict IS USED AS kwargs TO GIVEN functions
         """
         if not isinstance(requests, (list, tuple, GeneratorType, Iterable)):
-            Log.error("Expecting requests to be a list or generator", offset=1)
+            Log.error("Expecting requests to be a list or generator", stack_depth=1)
         else:
             requests = list(requests)
 
@@ -142,7 +143,7 @@ class worker_thread(Thread):
                 if DEBUG:
                     Log.note("{{name}} got a stop message", {"name": self.name})
                 got_stop_message = True
-                if self.in_queue.queue:
+                if OR(*(r != Thread.STOP for r in self.in_queue.queue)):
                     Log.warning("programmer error, queue not empty. {{num}} requests lost:\n{{requests}}", {
                         "num": len(self.in_queue.queue),
                         "requests": list(self.in_queue.queue)[:5:] + list(self.in_queue.queue)[-5::]

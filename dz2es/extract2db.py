@@ -8,7 +8,7 @@
 # Author: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from __future__ import unicode_literals
-from pyLibrary.cnv import CNV
+from pyLibrary import convert
 from pyLibrary.sql.db import DB
 from pyLibrary.env.files import File
 from pyLibrary.env.logs import Log
@@ -41,7 +41,7 @@ def file2db(db, table_name, filename):
                     continue
                 added.add(id)
 
-                data = CNV.JSON2object(col[1])
+                data = convert.JSON2object(col[1])
                 records_for_db.add({
                     "id": nvl(data.test_run_id, id),
                     "branch": data.json_blob.test_build.branch,
@@ -54,8 +54,8 @@ def file2db(db, table_name, filename):
                 Log.note("Added {{id}} from file", {"id": data.test_run_id})
             except Exception, e:
                 Log.warning("Bad line ({{length}}bytes):\n\t{{prefix}}", {
-                    "length": len(CNV.object2JSON(line)),
-                    "prefix": CNV.object2JSON(line)[0:130]
+                    "length": len(convert.object2JSON(line)),
+                    "prefix": convert.object2JSON(line)[0:130]
                 }, e)
 
 

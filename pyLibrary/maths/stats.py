@@ -14,12 +14,12 @@ from __future__ import division
 import sys
 from math import sqrt
 
-from ..cnv import CNV
-from ..collections import OR
+from pyLibrary import convert
+from pyLibrary.collections import OR
 from __init__ import Math, almost_equal
-from ..env.logs import Log
-from ..struct import nvl, Struct, Null
-from ..vendor import strangman
+from pyLibrary.env.logs import Log
+from pyLibrary.struct import nvl, Struct, Null
+from pyLibrary.vendor import strangman
 
 
 DEBUG = True
@@ -46,7 +46,7 @@ def chisquare(f_obs, f_exp):
         Log.error("problem with call", e)
 
     if DEBUG_STRANGMAN:
-        from ..testing.fuzzytestcase import assertAlmostEqualValue
+        from pyLibrary.testing.fuzzytestcase import assertAlmostEqualValue
 
         sp_result = scipy.stats.chisquare(
             np.array(f_obs),
@@ -73,7 +73,7 @@ def Stats2ZeroMoment(stats):
 
     m = ZeroMoment(mz0, mz1, mz2, mz3, mz4)
     if DEBUG:
-        from ..testing.fuzzytestcase import assertAlmostEqualValue
+        from pyLibrary.testing.fuzzytestcase import assertAlmostEqualValue
 
         globals()["DEBUG"] = False
         try:
@@ -127,7 +127,7 @@ def ZeroMoment2Stats(z_moment, unbiased=True):
     )
 
     if DEBUG:
-        from ..testing.fuzzytestcase import assertAlmostEqualValue
+        from pyLibrary.testing.fuzzytestcase import assertAlmostEqualValue
 
         globals()["DEBUG"] = False
         v = Null
@@ -305,8 +305,7 @@ def ZeroMoment2dict(z):
     # RETURN HASH OF SUMS
     return {u"s" + unicode(i): m for i, m in enumerate(z.S)}
 
-
-setattr(CNV, "ZeroMoment2dict", staticmethod(ZeroMoment2dict))
+setattr(convert, "ZeroMoment2dict", staticmethod(ZeroMoment2dict))
 
 
 def median(values, simple=True, mean_weight=0.0):

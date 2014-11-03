@@ -9,22 +9,23 @@
 
 from __future__ import unicode_literals
 from __future__ import division
+from copy import deepcopy
 
 from datetime import datetime
 import re
 import time
 import requests
 
-from ..collections import OR
-from ..cnv import CNV
-from ..env.logs import Log
-from ..maths.randoms import Random
-from ..maths import Math
-from ..strings import utf82unicode
-from ..struct import nvl, Null
-from ..structs.wraps import wrap, unwrap
-from ..struct import Struct, StructList
-from ..thread.threads import ThreadedQueue
+from pyLibrary.collections import OR
+from pyLibrary import convert
+from pyLibrary.env.logs import Log
+from pyLibrary.maths.randoms import Random
+from pyLibrary.maths import Math
+from pyLibrary.strings import utf82unicode
+from pyLibrary.struct import nvl, Null
+from pyLibrary.structs.wraps import wrap, unwrap
+from pyLibrary.struct import Struct, StructList
+from pyLibrary.thread.threads import ThreadedQueue
 
 
 DEBUG = False
@@ -110,7 +111,7 @@ class Index(object):
         self.cluster_metadata = None
         self.cluster._post(
             "/_aliases",
-            CNV.object2JSON({
+            convert.object2JSON({
                 "actions": [
                     {"add": {"index": self.settings.index, "alias": self.settings.alias}}
                 ]
@@ -170,7 +171,8 @@ class Index(object):
 
         self.cluster.delete(
             self.path + "/_query",
-            data=CNV.object2JSON(query)
+            data=convert.object2JSON(query),
+            timeout=60
         )
 
     def extend(self, records):
@@ -190,12 +192,12 @@ class Index(object):
                 if "json" in r:
                     json = r["json"]
                 elif "value" in r:
-                    json = CNV.object2JSON(r["value"])
+                    json = convert.object2JSON(r["value"])
                 else:
                     json = None
                     Log.error("Expecting every record given to have \"value\" or \"json\" property")
 
-                lines.append('{"index":{"_id": ' + CNV.object2JSON(id) + '}}')
+                lines.append('{"index":{"_id": ' + convert.object2JSON(id) + '}}')
                 lines.append(json)
             del records
 
@@ -251,7 +253,7 @@ class Index(object):
             data="{\"index.refresh_interval\":\"" + interval + "\"}"
         )
 
-        result = CNV.JSON2object(utf82unicode(response.content))
+        result = convert.JSON2object(utf82unicode(response.content))
         if not result.ok:
             Log.error("Can not set refresh interval ({{error}})", {
                 "error": utf82unicode(response.content)
@@ -269,7 +271,7 @@ class Index(object):
                 Log.note("Query:\n{{query|indent}}", {"query": show_query})
             return self.cluster._post(
                 self.path + "/_search",
-                data=CNV.object2JSON(query).encode("utf8"),
+                data=convert.object2JSON(query).encode("utf8"),
                 timeout=nvl(timeout, self.settings.timeout)
             )
         except Exception, e:
@@ -303,6 +305,7 @@ class Cluster(object):
         self.path = settings.host + ":" + unicode(settings.port)
 
     def get_or_create_index(self, settings, schema=None, limit_replicas=None):
+        settings = convert.JSON2object(convert.object2JSON(settings))  # DEEPCOPY
         aliases = self.get_aliases()
         indexes = [a for a in aliases if a.alias == settings.index or a.index == settings.index]
         if not indexes:
@@ -339,13 +342,13 @@ class Cluster(object):
         if not schema and settings.schema_file:
             from .files import File
 
-            schema = CNV.JSON2object(File(settings.schema_file).read(), flexible=True, paths=True)
+            schema = convert.JSON2object(File(settings.schema_file).read(), flexible=True, paths=True)
         elif not schema:
             Log.warning("Creating index {{name}} with no schema!", {"name": settings.alias})
         elif isinstance(schema, basestring):
-            schema = CNV.JSON2object(schema, paths=True)
+            schema = convert.JSON2object(schema, paths=True)
         else:
-            schema = CNV.JSON2object(CNV.object2JSON(schema), paths=True)
+            schema = convert.JSON2object(convert.object2JSON(schema), paths=True)
 
         limit_replicas = nvl(limit_replicas, settings.limit_replicas)
 
@@ -361,7 +364,7 @@ class Cluster(object):
 
         self._post(
             "/" + settings.index,
-            data=CNV.object2JSON(schema).encode("utf8"),
+            data=convert.object2JSON(schema).encode("utf8"),
             headers={"Content-Type": "application/json"}
         )
         time.sleep(2)
@@ -410,9 +413,9 @@ class Cluster(object):
             response = requests.post(url, *args, **kwargs)
             if self.debug:
                 Log.note(utf82unicode(response.content)[:130])
-            details = CNV.JSON2object(utf82unicode(response.content))
+            details = convert.JSON2object(utf82unicode(response.content))
             if details.error:
-                Log.error(CNV.quote2string(details.error))
+                Log.error(convert.quote2string(details.error))
             if details._shards.failed > 0:
                 Log.error("Shard failure")
             return details
@@ -435,7 +438,7 @@ class Cluster(object):
             response = requests.get(url, **kwargs)
             if self.debug:
                 Log.note(utf82unicode(response.content)[:130])
-            details = wrap(CNV.JSON2object(utf82unicode(response.content)))
+            details = wrap(convert.JSON2object(utf82unicode(response.content)))
             if details.error:
                 Log.error(details.error)
             return details
@@ -469,7 +472,7 @@ class Cluster(object):
 def proto_name(prefix, timestamp=None):
     if not timestamp:
         timestamp = datetime.utcnow()
-    return prefix + CNV.datetime2string(timestamp, "%Y%m%d_%H%M%S")
+    return prefix + convert.datetime2string(timestamp, "%Y%m%d_%H%M%S")
 
 
 def sort(values):
@@ -494,7 +497,7 @@ def _scrub(r):
                 return None
             return r
         elif Math.is_number(r):
-            return CNV.value2number(r)
+            return convert.value2number(r)
         elif isinstance(r, dict):
             if isinstance(r, Struct):
                 r = object.__getattribute__(r, "__dict__")
