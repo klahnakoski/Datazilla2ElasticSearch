@@ -274,12 +274,12 @@ def main():
 
             #RESET ONLY IF NEW Transform IS USED
             if settings.args.restart:
-                es = Cluster(settings.elasticsearch).create_index(settings.elasticsearch)
+                es = Cluster(settings.elasticsearch).create_index(settings.elasticsearch, limit_replicas=True)
                 es.add_alias()
                 es.delete_all_but_self()
                 extract_from_datazilla_using_id(es, settings, transformer)
             else:
-                es = Cluster(settings.elasticsearch).get_or_create_index(settings.elasticsearch)
+                es = Cluster(settings.elasticsearch).get_or_create_index(settings.elasticsearch, limit_replicas=True)
                 extract_from_datazilla_using_id(es, settings, transformer)
     except Exception, e:
         Log.error("Problem with etl", e)
