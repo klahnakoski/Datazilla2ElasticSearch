@@ -14,8 +14,10 @@
 from __future__ import unicode_literals
 from __future__ import division
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import math
+from pyLibrary.vendor.dateutil.parser import parse as parse_date
+from pyLibrary.strings import deformat
 
 
 class Date(object):
@@ -110,6 +112,16 @@ class Date(object):
     def __str__(self):
         return str(self.value)
 
+    def __sub__(self, other):
+        if isinstance(other, datetime):
+            return self.value - other
+        elif isinstance(other, date):
+            return self.value - other
+        elif isinstance(other, Date):
+            return self.value - other.value
+        else:
+            Log.error("can not subtract {{type}} from Date", {"type":other.__class__.__name__})
+
 
 def unicode2datetime(value, format=None):
     """
@@ -125,7 +137,25 @@ def unicode2datetime(value, format=None):
         except Exception, e:
             Log.error("Can not format {{value}} with {{format}}", {"value": value, "format": format}, e)
 
+    try:
+        local_value = parse_date(value)  #eg 2014-07-16 10:57 +0200
+        return (local_value - local_value.utcoffset()).replace(tzinfo=None)
+    except Exception, e:
+        pass
+
+
+
     formats = [
+        #"%Y-%m-%d %H:%M %z",  # "%z" NOT SUPPORTED IN 2.7
+    ]
+    for f in formats:
+        try:
+            return unicode2datetime(value, format=f)
+        except Exception:
+            pass
+
+    deformats = [
+        "%Y-%m",# eg 2014-07-16 10:57 +0200
         "%Y%m%d",
         "%d%m%Y",
         "%d%m%y",
@@ -135,7 +165,7 @@ def unicode2datetime(value, format=None):
         "%d%B%y"
     ]
     value = deformat(value)
-    for f in formats:
+    for f in deformats:
         try:
             return unicode2datetime(value, format=f)
         except Exception:
@@ -144,4 +174,4 @@ def unicode2datetime(value, format=None):
         Log.error("Can not interpret {{value}} as a datetime", {"value": value})
 
 
-from ..env.logs import Log
+from pyLibrary.env.logs import Log

@@ -15,18 +15,17 @@ from datetime import datetime
 import json
 import subprocess
 from pymysql import connect, InterfaceError
-from .. import struct
-from ..jsons import json_scrub
-from ..maths import Math
-from ..strings import expand_template, utf82unicode
-from ..struct import nvl
-from ..structs.wraps import wrap, listwrap
-from ..cnv import CNV
-from ..env.logs import Log, Except
-from ..queries import Q
-from ..strings import indent
-from ..strings import outdent
-from ..env.files import File
+from pyLibrary.jsons import json_scrub
+from pyLibrary.maths import Math
+from pyLibrary.strings import expand_template, utf82unicode
+from pyLibrary.structs import nvl
+from pyLibrary.structs.wraps import wrap, listwrap, unwrap
+from pyLibrary import convert
+from pyLibrary.env.logs import Log, Except
+from pyLibrary.queries import Q
+from pyLibrary.strings import indent
+from pyLibrary.strings import outdent
+from pyLibrary.env.files import File
 
 
 DEBUG = False
@@ -93,7 +92,10 @@ class DB(object):
             )
         except Exception, e:
             if self.settings.host.find("://") == -1:
-                Log.error(u"Failure to connect", e)
+                Log.error(u"Failure to connect to {{host}}:{{port}}", {
+                    "host": self.settings.host,
+                    "port": self.settings.port
+                }, e)
             else:
                 Log.error(u"Failure to connect.  PROTOCOL PREFIX IS PROBABLY BAD", e)
         self.cursor = None
@@ -214,7 +216,7 @@ class DB(object):
 
     def call(self, proc_name, params):
         self._execute_backlog()
-        params = [struct.unwrap(v) for v in params]
+        params = [unwrap(v) for v in params]
         try:
             self.cursor.callproc(proc_name, params)
             self.cursor.close()
@@ -245,7 +247,7 @@ class DB(object):
             self.cursor.execute(sql)
             columns = [utf8_to_unicode(d[0]) for d in nvl(self.cursor.description, [])]
             fixed = [[utf8_to_unicode(c) for c in row] for row in self.cursor]
-            result = CNV.table2list(columns, fixed)
+            result = convert.table2list(columns, fixed)
 
             if not old_cursor:   # CLEANUP AFTER NON-TRANSACTIONAL READS
                 self.cursor.close()
@@ -255,7 +257,7 @@ class DB(object):
         except Exception, e:
             if isinstance(e, InterfaceError) or e.message.find("InterfaceError") >= 0:
                 Log.error("Did you close the db connection?", e)
-            Log.error("Problem executing SQL:\n" + indent(sql.strip()), e, offset=1)
+            Log.error("Problem executing SQL:\n" + indent(sql.strip()), e, stack_depth=1)
 
     def column_query(self, sql, param=None):
         """
@@ -289,7 +291,7 @@ class DB(object):
         except Exception, e:
             if isinstance(e, InterfaceError) or e.message.find("InterfaceError") >= 0:
                 Log.error("Did you close the db connection?", e)
-            Log.error("Problem executing SQL:\n" + indent(sql.strip()), e, offset=1)
+            Log.error("Problem executing SQL:\n" + indent(sql.strip()), e, stack_depth=1)
 
 
 
@@ -322,7 +324,7 @@ class DB(object):
                 self.cursor = None
 
         except Exception, e:
-            Log.error("Problem executing SQL:\n" + indent(sql.strip()), e, offset=1)
+            Log.error("Problem executing SQL:\n" + indent(sql.strip()), e, stack_depth=1)
 
         return num
 
@@ -421,7 +423,7 @@ class DB(object):
                     self.cursor.close()
                     self.cursor = self.db.cursor()
                 except Exception, e:
-                    Log.error("Problem executing SQL:\n{{sql}}", {"sql": indent(sql.strip())}, e, offset=1)
+                    Log.error("Problem executing SQL:\n{{sql}}", {"sql": indent(sql.strip())}, e, stack_depth=1)
 
 
     ## Insert dictionary of values into table

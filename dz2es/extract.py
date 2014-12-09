@@ -16,10 +16,11 @@ from pyLibrary.env.files import File
 from pyLibrary.env.profiles import Profiler
 from pyLibrary.queries import Q
 from pyLibrary.queries.es_query import ESQuery
-from pyLibrary.struct import nvl, Struct
 from pyLibrary.env.logs import Log
 from pyLibrary.env import startup
-from pyLibrary.cnv import CNV
+from pyLibrary import convert
+from pyLibrary.structs import Struct
+from pyLibrary.structs import nvl
 from pyLibrary.thread.threads import ThreadedQueue
 from transform import DZ_to_ES
 from pyLibrary.times.timer import Timer
@@ -63,8 +64,8 @@ def etl(es_sink, file_sink, settings, transformer, max_id, id):
                 Log.note("{{id}} not found {{url}}", {"id": id, "url": url})
                 return False
 
-        data = CNV.JSON2object(content.decode('utf-8'))
-        content = CNV.object2JSON(data)  #ENSURE content HAS NO crlf
+        data = convert.JSON2object(content.decode('utf-8'))
+        content = convert.object2JSON(data)  #ENSURE content HAS NO crlf
 
         if data.test_run_id:
             Log.println("Add {{id}} for revision {{revision}} ({{bytes}} bytes)", {
@@ -189,7 +190,7 @@ def extract_from_datazilla_using_id(es, settings, transformer):
                         num += 1
 
                         with Profiler("decode and transform"):
-                            data = CNV.JSON2object(col[-1])
+                            data = convert.JSON2object(col[-1])
                             if data.test_run_id:
                                 with Profiler("transform"):
                                     data = transformer.transform(id, data)
@@ -204,8 +205,8 @@ def extract_from_datazilla_using_id(es, settings, transformer):
                     except Exception, e:
                         Log.warning("Bad line id={{id}} ({{length}}bytes):\n\t{{prefix}}", {
                             "id": id,
-                            "length": len(CNV.object2JSON(line)),
-                            "prefix": CNV.object2JSON(line)[0:130]
+                            "length": len(convert.object2JSON(line)),
+                            "prefix": convert.object2JSON(line)[0:130]
                         }, e)
         missing_ids = missing_ids - existing_ids
 

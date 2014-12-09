@@ -12,12 +12,13 @@ from __future__ import unicode_literals
 from __future__ import division
 import sys
 import math
-from .cube import Cube
-from ..queries.index import value2key
-from ..struct import StructList, Struct
-from ..structs.wraps import listwrap, wrap
-from ..env.logs import Log
-from ..collections.multiset import Multiset
+from pyLibrary.queries.cube import Cube
+from pyLibrary.queries.index import value2key
+from pyLibrary.structs.dicts import Struct
+from pyLibrary.structs.lists import StructList
+from pyLibrary.structs.wraps import listwrap, wrap
+from pyLibrary.env.logs import Log
+from pyLibrary.collections.multiset import Multiset
 
 
 def groupby(data, keys=None, size=None, min_size=None, max_size=None, contiguous=False):

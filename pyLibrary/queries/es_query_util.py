@@ -12,18 +12,19 @@ from __future__ import division
 
 from datetime import datetime
 
-from .. import struct
-from ..cnv import CNV
-from .. import strings
-from ..collections import COUNT
-from ..maths import stats
-from ..env.elasticsearch import Index
-from ..env.logs import Log
-from ..maths import Math
-from ..queries import domains, MVEL, filters
-from ..struct import nvl, StructList, Struct, split_field, join_field
-from ..structs.wraps import wrap
-from ..times import durations
+from pyLibrary import convert
+from pyLibrary import strings
+from pyLibrary.collections import COUNT
+from pyLibrary.maths import stats
+from pyLibrary.env.elasticsearch import Index
+from pyLibrary.env.logs import Log
+from pyLibrary.maths import Math
+from pyLibrary.queries import domains, MVEL, filters
+from pyLibrary.structs.dicts import Struct
+from pyLibrary.structs import set_default, split_field, join_field, nvl
+from pyLibrary.structs.lists import StructList
+from pyLibrary.structs.wraps import wrap
+from pyLibrary.times import durations
 
 
 TrueFilter = {"match_all": {}}
@@ -50,7 +51,7 @@ def loadColumns(es, frum):
             return INDEX_CACHE[frum.name]
 
     # FILL frum WITH DEFAULTS FROM es.settings
-    struct.set_default(frum, es.settings)
+    set_default(frum, es.settings)
 
     if not frum.host:
         Log.error("must have host defined")
@@ -149,7 +150,7 @@ def parseColumns(index_name, parent_path, esProperties):
             INDEX_CACHE[path].columns = childColumns
 
             columns.append({
-                "name": struct.join_field(split_field(path)[1::]),
+                "name": join_field(split_field(path)[1::]),
                 "type": property.type,
                 "useSource": True
             })
@@ -173,14 +174,14 @@ def parseColumns(index_name, parent_path, esProperties):
             for i, n, p in enumerate(property.fields):
                 if n == name:
                     # DEFAULT
-                    columns.append({"name": struct.join_field(split_field(path)[1::]), "type": p.type, "useSource": p.index == "no"})
+                    columns.append({"name": join_field(split_field(path)[1::]), "type": p.type, "useSource": p.index == "no"})
                 else:
-                    columns.append({"name": struct.join_field(split_field(path)[1::]) + "\\." + n, "type": p.type, "useSource": p.index == "no"})
+                    columns.append({"name": join_field(split_field(path)[1::]) + "\\." + n, "type": p.type, "useSource": p.index == "no"})
             continue
 
         if property.type in ["string", "boolean", "integer", "date", "long", "double"]:
             columns.append({
-                "name": struct.join_field(split_field(path)[1::]),
+                "name": join_field(split_field(path)[1::]),
                 "type": property.type,
                 "useSource": property.index == "no"
             })
@@ -190,9 +191,9 @@ def parseColumns(index_name, parent_path, esProperties):
                     "type": property.type,
                     "useSource": property.index == "no"
                 })
-        elif property.enabled == False:
+        elif not property.enabled:
             columns.append({
-                "name": struct.join_field(split_field(path)[1::]),
+                "name": join_field(split_field(path)[1::]),
                 "type": property.type,
                 "useSource": "yes"
             })
@@ -314,7 +315,7 @@ def compileNumeric2Term(edge):
         nullTest = "(" + value + "<" + ref + ") or (" + value + ">=" + top + ")"
 
     partition2int = "((" + nullTest + ") ? " + numPartitions + " : " + partition2int + ")"
-    offset = CNV.value2int(ref)
+    offset = convert.value2int(ref)
 
     def int2Partition(value):
         if Math.round(value) == numPartitions:
@@ -330,7 +331,7 @@ def compileString2Term(edge):
 
     value = edge.value
     if MVEL.isKeyword(value):
-        value = strings.expand_template("getDocValue({{path}})", {"path": CNV.string2quote(value)})
+        value = strings.expand_template("getDocValue({{path}})", {"path": convert.string2quote(value)})
     else:
         Log.error("not handled")
 

@@ -10,12 +10,12 @@
 from __future__ import unicode_literals
 from __future__ import division
 import re
-from ..cnv import CNV
-from ..collections import UNION
-from ..env.logs import Log
-from ..struct import Struct, nvl, StructList
-from ..structs.wraps import wrap, unwrap
-from .index import UniqueIndex
+from pyLibrary import convert
+from pyLibrary.env.logs import Log
+from pyLibrary.queries.unique_index import UniqueIndex
+from pyLibrary.structs import nvl, Struct
+from pyLibrary.structs.lists import StructList
+from pyLibrary.structs.wraps import wrap, unwrap
 
 ALGEBRAIC = {"time", "duration", "numeric", "count", "datetime"}  # DOMAINS THAT HAVE ALGEBRAIC OPERATIONS DEFINED
 KNOWN = {"set", "boolean", "duration", "time", "numeric"}    # DOMAINS THAT HAVE A KNOWN NUMBER FOR PARTS AT QUERY TIME
@@ -67,7 +67,7 @@ class Domain(object):
         )
 
     def __json__(self):
-        return CNV.object2JSON(self.dict)
+        return convert.object2JSON(self.dict)
 
 
 class ValueDomain(Domain):

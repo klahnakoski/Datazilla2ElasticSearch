@@ -10,7 +10,10 @@
 from __future__ import unicode_literals
 from __future__ import division
 from types import NoneType, GeneratorType
-from ..struct import Null, StructList, Struct
+from pyLibrary.structs import split_field
+from pyLibrary.structs.nones import Null, NullType
+from pyLibrary.structs.dicts import Struct
+
 
 
 _get = object.__getattribute__
@@ -58,7 +61,7 @@ def _wrap_dot(value):
             value = _wrap_dot(value)
 
             if key == "":
-                from ..env.logs import Log
+                from pyLibrary.env.logs import Log
 
                 Log.error("key is empty string.  Probably a bad idea")
             if isinstance(key, str):
@@ -147,4 +150,4 @@ def tuplewrap(value):
     return unwrap(value),
 
 
-from ..struct import StructList, Struct, split_field, NullType
+from pyLibrary.structs.lists import StructList

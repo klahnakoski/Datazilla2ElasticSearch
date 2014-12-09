@@ -9,13 +9,13 @@
 #
 from __future__ import unicode_literals
 from __future__ import division
-from .. import struct
-from ..collections import SUM
-from ..queries.domains import Domain, ALGEBRAIC, KNOWN
-from ..struct import Struct, nvl, Null, StructList, join_field, split_field
-from ..times.timer import Timer
-from ..env.logs import Log
-from ..structs.wraps import wrap, listwrap
+from pyLibrary.collections import SUM
+from pyLibrary.queries.domains import Domain, ALGEBRAIC, KNOWN
+from pyLibrary.structs import Null, nvl, join_field, split_field, Struct
+from pyLibrary.structs.lists import StructList
+from pyLibrary.times.timer import Timer
+from pyLibrary.env.logs import Log
+from pyLibrary.structs.wraps import wrap, listwrap
 
 
 DEFAULT_QUERY_LIMIT = 20

@@ -17,12 +17,12 @@ import os
 import sys
 from types import ModuleType
 
-from ..jsons import json_encoder
-from ..thread import threads
-from ..struct import nvl, Struct, split_field, join_field
-from ..structs.wraps import listwrap, wrap, wrap_dot
-from ..strings import indent, expand_template
-from ..thread.threads import Thread
+from pyLibrary.jsons import json_encoder
+from pyLibrary.thread import threads
+from pyLibrary.structs import nvl, Struct, split_field, join_field
+from pyLibrary.structs.wraps import listwrap, wrap, wrap_dot
+from pyLibrary.strings import indent, expand_template
+from pyLibrary.thread.threads import Thread
 
 
 DEBUG_LOGGING = False
@@ -50,12 +50,12 @@ class Log(object):
 
         if settings["class"]:
             if settings["class"].startswith("logging.handlers."):
-                from .log_usingLogger import Log_usingLogger
+                from pyLibrary.env.log_usingLogger import Log_usingLogger
 
                 return Log_usingLogger(settings)
             else:
                 try:
-                    from .log_usingLogger import make_log_from_settings
+                    from pyLibrary.env.log_usingLogger import make_log_from_settings
 
                     return make_log_from_settings(settings)
                 except Exception, e:
@@ -66,11 +66,11 @@ class Log(object):
         if settings.log_type == "file" or settings.filename:
             return Log_usingFile(settings.filename)
         if settings.log_type == "stream" or settings.stream:
-            from .log_usingStream import Log_usingStream
+            from pyLibrary.env.log_usingStream import Log_usingStream
 
             return Log_usingStream(settings.stream)
         if settings.log_type == "elasticsearch" or settings.stream:
-            from .log_usingElasticSearch import Log_usingElasticSearch
+            from pyLibrary.env.log_usingElasticSearch import Log_usingElasticSearch
 
             return Log_usingElasticSearch(settings)
 
@@ -167,7 +167,7 @@ class Log(object):
         template, # human readable template
         params=None, # parameters for template
         cause=None, # pausible cause
-        offset=0        # stack trace offset (==1 if you do not want to report self)
+        stack_depth=0        # stack trace offset (==1 if you do not want to report self)
     ):
         """
         raise an exception with a trace for the cause too
@@ -186,11 +186,11 @@ class Log(object):
         else:
             add_to_trace = True
             if hasattr(cause, "message"):
-                cause = [Except(ERROR, unicode(cause.message), trace=extract_tb(offset))]
+                cause = [Except(ERROR, unicode(cause.message), trace=extract_tb(stack_depth))]
             else:
-                cause = [Except(ERROR, unicode(cause), trace=extract_tb(offset))]
+                cause = [Except(ERROR, unicode(cause), trace=extract_tb(stack_depth))]
 
-        trace = extract_stack(1 + offset)
+        trace = extract_stack(1 + stack_depth)
         if add_to_trace:
             cause[0].trace.extend(trace[1:])
 
@@ -203,7 +203,7 @@ class Log(object):
         template, # human readable template
         params=None, # parameters for template
         cause=None, # pausible cause
-        offset=0    # stack trace offset (==1 if you do not want to report self)
+        stack_depth=0    # stack trace offset (==1 if you do not want to report self)
     ):
         """
         SEND TO STDERR
@@ -219,9 +219,9 @@ class Log(object):
         elif isinstance(cause, Except):
             cause = [cause]
         else:
-            cause = [Except(ERROR, unicode(cause), trace=extract_tb(offset))]
+            cause = [Except(ERROR, unicode(cause), trace=extract_tb(stack_depth))]
 
-        trace = extract_stack(1 + offset)
+        trace = extract_stack(1 + stack_depth)
         e = Except(ERROR, template, params, cause, trace)
         str_e = unicode(e)
 
@@ -254,7 +254,7 @@ class Log(object):
         cls.settings = settings
         cls.trace = cls.trace | nvl(settings.trace, False)
         if cls.trace:
-            from ..thread.threads import Thread
+            from pyLibrary.thread.threads import Thread
 
         if not settings.log:
             return
@@ -275,7 +275,7 @@ class Log(object):
             cls.cprofiler.enable()
 
         if settings.profile:
-            from ..env import profiles
+            from pyLibrary.env import profiles
 
             if isinstance(settings.profile, bool):
                 settings.profile = {"enabled": True, "filename": "profile.tab"}
@@ -329,7 +329,7 @@ class Log(object):
 
     @classmethod
     def stop(cls):
-        from ..env import profiles
+        from pyLibrary.env import profiles
 
         if cls.cprofiler and hasattr(cls, "settings"):
             write_profile(cls.settings.cprofile, cls.cprofiler)
@@ -443,9 +443,13 @@ class Except(Exception):
 
     @property
     def message(self):
-        return unicode(self)
+        return expand_template(self.template, self.params)
 
     def contains(self, value):
+        if isinstance(value, basestring):
+            if self.message.find(value) >= 0:
+                return True
+
         if self.type == value:
             return True
         for c in self.cause:
@@ -465,11 +469,11 @@ class Except(Exception):
             cause_strings = []
             for c in listwrap(self.cause):
                 try:
-                    cause_strings.append(unicode(c))
+                    cause_strings.append(indent(unicode(c)))
                 except Exception, e:
                     pass
 
-            output += "caused by\n\t" + "and caused by\n\t".join(cause_strings)
+            output += "caused by\n" + "\nand caused by\n".join(cause_strings)
 
         return output
 
@@ -498,7 +502,7 @@ class Log_usingFile(BaseLog):
     def __init__(self, file):
         assert file
 
-        from ..env.files import File
+        from pyLibrary.env.files import File
 
         self.file = File(file)
         if self.file.exists:
@@ -515,7 +519,7 @@ class Log_usingFile(BaseLog):
 class Log_usingThread(BaseLog):
     def __init__(self, logger):
         # DELAYED LOAD FOR THREADS MODULE
-        from ..thread.threads import Queue
+        from pyLibrary.thread.threads import Queue
 
         self.queue = Queue(max=10000, silent=True)
         self.logger = logger
@@ -595,8 +599,8 @@ class Log_usingMulti(BaseLog):
 
 
 def write_profile(profile_settings, cprofiler):
-    from ..cnv import CNV
-    from .files import File
+    from pyLibrary import convert
+    from pyLibrary.env.files import File
     import pstats
 
     p = pstats.Stats(cprofiler)
@@ -612,8 +616,8 @@ def write_profile(profile_settings, cprofiler):
     }
         for f, d, in p.stats.iteritems()
     ]
-    stats_file = File(profile_settings.filename, suffix=CNV.datetime2string(datetime.now(), "_%Y%m%d_%H%M%S"))
-    stats_file.write(CNV.list2tab(stats))
+    stats_file = File(profile_settings.filename, suffix=convert.datetime2string(datetime.now(), "_%Y%m%d_%H%M%S"))
+    stats_file.write(convert.list2tab(stats))
 
 
 if not Log.main_log:

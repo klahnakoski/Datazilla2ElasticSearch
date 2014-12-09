@@ -16,11 +16,11 @@ from datetime import timedelta
 import logging
 import sys
 
-from .. import struct
-from .log_usingStream import Log_usingStream, time_delta_pusher
-from .logs import BaseLog, DEBUG_LOGGING, Log
-from ..thread import threads
-from ..thread.threads import Thread
+from pyLibrary.env.log_usingStream import Log_usingStream, time_delta_pusher
+from pyLibrary.env.logs import BaseLog, DEBUG_LOGGING, Log
+from pyLibrary.structs import unwrap
+from pyLibrary.thread import threads
+from pyLibrary.thread.threads import Thread
 
 
 
@@ -76,14 +76,14 @@ def make_log_from_settings(settings):
 
     # IF WE NEED A FILE, MAKE SURE DIRECTORY EXISTS
     if settings.filename:
-        from ..env.files import File
+        from pyLibrary.env.files import File
 
         f = File(settings.filename)
         if not f.parent.exists:
             f.parent.create()
 
     settings['class'] = None
-    params = struct.unwrap(settings)
+    params = unwrap(settings)
     log_instance = constructor(**params)
     return log_instance
 

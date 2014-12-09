@@ -9,22 +9,24 @@
 
 from __future__ import unicode_literals
 from __future__ import division
+from copy import deepcopy
 
 from datetime import datetime
 import re
 import time
 import requests
 
-from ..collections import OR
-from ..cnv import CNV
-from ..env.logs import Log
-from ..maths.randoms import Random
-from ..maths import Math
-from ..strings import utf82unicode
-from ..struct import nvl, Null
-from ..structs.wraps import wrap, unwrap
-from ..struct import Struct, StructList
-from ..thread.threads import ThreadedQueue
+from pyLibrary.collections import OR
+from pyLibrary import convert
+from pyLibrary.env.logs import Log
+from pyLibrary.maths.randoms import Random
+from pyLibrary.maths import Math
+from pyLibrary.queries import Q
+from pyLibrary.strings import utf82unicode
+from pyLibrary.structs import nvl, Null, Struct
+from pyLibrary.structs.lists import StructList
+from pyLibrary.structs.wraps import wrap, unwrap
+from pyLibrary.thread.threads import ThreadedQueue
 
 
 DEBUG = False
@@ -69,7 +71,7 @@ class Index(object):
 
         try:
             index = self.get_index(settings.index)
-            if index:
+            if index and settings.alias==None:
                 settings.alias = settings.index
                 settings.index = index
         except Exception, e:
@@ -110,11 +112,11 @@ class Index(object):
         self.cluster_metadata = None
         self.cluster._post(
             "/_aliases",
-            CNV.object2JSON({
+            data=convert.unicode2utf8(convert.object2JSON({
                 "actions": [
                     {"add": {"index": self.settings.index, "alias": self.settings.alias}}
                 ]
-            }),
+            })),
             timeout=nvl(self.settings.timeout, 30)
         )
 
@@ -137,8 +139,11 @@ class Index(object):
         output = sort([
             a.index
             for a in self.cluster.get_aliases()
-            if a.alias == alias
+            if a.alias == alias or
+                a.index == alias or
+               (re.match(re.escape(alias) + "\\d{8}_\\d{6}", a.index) and a.index != alias)
         ])
+
         if len(output) > 1:
             Log.error("only one index with given alias==\"{{alias}}\" expected", {"alias": alias})
 
@@ -170,7 +175,8 @@ class Index(object):
 
         self.cluster.delete(
             self.path + "/_query",
-            data=CNV.object2JSON(query)
+            data=convert.object2JSON(query),
+            timeout=60
         )
 
     def extend(self, records):
@@ -190,12 +196,12 @@ class Index(object):
                 if "json" in r:
                     json = r["json"]
                 elif "value" in r:
-                    json = CNV.object2JSON(r["value"])
+                    json = convert.object2JSON(r["value"])
                 else:
                     json = None
                     Log.error("Expecting every record given to have \"value\" or \"json\" property")
 
-                lines.append('{"index":{"_id": ' + CNV.object2JSON(id) + '}}')
+                lines.append('{"index":{"_id": ' + convert.object2JSON(id) + '}}')
                 lines.append(json)
             del records
 
@@ -205,7 +211,6 @@ class Index(object):
             try:
                 data_bytes = "\n".join(lines) + "\n"
                 data_bytes = data_bytes.encode("utf8")
-                del lines
             except Exception, e:
                 Log.error("can not make request body from\n{{lines|indent}}", {"lines": lines}, e)
 
@@ -218,11 +223,20 @@ class Index(object):
             items = response["items"]
 
             for i, item in enumerate(items):
-                if not item.index.ok:
-                    Log.error("{{error}} while loading line:\n{{line}}", {
-                        "error": item.index.error,
-                        "line": lines[i * 2 + 1]
-                    })
+                if self.cluster.version.startswith("0.90."):
+                    if not item.index.ok:
+                        Log.error("{{error}} while loading line:\n{{line}}", {
+                            "error": item.index.error,
+                            "line": lines[i * 2 + 1]
+                        })
+                elif self.cluster.version.startswith("1.4."):
+                    if not item.index.status==201:
+                        Log.error("{{error}} while loading line:\n{{line}}", {
+                            "error": item.index.error,
+                            "line": lines[i * 2 + 1]
+                        })
+                else:
+                    Log.error("version not supported {{version}}", {"version":self.cluster.version})
 
             if self.debug:
                 Log.note("{{num}} items added", {"num": len(items)})
@@ -242,20 +256,28 @@ class Index(object):
     # -1 FOR NO REFRESH
     def set_refresh_interval(self, seconds):
         if seconds <= 0:
-            interval = "-1"
+            interval = -1
         else:
             interval = unicode(seconds) + "s"
 
         response = self.cluster.put(
             "/" + self.settings.index + "/_settings",
-            data="{\"index.refresh_interval\":\"" + interval + "\"}"
+            data='{"index":{"refresh_interval":' + convert.object2JSON(interval) + '}}'
         )
 
-        result = CNV.JSON2object(utf82unicode(response.content))
-        if not result.ok:
-            Log.error("Can not set refresh interval ({{error}})", {
-                "error": utf82unicode(response.content)
-            })
+        result = convert.JSON2object(utf82unicode(response.content))
+        if self.cluster.version.startswith("0.90."):
+            if not result.ok:
+                Log.error("Can not set refresh interval ({{error}})", {
+                    "error": utf82unicode(response.content)
+                })
+        elif self.cluster.version.startswith("1.4."):
+            if not result.acknowledged:
+                Log.error("Can not set refresh interval ({{error}})", {
+                    "error": utf82unicode(response.content)
+                })
+        else:
+            Log.error("Do not know how to handle ES version {{version}}", {"version":self.cluster.version})
 
     def search(self, query, timeout=None):
         query = wrap(query)
@@ -269,7 +291,7 @@ class Index(object):
                 Log.note("Query:\n{{query|indent}}", {"query": show_query})
             return self.cluster._post(
                 self.path + "/_search",
-                data=CNV.object2JSON(query).encode("utf8"),
+                data=convert.object2JSON(query).encode("utf8"),
                 timeout=nvl(timeout, self.settings.timeout)
             )
         except Exception, e:
@@ -300,18 +322,28 @@ class Cluster(object):
         settings.setdefault("port", 9200)
         self.debug = nvl(settings.debug, DEBUG)
         self.settings = settings
+        self.version = None
         self.path = settings.host + ":" + unicode(settings.port)
 
     def get_or_create_index(self, settings, schema=None, limit_replicas=None):
+        settings = deepcopy(settings)
         aliases = self.get_aliases()
-        indexes = [a for a in aliases if a.alias == settings.index or a.index == settings.index]
+
+        indexes = Q.sort([
+            a
+            for a in aliases
+            if (a.alias == settings.index and settings.alias == None) or
+               (re.match(re.escape(settings.index) + "\\d{8}_\\d{6}", a.index) and settings.alias == None) or
+               (a.index == settings.index and a.alias == settings.alias )
+        ], "index")
         if not indexes:
             self.create_index(settings, schema, limit_replicas=limit_replicas)
-        elif len(indexes) > 1:
-            Log.error("More than one match")
-        elif indexes[0].alias != None:
-            settings.alias = indexes[0].alias
-            settings.index = indexes[0].index
+        elif indexes.last().alias != None:
+            settings.alias = indexes.last().alias
+            settings.index = indexes.last().index
+        elif settings.alias == None:
+            settings.alias = settings.index
+            settings.index = indexes.last().index
         return Index(settings)
 
     def get_index(self, settings):
@@ -336,16 +368,16 @@ class Cluster(object):
         if settings.alias == settings.index:
             Log.error("Expecting index name to conform to pattern")
 
-        if not schema and settings.schema_file:
-            from .files import File
+        if settings.schema_file:
+            Log.error('schema_file attribute not suported.  Use {"$ref":<filename>} instead')
 
-            schema = CNV.JSON2object(File(settings.schema_file).read(), flexible=True, paths=True)
-        elif not schema:
-            Log.warning("Creating index {{name}} with no schema!", {"name": settings.alias})
-        elif isinstance(schema, basestring):
-            schema = CNV.JSON2object(schema, paths=True)
+        if isinstance(schema, basestring):
+            schema = convert.JSON2object(schema, paths=True)
         else:
-            schema = CNV.JSON2object(CNV.object2JSON(schema), paths=True)
+            schema = convert.JSON2object(convert.object2JSON(schema), paths=True)
+
+        if not schema:
+            schema = settings.schema
 
         limit_replicas = nvl(limit_replicas, settings.limit_replicas)
 
@@ -361,7 +393,7 @@ class Cluster(object):
 
         self._post(
             "/" + settings.index,
-            data=CNV.object2JSON(schema).encode("utf8"),
+            data=convert.object2JSON(schema).encode("utf8"),
             headers={"Content-Type": "application/json"}
         )
         time.sleep(2)
@@ -392,13 +424,12 @@ class Cluster(object):
                 response = self.get("/_cluster/state")
                 self.cluster_metadata = response.metadata
                 self.node_metatdata = self.get("/")
+                self.version = self.node_metatdata.version.number
         else:
             Log.error("Metadata exploration has been disabled")
         return self.cluster_metadata
 
-    def _post(self, path, *args, **kwargs):
-        if "data" in kwargs and not isinstance(kwargs["data"], str):
-            Log.error("data must be utf8 encoded string")
+    def _post(self, path, **kwargs):
 
         url = self.settings.host + ":" + unicode(self.settings.port) + path
 
@@ -407,12 +438,20 @@ class Cluster(object):
             kwargs.setdefault("timeout", 600)
             kwargs.headers["Accept-Encoding"] = "gzip,deflate"
             kwargs = unwrap(kwargs)
-            response = requests.post(url, *args, **kwargs)
+
+
+            if "data" in kwargs and not isinstance(kwargs["data"], str):
+                Log.error("data must be utf8 encoded string")
+
+            if DEBUG:
+                Log.note("{{url}}:\n{{data|left(300)|indent}}", {"url": url, "data": kwargs["data"]})
+
+            response = requests.post(url, **kwargs)
             if self.debug:
                 Log.note(utf82unicode(response.content)[:130])
-            details = CNV.JSON2object(utf82unicode(response.content))
+            details = convert.JSON2object(utf82unicode(response.content))
             if details.error:
-                Log.error(CNV.quote2string(details.error))
+                Log.error(convert.quote2string(details.error))
             if details._shards.failed > 0:
                 Log.error("Shard failure")
             return details
@@ -435,19 +474,22 @@ class Cluster(object):
             response = requests.get(url, **kwargs)
             if self.debug:
                 Log.note(utf82unicode(response.content)[:130])
-            details = wrap(CNV.JSON2object(utf82unicode(response.content)))
+            details = wrap(convert.JSON2object(utf82unicode(response.content)))
             if details.error:
                 Log.error(details.error)
             return details
         except Exception, e:
             Log.error("Problem with call to {{url}}", {"url": url}, e)
 
-    def put(self, path, *args, **kwargs):
+    def put(self, path, **kwargs):
         url = self.settings.host + ":" + unicode(self.settings.port) + path
+
+        if DEBUG:
+            Log.note("PUT {{url}}:\n{{data|indent}}", {"url": url, "data": kwargs["data"]})
         try:
             kwargs = wrap(kwargs)
             kwargs.setdefault("timeout", 60)
-            response = requests.put(url, *args, **kwargs)
+            response = requests.put(url, data=kwargs.data, **kwargs)
             if self.debug:
                 Log.note(utf82unicode(response.content))
             return response
@@ -469,7 +511,7 @@ class Cluster(object):
 def proto_name(prefix, timestamp=None):
     if not timestamp:
         timestamp = datetime.utcnow()
-    return prefix + CNV.datetime2string(timestamp, "%Y%m%d_%H%M%S")
+    return prefix + convert.datetime2string(timestamp, "%Y%m%d_%H%M%S")
 
 
 def sort(values):
@@ -494,7 +536,7 @@ def _scrub(r):
                 return None
             return r
         elif Math.is_number(r):
-            return CNV.value2number(r)
+            return convert.value2number(r)
         elif isinstance(r, dict):
             if isinstance(r, Struct):
                 r = object.__getattribute__(r, "__dict__")

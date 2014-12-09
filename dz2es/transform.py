@@ -11,17 +11,18 @@ from __future__ import unicode_literals
 from math import sqrt
 import datetime
 
+from dz2es.pushlog import Pushlog
 import pyLibrary
-from pyLibrary.cnv import CNV
 from pyLibrary.collections import MIN, MAX
 from pyLibrary.env.profiles import Profiler
 from pyLibrary.maths import Math
 from pyLibrary.maths.stats import Stats, ZeroMoment2Stats, ZeroMoment
-from pyLibrary.struct import Struct, literal_field, nvl, StructList
-from pyLibrary.structs.wraps import wrap
+from pyLibrary.structs import Struct, nvl
+from pyLibrary.structs import literal_field
+from pyLibrary.structs.lists import StructList
+from pyLibrary import convert
+
 from pyLibrary.thread.threads import Lock
-from pyLibrary.times.timer import Timer
-from pyLibrary.sql.db import DB
 from pyLibrary.env.logs import Log
 from pyLibrary.queries import Q
 
@@ -35,37 +36,8 @@ PUSHLOG_TOO_OLD = NOW - datetime.timedelta(days=7)
 
 class DZ_to_ES():
     def __init__(self, pushlog_settings):
-        with Timer("get pushlog"):
-            if pushlog_settings.disable:
-                all_pushlogs = []
-            else:
-                with DB(pushlog_settings) as db:
-                    all_pushlogs = db.query("""
-                        SELECT
-                            pl.`date`,
-                            left(ch.node, 12) revision,
-                            coalesce(bm.alt_name, br.name) branch
-                        FROM
-                            changesets ch
-                        LEFT JOIN
-                            pushlogs pl ON pl.id = ch.pushlog_id
-                        LEFT JOIN
-                            branches br ON br.id = pl.branch_id
-                        LEFT JOIN
-                            branch_map bm ON br.id = bm.id
-                        WHERE
-                            pl.date > {{oldest_date}}
-                    """, {"oldest_date": TOO_OLD})
-            Log.note("Got pushlog, now indexing...")
-            self.pushlog = wrap(Q.index(all_pushlogs, ["branch", "revision"])._data)
-            self.locker = Lock()
-            self.unknown_branches = set()
-
-    def __del__(self):
-        try:
-            Log.println("Branches missing from pushlog:\n{{list}}", {"list": self.unknown_branches})
-        except Exception, e:
-            pass
+        self.pushlog = Pushlog()
+        self.locker = Lock()
 
 
     # A SIMPLE TRANSFORM OF DATA:  I WOULD ALSO LIKE TO ADD DIMENSIONAL TYPE INFORMATION
@@ -130,32 +102,20 @@ class DZ_to_ES():
                     r.test_build.pgo = True
 
                 with Profiler("get from pushlog"):
-                    if not self.pushlog:
-                        #NO PUSHLOG MEANS WE DO NOTHING TO MARKUP TEST RESULTS
-                        pass
-                    elif self.pushlog[branch]:
-                        possible_dates = self.pushlog[branch][r.test_build.revision]
-                        if possible_dates:
-                            r.test_build.push_date = int(Math.round(possible_dates[0].date * 1000))
-                        else:
-                            if r.test_build.revision == 'NULL':
-                                r.test_build.no_pushlog = True  # OOPS! SOMETHING BROKE
-                            elif CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
-                                Log.note("{{branch}} @ {{revision}} has no pushlog, transforming anyway", r.test_build)
-                                r.test_build.no_pushlog = True
-                            else:
-                                Log.note("{{branch}} @ {{revision}} has no pushlog, try again later", r.test_build)
-                                return []  # TRY AGAIN LATER
+                    with self.locker:
+                        pushdate = self.pushlog[branch, r.test_build.revision]
+
+                    if pushdate:
+                        r.test_build.push_date = int(Math.round(pushdate * 1000))
                     else:
-                        with self.locker:
-                            if branch not in self.unknown_branches:
-                                Log.note("Whole branch {{branch}} has no pushlog", {"branch":branch})
-                                self.unknown_branches.add(branch)
-                            if CNV.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
-                                r.test_build.no_pushlog = True
-                            else:
-                                r.test_build.no_pushlog = True
-                                #return [r]  #TODO: DO THIS IF WE FIGURE OUT HOW TO HANDLE THE VERY LARGE NUMBER OF RESULTS WITH NO PUSHLOG
+                        if r.test_build.revision == 'NULL':
+                            r.test_build.no_pushlog = True  # OOPS! SOMETHING BROKE
+                        elif convert.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
+                            Log.note("{{branch}} @ {{revision}} has no pushlog, transforming anyway", r.test_build)
+                            r.test_build.no_pushlog = True
+                        else:
+                            Log.note("{{branch}} @ {{revision}} has no pushlog, try again later", r.test_build)
+                            return []  # TRY AGAIN LATER
 
             except Exception, e:
                 Log.warning("{{branch}} @ {{revision}} has no pushlog", r.test_build, e)
