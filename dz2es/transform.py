@@ -36,7 +36,10 @@ PUSHLOG_TOO_OLD = NOW - datetime.timedelta(days=7)
 
 class DZ_to_ES():
     def __init__(self, pushlog_settings):
-        self.pushlog = Pushlog()
+        if pushlog_settings.disable:
+            self.pushlog=None
+        else:
+            self.pushlog = Pushlog()
         self.locker = Lock()
 
 
@@ -102,8 +105,11 @@ class DZ_to_ES():
                     r.test_build.pgo = True
 
                 with Profiler("get from pushlog"):
+                    pushdate = None
+
                     with self.locker:
-                        pushdate = self.pushlog[branch, r.test_build.revision]
+                        if self.pushlog:
+                            pushdate = self.pushlog[branch, r.test_build.revision]
 
                     if pushdate:
                         r.test_build.push_date = int(Math.round(pushdate * 1000))
@@ -111,7 +117,8 @@ class DZ_to_ES():
                         if r.test_build.revision == 'NULL':
                             r.test_build.no_pushlog = True  # OOPS! SOMETHING BROKE
                         elif convert.milli2datetime(Math.min(r.testrun.date, r.datazilla.date_loaded)) < PUSHLOG_TOO_OLD:
-                            Log.note("{{branch}} @ {{revision}} has no pushlog, transforming anyway", r.test_build)
+                            if self.pushlog:
+                                Log.note("{{branch}} @ {{revision}} has no pushlog, transforming anyway", r.test_build)
                             r.test_build.no_pushlog = True
                         else:
                             Log.note("{{branch}} @ {{revision}} has no pushlog, try again later", r.test_build)
