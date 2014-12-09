@@ -16,9 +16,9 @@ from math import sqrt
 
 from pyLibrary import convert
 from pyLibrary.collections import OR
-from __init__ import Math, almost_equal
+from __init__ import almost_equal
 from pyLibrary.env.logs import Log
-from pyLibrary.struct import nvl, Struct, Null
+from pyLibrary.structs import nvl, Struct, Null
 from pyLibrary.vendor import strangman
 
 
@@ -78,11 +78,11 @@ def Stats2ZeroMoment(stats):
         globals()["DEBUG"] = False
         try:
             v = ZeroMoment2Stats(m, unbiased=False)
-            assertAlmostEqualValue(v.count, stats.count)
-            assertAlmostEqualValue(v.mean, stats.mean)
-            assertAlmostEqualValue(v.variance, stats.variance)
-            assertAlmostEqualValue(v.skew, stats.skew)
-            assertAlmostEqualValue(v.kurtosis, stats.vkurtosis)
+            assertAlmostEqualValue(v.count, stats.count, places=10)
+            assertAlmostEqualValue(v.mean, stats.mean, places=10)
+            assertAlmostEqualValue(v.variance, stats.variance, places=10)
+            assertAlmostEqualValue(v.skew, stats.skew, places=10)
+            assertAlmostEqualValue(v.kurtosis, stats.vkurtosis, places=10)
         except Exception, e:
             v = ZeroMoment2Stats(m, unbiased=False)
             Log.error("programmer error")

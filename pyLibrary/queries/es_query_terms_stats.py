@@ -19,7 +19,8 @@ from pyLibrary.queries.filters import simplify
 from pyLibrary.env.logs import Log
 from pyLibrary.queries import domains, MVEL, filters
 from pyLibrary.queries.MVEL import UID
-from pyLibrary.struct import nvl, StructList
+from pyLibrary.structs import literal_field, nvl
+from pyLibrary.structs.lists import StructList
 from pyLibrary.structs.wraps import wrap, listwrap
 
 
@@ -126,7 +127,7 @@ def es_terms_stats(esq, mvel, query):
         for parts in esFacets:
             condition = StructList()
             constants = StructList()
-            name = [s.name]
+            name = [literal_field(s.name)]
             for f, fedge in enumerate(facetEdges):
                 name.append(str(parts[f].dataIndex))
                 condition.append(buildCondition(mvel, fedge, parts[f]))

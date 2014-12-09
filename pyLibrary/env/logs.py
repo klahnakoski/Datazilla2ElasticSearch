@@ -19,7 +19,7 @@ from types import ModuleType
 
 from pyLibrary.jsons import json_encoder
 from pyLibrary.thread import threads
-from pyLibrary.struct import nvl, Struct, split_field, join_field
+from pyLibrary.structs import nvl, Struct, split_field, join_field
 from pyLibrary.structs.wraps import listwrap, wrap, wrap_dot
 from pyLibrary.strings import indent, expand_template
 from pyLibrary.thread.threads import Thread
@@ -50,12 +50,12 @@ class Log(object):
 
         if settings["class"]:
             if settings["class"].startswith("logging.handlers."):
-                from .log_usingLogger import Log_usingLogger
+                from pyLibrary.env.log_usingLogger import Log_usingLogger
 
                 return Log_usingLogger(settings)
             else:
                 try:
-                    from .log_usingLogger import make_log_from_settings
+                    from pyLibrary.env.log_usingLogger import make_log_from_settings
 
                     return make_log_from_settings(settings)
                 except Exception, e:
@@ -66,11 +66,11 @@ class Log(object):
         if settings.log_type == "file" or settings.filename:
             return Log_usingFile(settings.filename)
         if settings.log_type == "stream" or settings.stream:
-            from .log_usingStream import Log_usingStream
+            from pyLibrary.env.log_usingStream import Log_usingStream
 
             return Log_usingStream(settings.stream)
         if settings.log_type == "elasticsearch" or settings.stream:
-            from .log_usingElasticSearch import Log_usingElasticSearch
+            from pyLibrary.env.log_usingElasticSearch import Log_usingElasticSearch
 
             return Log_usingElasticSearch(settings)
 
@@ -443,9 +443,13 @@ class Except(Exception):
 
     @property
     def message(self):
-        return unicode(self)
+        return expand_template(self.template, self.params)
 
     def contains(self, value):
+        if isinstance(value, basestring):
+            if self.message.find(value) >= 0:
+                return True
+
         if self.type == value:
             return True
         for c in self.cause:
@@ -465,11 +469,11 @@ class Except(Exception):
             cause_strings = []
             for c in listwrap(self.cause):
                 try:
-                    cause_strings.append(unicode(c))
+                    cause_strings.append(indent(unicode(c)))
                 except Exception, e:
                     pass
 
-            output += "caused by\n\t" + "and caused by\n\t".join(cause_strings)
+            output += "caused by\n" + "\nand caused by\n".join(cause_strings)
 
         return output
 
@@ -596,7 +600,7 @@ class Log_usingMulti(BaseLog):
 
 def write_profile(profile_settings, cprofiler):
     from pyLibrary import convert
-    from .files import File
+    from pyLibrary.env.files import File
     import pstats
 
     p = pstats.Stats(cprofiler)

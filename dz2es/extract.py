@@ -16,10 +16,11 @@ from pyLibrary.env.files import File
 from pyLibrary.env.profiles import Profiler
 from pyLibrary.queries import Q
 from pyLibrary.queries.es_query import ESQuery
-from pyLibrary.struct import nvl, Struct
 from pyLibrary.env.logs import Log
 from pyLibrary.env import startup
 from pyLibrary import convert
+from pyLibrary.structs import Struct
+from pyLibrary.structs import nvl
 from pyLibrary.thread.threads import ThreadedQueue
 from transform import DZ_to_ES
 from pyLibrary.times.timer import Timer

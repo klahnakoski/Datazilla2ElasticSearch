@@ -13,7 +13,8 @@ from pyLibrary.sql.db import DB
 from pyLibrary.env.files import File
 from pyLibrary.env.logs import Log
 from pyLibrary.env import startup
-from pyLibrary.struct import nvl, Struct
+from pyLibrary.structs import Struct
+from pyLibrary.structs import nvl
 from pyLibrary.thread.threads import ThreadedQueue
 
 
