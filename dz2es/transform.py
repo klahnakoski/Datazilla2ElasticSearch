@@ -139,7 +139,7 @@ class DZ_to_ES():
             # RECORD THE UNKNOWN PART OF THE TEST RESULTS
             remainder = r.copy()
             remainder.results = None
-            if len(remainder.keys()) > 4:
+            if not r.results or len(remainder.keys()) > 4:
                 new_records.append(remainder)
 
             #RECORD TEST RESULTS

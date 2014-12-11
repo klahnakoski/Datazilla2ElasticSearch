@@ -37,6 +37,8 @@ class Pushlog(object):
 
 def talos2treeherder(name):
     name = name.lower()
+    name = name.replace(".", "_")
+
     if name.endswith("-non-pgo"):
         name = name[:-8]
     if name == "mozilla-central":
