@@ -11,7 +11,14 @@ class Pushlog(object):
 
     def __init__(self):
         repos = convert.JSON2object(convert.utf82unicode(requests.get("https://treeherder.mozilla.org/api/repository/").content))
-        self.branches = {b.name.lower(): b for b in repos}
+
+        def talos2treeherder(name):
+            if name == "mozilla-central":
+                return "firefox"
+            else:
+                return name
+
+        self.branches = {talos2treeherder(b.name.lower()): b for b in repos}
         self.graph = MozillaGraph(Struct(branches=self.branches))
 
 
