@@ -12,13 +12,7 @@ class Pushlog(object):
     def __init__(self):
         repos = convert.JSON2object(convert.utf82unicode(requests.get("https://treeherder.mozilla.org/api/repository/").content))
 
-        def talos2treeherder(name):
-            if name == "mozilla-central":
-                return "firefox"
-            else:
-                return name
-
-        self.branches = {talos2treeherder(b.name.lower()): b for b in repos}
+        self.branches = {talos2treeherder(b.name): b for b in repos}
         self.graph = MozillaGraph(Struct(branches=self.branches))
 
 
@@ -28,7 +22,7 @@ class Pushlog(object):
                 Log.error("Expecting a [branch, rev] pair")
 
             push = self.graph.get_push(Revision(
-                branch=self.branches[item[0].lower()],
+                branch=self.branches[talos2treeherder(item[0])],
                 changeset={"id": item[1]}
             ))
         except Exception, e:
@@ -41,3 +35,11 @@ class Pushlog(object):
 
 
 
+def talos2treeherder(name):
+    name = name.lower()
+    if name.endswith("-non-pgo"):
+        name = name[:-8]
+    if name == "mozilla-central":
+        return "firefox"
+    else:
+        return name

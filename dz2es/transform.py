@@ -94,16 +94,22 @@ class DZ_to_ES():
             mainthread_transform(r.results_aux)
             mainthread_transform(r.results_xperf)
 
+
+            branch = r.test_build.branch
+            if branch.lower().endswith("-non-pgo"):
+                branch = branch[0:-8]
+                r.test_build.branch = branch
+                r.test_build.pgo = False
+            else:
+                r.test_build.pgo = True
+
+            if r.test_machine.osversion.endswith(".e"):
+                r.test_machine.osversion = r.test_machine.osversion[:-2]
+                r.test_machine.e10s = True
+
+
             #ADD PUSH LOG INFO
             try:
-                branch = r.test_build.branch
-                if branch.endswith("-Non-PGO"):
-                    r.test_build.branch = branch
-                    r.test_build.pgo = False
-                    branch = branch[0:-8]
-                else:
-                    r.test_build.pgo = True
-
                 with Profiler("get from pushlog"):
                     pushdate = None
 
@@ -120,6 +126,7 @@ class DZ_to_ES():
                             if self.pushlog:
                                 Log.note("{{branch}} @ {{revision}} has no pushlog, transforming anyway", r.test_build)
                             r.test_build.no_pushlog = True
+                            r.test_build.push_date = Math.min(r.testrun.date, r.datazilla.date_loaded)  #GIVE IT A DATE
                         else:
                             Log.note("{{branch}} @ {{revision}} has no pushlog, try again later", r.test_build)
                             return []  # TRY AGAIN LATER
