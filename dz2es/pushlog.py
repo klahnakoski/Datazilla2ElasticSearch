@@ -14,7 +14,7 @@ from dz2es.mozilla_graph import MozillaGraph
 from dz2es.repos.revisions import Revision
 from pyLibrary import convert
 from pyLibrary.env.logs import Log
-from pyLibrary.structs import Struct
+from pyLibrary.structs import Struct, wrap
 
 
 class Pushlog(object):
@@ -23,7 +23,10 @@ class Pushlog(object):
     def __init__(self):
         repos = convert.JSON2object(convert.utf82unicode(requests.get("https://treeherder.mozilla.org/api/repository/").content))
 
-        self.branches = {talos2treeherder(b.name): b for b in repos}
+        self.branches = wrap({talos2treeherder(b.name): b for b in repos})
+        if not self.branches.gum:
+            self.branches.gum = {"name": "Gum", "url": "https://hg.mozilla.org/projects/gum/"}
+
         self.graph = MozillaGraph(Struct(branches=self.branches))
 
 
