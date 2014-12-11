@@ -14,6 +14,7 @@ from dz2es.mozilla_graph import MozillaGraph
 from dz2es.repos.revisions import Revision
 from pyLibrary import convert
 from pyLibrary.env.logs import Log
+from pyLibrary.strings import deformat
 from pyLibrary.structs import Struct, wrap
 
 
@@ -54,11 +55,9 @@ class Pushlog(object):
 
 def talos2treeherder(name):
     name = name.lower()
-    name = name.replace(".", "_")
-
     if name.endswith("-non-pgo"):
         name = name[:-8]
     if name == "mozilla-central":
-        return "firefox"
-    else:
-        return name
+        name = "firefox"
+
+    return deformat(name)
