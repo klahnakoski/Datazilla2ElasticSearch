@@ -27,6 +27,8 @@ class Pushlog(object):
         self.branches = wrap({talos2treeherder(b.name): b for b in repos})
         if not self.branches.gum:
             self.branches.gum = {"name": "Gum", "url": "https://hg.mozilla.org/projects/gum/"}
+        if not self.branches.alder:
+            self.branches.alder = {"name": "Alder", "url": "https://hg.mozilla.org/projects/alder/"}
 
         self.graph = MozillaGraph(Struct(branches=self.branches))
 
