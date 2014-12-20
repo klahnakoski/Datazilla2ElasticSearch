@@ -1,12 +1,4 @@
 {
-	"pushlog" : {
-		"host" : "s4n4.qa.phx1.mozilla.com",
-		"port" : 3306,
-		"username" : "username",
-		"password" : "password",
-		"schema" : "pushlog_hgmozilla_1",
-		"disable" : false
-	},
 	"elasticsearch" : {
 		"host" : "http://localhost",
 		"port" : 9200,
