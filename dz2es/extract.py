@@ -64,8 +64,8 @@ def etl(es_sink, file_sink, settings, transformer, max_id, id):
                 Log.note("{{id}} not found {{url}}", {"id": id, "url": url})
                 return False
 
-        data = convert.JSON2object(content.decode('utf-8'))
-        content = convert.object2JSON(data)  #ENSURE content HAS NO crlf
+        data = convert.json2value(content.decode('utf-8'))
+        content = convert.value2json(data)  #ENSURE content HAS NO crlf
 
         if data.test_run_id:
             Log.println("Add {{id}} for revision {{revision}} ({{bytes}} bytes)", {
@@ -190,7 +190,7 @@ def extract_from_datazilla_using_id(es, settings, transformer):
                         num += 1
 
                         with Profiler("decode and transform"):
-                            data = convert.JSON2object(col[-1])
+                            data = convert.json2value(col[-1])
                             if data.test_run_id:
                                 with Profiler("transform"):
                                     data = transformer.transform(id, data)
@@ -205,8 +205,8 @@ def extract_from_datazilla_using_id(es, settings, transformer):
                     except Exception, e:
                         Log.warning("Bad line id={{id}} ({{length}}bytes):\n\t{{prefix}}", {
                             "id": id,
-                            "length": len(convert.object2JSON(line)),
-                            "prefix": convert.object2JSON(line)[0:130]
+                            "length": len(convert.value2json(line)),
+                            "prefix": convert.value2json(line)[0:130]
                         }, e)
         missing_ids = missing_ids - existing_ids
 

@@ -22,7 +22,7 @@ class Pushlog(object):
 
 
     def __init__(self):
-        repos = convert.JSON2object(convert.utf82unicode(requests.get("https://treeherder.mozilla.org/api/repository/").content))
+        repos = convert.json2value(convert.utf82unicode(requests.get("https://treeherder.mozilla.org/api/repository/").content))
 
         self.branches = wrap({talos2treeherder(b.name): b for b in repos})
         if not self.branches.gum:
