@@ -14,6 +14,7 @@ import datetime
 from dz2es.pushlog import Pushlog
 import pyLibrary
 from pyLibrary.collections import MIN, MAX
+from pyLibrary.debugs.logs import Log
 from pyLibrary.debugs.profiles import Profiler
 from pyLibrary.maths import Math
 from pyLibrary.maths.stats import ZeroMoment2Stats, ZeroMoment
@@ -22,7 +23,6 @@ from pyLibrary.structs import literal_field
 from pyLibrary.structs.lists import StructList
 from pyLibrary import convert
 from pyLibrary.thread.threads import Lock
-from pyLibrary.env.logs import Log
 from pyLibrary.queries import Q
 
 
