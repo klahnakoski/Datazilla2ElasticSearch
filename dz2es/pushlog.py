@@ -10,10 +10,11 @@
 from __future__ import unicode_literals
 
 import requests
+
 from dz2es.mozilla_graph import MozillaGraph
 from dz2es.repos.revisions import Revision
 from pyLibrary import convert
-from pyLibrary.env.logs import Log
+from pyLibrary.debugs.logs import Log
 from pyLibrary.strings import deformat
 from pyLibrary.structs import Struct, wrap
 
