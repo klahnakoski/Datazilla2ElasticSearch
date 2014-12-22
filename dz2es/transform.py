@@ -203,20 +203,6 @@ class DZ_to_ES():
                 )
                 new_records.append(new_record)
 
-                # ADD RECORD FOR GRAPH SERVER SUMMARY
-                new_record = Struct(
-                    test_machine=r.test_machine,
-                    datazilla=r.datazilla,
-                    testrun=r.testrun,
-                    test_build=r.test_build,
-                    result={
-                        "test_name": "_"+r.testrun.suite+"_old_summary",
-                        "ordering": -1,
-                        "stats": Stats(samples=Q.sort(total.mean).leftBut(1))
-                    }
-                )
-                new_records.append(new_record)
-
             return new_records
         except Exception, e:
             Log.error("Transformation failure on id={{id}}", {"id": id}, e)
