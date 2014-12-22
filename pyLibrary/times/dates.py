@@ -17,6 +17,10 @@ from __future__ import division
 from datetime import datetime, date, timedelta
 import math
 from pyLibrary.vendor.dateutil.parser import parse as parse_date
+try:
+    import pytz
+except Exception, e:
+    pass
 from pyLibrary.strings import deformat
 
 
@@ -174,4 +178,4 @@ def unicode2datetime(value, format=None):
         Log.error("Can not interpret {{value}} as a datetime", {"value": value})
 
 
-from pyLibrary.env.logs import Log
+from pyLibrary.debugs.logs import Log

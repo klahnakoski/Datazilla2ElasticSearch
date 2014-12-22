@@ -16,7 +16,7 @@ from pyLibrary import regex
 from pyLibrary.vendor.dateutil.relativedelta import relativedelta
 from pyLibrary import convert
 from pyLibrary.collections import MIN
-from pyLibrary.env.logs import Log
+from pyLibrary.debugs.logs import Log
 from pyLibrary.maths import Math
 from pyLibrary.structs.wraps import wrap
 
@@ -55,7 +55,7 @@ class Duration(object):
         elif Math.is_nan(value):
             return None
         else:
-            Log.error("Do not know type of object (" + convert.object2JSON(value) + ")of to make a Duration")
+            Log.error("Do not know type of object (" + convert.value2json(value) + ")of to make a Duration")
 
 
     def __add__(self, other):

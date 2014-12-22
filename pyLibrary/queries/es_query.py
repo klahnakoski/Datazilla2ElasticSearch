@@ -19,7 +19,7 @@ from pyLibrary.queries.es_query_terms_stats import es_terms_stats, is_terms_stat
 from pyLibrary.queries.es_query_util import aggregates, loadColumns
 from pyLibrary.queries.dimensions import Dimension
 from pyLibrary.queries.query import Query, _normalize_where
-from pyLibrary.env.logs import Log
+from pyLibrary.debugs.logs import Log
 from pyLibrary.queries.MVEL import _MVEL
 from pyLibrary.structs.dicts import Struct
 from pyLibrary.structs import nvl, split_field
@@ -182,7 +182,7 @@ class ESQuery(object):
             for id in results.hits.hits._id:
                 command.append({"update": {"_id": id}})
                 command.append({"script": script})
-            content = ("\n".join(convert.object2JSON(c) for c in command)+"\n").encode('utf-8')
+            content = ("\n".join(convert.value2json(c) for c in command)+"\n").encode('utf-8')
             self.es.cluster._post(
                 self.es.path + "/_bulk",
                 data=content,
