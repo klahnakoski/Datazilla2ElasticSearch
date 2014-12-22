@@ -11,18 +11,25 @@ from __future__ import unicode_literals
 from __future__ import division
 
 from datetime import timedelta, datetime
+
 from pyLibrary import convert
 from pyLibrary.env.elasticsearch import Cluster
 from pyLibrary.structs.wraps import wrap
 from pyLibrary.thread.threads import Thread, Queue
-from pyLibrary.env.logs import BaseLog, Log
+from .logs import BaseLog, Log
 
 
 class Log_usingElasticSearch(BaseLog):
+
+
+
     def __init__(self, settings):
+        """
+        settings ARE FOR THE ELASTICSEARCH INDEX
+        """
         settings = wrap(settings)
 
-        self.es = Cluster(settings).get_or_create_index(settings, schema=convert.JSON2object(convert.object2JSON(SCHEMA), paths=True))
+        self.es = Cluster(settings).get_or_create_index(settings, schema=convert.json2value(convert.value2json(SCHEMA), paths=True), limit_replicas=True)
         self.queue = Queue()
         self.thread = Thread("log to " + settings.index, time_delta_pusher, es_sink=self.es, queue=self.queue, interval=timedelta(seconds=1))
         self.thread.start()

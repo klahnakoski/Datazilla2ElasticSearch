@@ -196,7 +196,7 @@ class DZ_to_ES():
                     testrun=r.testrun,
                     test_build=r.test_build,
                     result={
-                        "test_name": "SUMMARY",
+                        "test_name": "_"+r.testrun.suite+"_summary",
                         "ordering": -1,
                         "stats": geo_mean(total)
                     }
@@ -239,7 +239,7 @@ def stats(values):
         s[k] = v
     s.max = MAX(values)
     s.min = MIN(values)
-    s.median = pyLibrary.stats.median(values, simple=False)
+    s.median = pyLibrary.maths.stats.median(values, simple=False)
     s.last = values.last()
     s.first = values[0]
     if Math.is_number(s.variance) and not Math.is_nan(s.variance):
